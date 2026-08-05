@@ -930,15 +930,16 @@ function showApp() {
   const isDark = document.documentElement.classList.contains('dark');
   const tb = document.getElementById('btn-theme');
   if (tb) tb.textContent = isDark ? '☀' : '🌙';
-  // role-based nav
-  document.getElementById('nav-clients').style.display = 'flex'; // semua role bisa lihat
+  // nav-submit tampil untuk semua role
+  document.getElementById('nav-submit').style.display = 'flex';
+  document.getElementById('nav-clients').style.display = 'flex';
+
   if (role === 'marketing') {
-    document.getElementById('nav-submit').style.display = 'flex';
     document.getElementById('btn-new-request').style.display = 'flex';
   }
   if (role === 'cto') {
     document.getElementById('nav-validate').style.display = 'flex';
-    document.getElementById('nav-submit').style.display = 'flex'; // CTO bisa buat request juga
+    document.getElementById('btn-new-request').style.display = 'flex';
   }
   if (role === 'dev') {
     document.getElementById('nav-dev').style.display = 'flex';
@@ -1275,75 +1276,103 @@ function buildClientOptions(selectedId='') {
 }
 
 function renderSubmitForm() {
+  const clientOpts = buildClientOptions();
   return `
-    <div style="max-width:680px;">
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;box-shadow:var(--sh-card);margin-bottom:16px;">
-        <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:8px;">
-          <span style="background:var(--indigo-dim);color:var(--indigo);border-radius:8px;padding:4px 10px;font-size:12px;">1</span> Informasi Dasar
-        </div>
-        <div class="field">
-          <label>Judul Request <span style="color:var(--red)">*</span></label>
-          <input type="text" id="sf-title" placeholder="Contoh: Laporan Rekap Penjualan per Salesman per Bulan">
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-          <div class="field">
-            <label>Tipe Request <span style="color:var(--red)">*</span></label>
-            <select id="sf-type">
-              <option value="">-- Pilih Tipe --</option>
-              <option value="feature">Fitur Baru</option>
-              <option value="menu">Menu / Modul</option>
-              <option value="function">Fungsi / Logic</option>
-              <option value="report">Laporan</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Prioritas</label>
-            <select id="sf-priority">
-              <option value="low">Low</option>
-              <option value="medium" selected>Medium</option>
-              <option value="high">High</option>
-            </select>
+    <div style="max-width:700px;">
+
+      <!-- SECTION 1: INFO DASAR -->
+      <div style="background:var(--card);border:1.5px solid var(--border);border-radius:18px;overflow:hidden;box-shadow:var(--sh-card);margin-bottom:16px;">
+        <div style="background:linear-gradient(135deg,#025f87,#027fb3);padding:16px 24px;display:flex;align-items:center;gap:10px;">
+          <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;">1</div>
+          <div>
+            <div style="font-size:14px;font-weight:800;color:#fff;">Informasi Dasar</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.65);">Data umum request</div>
           </div>
         </div>
-        <div class="field">
-          <label>Klien <span style="color:var(--red)">*</span></label>
-          <select id="sf-client-id" onchange="onPageClientChange()">
-            ${buildClientOptions()}
-          </select>
-        </div>
-        <div class="field" id="sf-client-manual-wrap" style="display:none">
-          <label>Nama Klien (manual)</label>
-          <input type="text" id="sf-client-manual" placeholder="PT. Nama Perusahaan">
-        </div>
-        <div class="field">
-          <label>Deskripsi Kebutuhan <span style="color:var(--red)">*</span></label>
-          <textarea id="sf-desc" placeholder="Jelaskan secara detail apa yang dibutuhkan klien, konteks pemakaian, contoh kasus jika ada..." style="min-height:130px;"></textarea>
-        </div>
-        <div class="field">
-          <label>Catatan Tambahan</label>
-          <textarea id="sf-notes" placeholder="Referensi, link dokumen, screenshot URL, atau informasi tambahan lainnya" style="min-height:70px;"></textarea>
+        <div style="padding:24px;">
+          <div class="field">
+            <label>Judul Request <span style="color:var(--red)">*</span></label>
+            <input type="text" id="sf-title" placeholder="Contoh: Laporan Rekap Penjualan per Salesman per Bulan">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="field">
+              <label>Tipe Request <span style="color:var(--red)">*</span></label>
+              <select id="sf-type">
+                <option value="">-- Pilih Tipe --</option>
+                <option value="feature">⚡ Fitur Baru</option>
+                <option value="menu">☰ Menu / Modul</option>
+                <option value="function">⚙ Fungsi / Logic</option>
+                <option value="report">📊 Laporan</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Prioritas</label>
+              <select id="sf-priority">
+                <option value="low">🟢 Low</option>
+                <option value="medium" selected>🟡 Medium</option>
+                <option value="high">🔴 High</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Klien <span style="color:var(--red)">*</span></label>
+            <select id="sf-client-id" onchange="onPageClientChange()">${clientOpts}</select>
+          </div>
+          <div class="field" id="sf-client-manual-wrap" style="display:none">
+            <label>Nama Klien (manual)</label>
+            <input type="text" id="sf-client-manual" placeholder="PT. Nama Perusahaan">
+          </div>
+          <div class="field">
+            <label>Deskripsi Kebutuhan <span style="color:var(--red)">*</span></label>
+            <textarea id="sf-desc" placeholder="Jelaskan secara detail apa yang dibutuhkan klien — apa masalahnya, konteks pemakaian, contoh kasus jika ada..." style="min-height:130px;"></textarea>
+          </div>
+          <div class="field">
+            <label>Catatan Tambahan</label>
+            <textarea id="sf-notes" placeholder="Referensi, link dokumen, screenshot URL, atau informasi tambahan lainnya" style="min-height:70px;"></textarea>
+          </div>
         </div>
       </div>
 
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;box-shadow:var(--sh-card);margin-bottom:16px;">
-        <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span style="background:var(--indigo-dim);color:var(--indigo);border-radius:8px;padding:4px 10px;font-size:12px;">2</span> Spesifikasi Custom
+      <!-- SECTION 2: SPESIFIKASI CUSTOM -->
+      <div style="background:var(--card);border:1.5px solid rgba(124,58,237,0.3);border-radius:18px;overflow:hidden;box-shadow:var(--sh-card);margin-bottom:20px;">
+        <div style="background:linear-gradient(135deg,#5B21B6,#7C3AED);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;">2</div>
+            <div>
+              <div style="font-size:14px;font-weight:800;color:#fff;">Spesifikasi Custom</div>
+              <div style="font-size:11px;color:rgba(255,255,255,0.65);">Detail teknis untuk tim dev</div>
+            </div>
           </div>
-          <button type="button" onclick="addSpecRow('sf-specs')" style="font-size:12px;font-weight:700;color:var(--indigo);background:var(--indigo-dim);border:1.5px solid var(--indigo-dim2);border-radius:8px;padding:6px 14px;cursor:pointer;transition:all .15s;" onmouseover="this.style.background='var(--indigo-dim2)'" onmouseout="this.style.background='var(--indigo-dim)'">＋ Tambah Baris</button>
+          <button type="button" onclick="addSpecRow('sf-specs')"
+            style="display:flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(255,255,255,0.2);border:1.5px solid rgba(255,255,255,0.3);border-radius:9px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;"
+            onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+            ＋ Tambah Baris
+          </button>
         </div>
-        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">
-          Tambahkan detail teknis, parameter, atau kebutuhan spesifik yang perlu diketahui tim desain dan developer.
-          Contoh: <em>Sumber Data → Tabel transaksi penjualan</em>, <em>Filter → Per cabang dan per periode</em>
-        </div>
-        <div id="sf-specs"></div>
-        <div id="sf-specs-empty" style="text-align:center;padding:24px;color:var(--text-dim);font-size:13px;border:1.5px dashed var(--border-md);border-radius:10px;">
-          Belum ada spesifikasi. Klik <strong>＋ Tambah Baris</strong> untuk mulai.
+        <div style="padding:20px 24px;">
+          <div style="background:rgba(124,58,237,0.07);border:1px solid rgba(124,58,237,0.15);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--text-muted);line-height:1.7;">
+            💡 Gunakan spesifikasi custom untuk mencatat detail teknis yang perlu diketahui tim dev.<br>
+            <strong>Contoh:</strong> <em>Sumber Data</em> → Tabel transaksi · <em>Filter</em> → Per cabang & periode · <em>Output</em> → PDF + Excel · <em>Akses</em> → Role manager ke atas
+          </div>
+
+          <!-- HEADER TABEL -->
+          <div style="display:grid;grid-template-columns:1fr 1.5fr 36px;gap:8px;margin-bottom:6px;padding:0 2px;">
+            <div style="font-size:11px;font-weight:800;color:var(--violet);text-transform:uppercase;letter-spacing:.06em;">Nama Field</div>
+            <div style="font-size:11px;font-weight:800;color:var(--violet);text-transform:uppercase;letter-spacing:.06em;">Keterangan / Nilai</div>
+            <div></div>
+          </div>
+
+          <div id="sf-specs"></div>
+          <div id="sf-specs-empty" style="text-align:center;padding:32px;border:2px dashed rgba(124,58,237,0.2);border-radius:12px;color:var(--text-dim);">
+            <div style="font-size:32px;margin-bottom:8px;opacity:.4;">📋</div>
+            <div style="font-size:13px;font-weight:600;margin-bottom:4px;">Belum ada spesifikasi</div>
+            <div style="font-size:12px;">Klik <strong style="color:var(--violet)">＋ Tambah Baris</strong> untuk menambahkan detail teknis</div>
+          </div>
         </div>
       </div>
 
-      <button class="btn-submit" style="width:100%;padding:14px;font-size:15px;" onclick="submitRequestFromForm()">
-        Kirim Request
+      <button class="btn-submit" style="width:100%;padding:15px;font-size:15px;font-weight:800;letter-spacing:.02em;" onclick="submitRequestFromForm()">
+        🚀 Kirim Request
       </button>
     </div>
   `;
@@ -1357,11 +1386,12 @@ window.addSpecRow = function(containerId, key='', val='') {
   const idx = Date.now();
   const row = document.createElement('div');
   row.id = `spec-row-${idx}`;
-  row.style.cssText = 'display:grid;grid-template-columns:1fr 1.5fr auto;gap:8px;margin-bottom:8px;align-items:start;';
+  row.style.cssText = 'display:grid;grid-template-columns:1fr 1.5fr 36px;gap:8px;margin-bottom:8px;align-items:center;';
+  const accentColor = containerId === 'sf-specs' ? '#7C3AED' : 'var(--indigo)';
   row.innerHTML = `
-    <input type="text" value="${key}" placeholder="Nama field (cth: Filter)" style="padding:9px 12px;background:var(--inset);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;outline:none;" onfocus="this.style.borderColor='var(--indigo)'" onblur="this.style.borderColor='var(--border)'" class="spec-key">
-    <input type="text" value="${val}" placeholder="Nilai / keterangan" style="padding:9px 12px;background:var(--inset);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;outline:none;" onfocus="this.style.borderColor='var(--indigo)'" onblur="this.style.borderColor='var(--border)'" class="spec-val">
-    <button onclick="document.getElementById('spec-row-${idx}').remove();checkSpecEmpty('${containerId}')" style="padding:9px 10px;background:var(--red-dim);border:1.5px solid rgba(239,68,68,0.2);border-radius:var(--radius);color:var(--red);cursor:pointer;font-size:13px;font-weight:700;">✕</button>
+    <input type="text" value="${key}" placeholder="Nama field" style="padding:9px 12px;background:var(--inset);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s;" onfocus="this.style.borderColor='${accentColor}';this.style.boxShadow='0 0 0 3px rgba(124,58,237,0.12)'" onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'" class="spec-key">
+    <input type="text" value="${val}" placeholder="Nilai / keterangan" style="padding:9px 12px;background:var(--inset);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s;" onfocus="this.style.borderColor='${accentColor}';this.style.boxShadow='0 0 0 3px rgba(124,58,237,0.12)'" onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'" class="spec-val">
+    <button onclick="document.getElementById('spec-row-${idx}').remove();checkSpecEmpty('${containerId}')" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:var(--red-dim);border:1.5px solid rgba(220,38,38,0.2);border-radius:var(--radius);color:var(--red);cursor:pointer;font-size:14px;font-weight:700;flex-shrink:0;" title="Hapus baris">✕</button>
   `;
   container.appendChild(row);
 };
