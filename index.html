@@ -1361,6 +1361,7 @@ function renderClientGroupCard(group) {
           <thead>
             <tr style="border-bottom:1.5px solid var(--border);">
               <th style="text-align:left;padding:10px 8px 8px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;">Nama Item</th>
+              <th style="text-align:left;padding:10px 8px 8px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;width:90px;">Tipe</th>
               <th style="text-align:left;padding:10px 8px 8px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;width:130px;">Status</th>
               <th style="text-align:left;padding:10px 8px 8px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;width:100px;">Deadline</th>
               <th style="width:64px;"></th>
@@ -1369,31 +1370,26 @@ function renderClientGroupCard(group) {
           <tbody>
             ${group.items.flatMap(r => {
               const safeTitle = (r.title||'').replace(/'/g,"\'");
-              const statusColor = r.status==='done'?'#10B981':r.status==='rejected'?'#EF4444':r.status==='pending'?'#F59E0B':r.status==='validated'?'#6366F1':'#027fb3';
               return (r.items||[]).map((item, itemIdx) => {
                 const cd = calcCountdown(item.dateDeadline||r.dateDeadline);
                 const cdColor = cd===null?'var(--text-dim)':cd<0?'var(--red)':cd<=3?'var(--amber)':'var(--green)';
                 const cdText  = cd===null?'\u2014':cd<0?`\u26a0 ${Math.abs(cd)}h`:cd===0?'\uD83D\uDD34 Hari ini':`${cd}h lagi`;
-                const tl      = item.type ? (TYPE_LABELS[item.type]||item.type) : '';
+                const tl = item.type ? (TYPE_LABELS[item.type]||item.type) : '';
                 const isFirst = itemIdx === 0;
-                const rowId   = `item-detail-${r.id}-${itemIdx}`;
-                const specHtml = item.specs&&item.specs.length
-                  ? item.specs.map(s=>`<span style="font-size:11px;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:2px 8px;color:var(--text-muted);"><strong style="color:var(--text);">${s.key}:</strong> ${s.value}</span>`).join('')
-                  : '';
                 return `
-                <tr data-item-row="${rowId}" style="border-bottom:1px solid var(--border);" onmouseover="this.style.background='var(--inset)'" onmouseout="this.style.background=''">
-                  <td style="padding:9px 8px;cursor:pointer;" onclick="toggleItemDetail('${rowId}')">
+                <tr style="border-bottom:1px solid var(--border);" onmouseover="this.style.background='var(--inset)'" onmouseout="this.style.background=''">
+                  <td style="padding:9px 8px;">
                     <div style="display:flex;align-items:flex-start;gap:8px;">
-                      <div style="width:3px;min-height:36px;background:${statusColor};border-radius:2px;flex-shrink:0;margin-top:2px;"></div>
-                      <div style="min-width:0;flex:1;">
-                        <div style="display:flex;align-items:center;gap:6px;">
-                          <span style="font-size:13px;font-weight:700;color:var(--text);line-height:1.4;">${item.name||'\u2014'}</span>
-                          ${item.type ? `<span class="badge badge-type-${item.type}" style="font-size:10px;">${tl}</span>` : ''}
-                          <span id="chev-${rowId}" style="font-size:9px;color:var(--text-dim);transition:transform .2s;margin-left:auto;flex-shrink:0;">\u25b6</span>
-                        </div>
-                        ${isFirst ? `<div style="font-size:10px;color:var(--text-dim);font-family:monospace;margin-top:2px;">#${r.id.slice(-8).toUpperCase()}</div>` : ''}
+                      ${isFirst ? `<div style="width:3px;min-height:36px;background:var(--indigo);border-radius:2px;flex-shrink:0;margin-top:2px;"></div>` : `<div style="width:3px;min-height:36px;flex-shrink:0;"></div>`}
+                      <div style="min-width:0;">
+                        <div style="font-size:13px;font-weight:700;color:var(--text);line-height:1.4;">${item.name||'—'}</div>
+                        ${isFirst ? `<div style="font-size:10px;color:var(--text-dim);font-family:monospace;margin-top:1px;">#${r.id.slice(-8).toUpperCase()}</div>` : ''}
+                        ${item.desc ? `<div style="font-size:11px;color:var(--text-muted);margin-top:2px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;">${item.desc}</div>` : ''}
                       </div>
                     </div>
+                  </td>
+                  <td style="padding:9px 8px;">
+                    ${item.type ? `<span class="badge badge-type-${item.type}" style="font-size:10px;">${tl}</span>` : '<span style="color:var(--text-dim);font-size:11px;">—</span>'}
                   </td>
                   <td style="padding:9px 8px;">
                     ${isFirst ? `<span class="badge badge-status-${r.status}" style="font-size:11px;">${STATUS_LABELS[r.status]||r.status}</span>` : ''}
@@ -1409,20 +1405,6 @@ function renderClientGroupCard(group) {
                       <button onclick="event.stopPropagation();deleteRequest('${r.id}','${safeTitle}')" title="Hapus"
                         style="width:26px;height:26px;border-radius:6px;border:1.5px solid rgba(220,38,38,0.2);background:var(--red-dim);color:var(--red);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;">\uD83D\uDDD1</button>
                     </div>` : ''}
-                  </td>
-                </tr>
-                <tr id="${rowId}" style="display:none;background:var(--inset);">
-                  <td colspan="4" style="padding:0 8px 12px 28px;">
-                    <div style="border-left:2px solid ${statusColor};padding-left:14px;margin-top:4px;">
-                      ${item.desc ? `<div style="font-size:13px;color:var(--text);line-height:1.65;margin-bottom:${specHtml?'10px':'0'};">${item.desc}</div>` : ''}
-                      ${specHtml ? `<div style="display:flex;flex-wrap:wrap;gap:5px;">${specHtml}</div>` : ''}
-                      ${item.dateDeadline||item.duration ? `
-                        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;">
-                          ${item.dateDeadline ? `<span style="font-size:11px;background:var(--amber-dim);color:var(--amber);border-radius:6px;padding:3px 9px;font-weight:700;">\uD83D\uDCC5 Deadline: ${item.dateDeadline}</span>` : ''}
-                          ${item.duration     ? `<span style="font-size:11px;background:var(--inset);border:1px solid var(--border);border-radius:6px;padding:3px 9px;color:var(--text-muted);">\u23F1 ${item.duration}</span>` : ''}
-                        </div>` : ''}
-                      ${!item.desc&&!specHtml&&!item.dateDeadline&&!item.duration ? `<span style="font-size:12px;color:var(--text-dim);font-style:italic;">Tidak ada detail tambahan</span>` : ''}
-                    </div>
                   </td>
                 </tr>`;
               });
@@ -1617,16 +1599,6 @@ window.openRequestFormForClient = function(clientId) {
   }
 };
 
-
-
-window.toggleItemDetail = function(rowId) {
-  const detail = document.getElementById(rowId);
-  const chev   = document.getElementById('chev-' + rowId);
-  if (!detail) return;
-  const open = detail.style.display === 'none' || detail.style.display === '';
-  detail.style.display = open ? 'table-row' : 'none';
-  if (chev) chev.style.transform = open ? 'rotate(90deg)' : 'rotate(0deg)';
-};
 
 window.navToClient = function(clientId) {
   if (clientId) navigate('client-detail', clientId);
@@ -2628,68 +2600,63 @@ window.onReqClientChange = function() {
 };
 
 window.saveRequest = async function() {
-  const priority    = document.getElementById('req-priority').value;
-  const notes       = document.getElementById('req-notes')?.value.trim() || '';
-  const items       = collectItems();
-  const dateRequest = document.getElementById('req-date-request').value || '';
-  const dateDeadline= document.getElementById('req-date-deadline').value || '';
-  const dateStart   = document.getElementById('req-date-start')?.value || '';
-  const dateEnd     = document.getElementById('req-date-end')?.value || '';
-  const duration    = document.getElementById('req-duration').value.trim();
-  const selVal      = document.getElementById('req-client-id').value;
+  const items  = collectItems();
+  const editId = document.getElementById('req-edit-id').value;
 
-  let clientId = '', client = '';
-  if (selVal === '__manual__') {
-    client = document.getElementById('req-client-manual').value.trim();
-  } else if (selVal) {
-    clientId = selVal;
-    client   = allClients.find(c=>c.id===selVal)?.name || '';
-  }
+  // clientId dari hidden field (diset saat badge/dropdown)
+  let clientId = document.getElementById('req-client-id')?.value || '';
+  // fallback dari dropdown selector
+  const dd = document.getElementById('req-client-select-dropdown');
+  if (!clientId && dd?.value) clientId = dd.value;
 
-  if (!client) {
-    showToast('Pilih klien terlebih dahulu','error');
+  const client = allClients.find(x => x.id === clientId)?.name || '';
+
+  if (!clientId || !client) {
+    showToast('Pilih klien terlebih dahulu', 'error');
     return;
   }
   if (items.length === 0) {
-    showToast('Tambahkan minimal 1 item custom','error');
+    showToast('Tambahkan minimal 1 item', 'error');
+    return;
+  }
+  const unnamed = items.findIndex(it => !it.name);
+  if (unnamed >= 0) {
+    showToast('Item #' + (unnamed+1) + ' belum ada nama/judulnya', 'error');
     return;
   }
 
-  // Judul: ambil dari nama/judul item request (bukan lagi "Custom Request {klien} — tanggal")
-  const itemNames = items.map(it => (it.name||'').trim()).filter(Boolean);
-  let title;
-  if (itemNames.length === 0) {
-    // fallback jika item tidak punya nama sama sekali
-    const dateLabel = dateRequest
-      ? new Date(dateRequest).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})
-      : new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'});
-    title = `Custom Request ${client} \u2014 ${dateLabel}`;
-  } else if (itemNames.length === 1) {
-    title = itemNames[0];
-  } else {
-    title = `${itemNames[0]} (+${itemNames.length - 1} item lainnya)`;
-  }
-  const type      = items[0]?.type || 'other';
-  const timeline  = { dateRequest, dateDeadline, dateStart, dateEnd, duration };
-  const editId    = document.getElementById('req-edit-id').value;
+  const priority    = document.getElementById('req-priority')?.value || 'medium';
+  const notes       = document.getElementById('req-notes')?.value.trim() || '';
+  const dateRequest = new Date().toISOString().split('T')[0];
+
+  // Deadline dokumen = deadline paling awal dari semua item
+  const deadlines  = items.map(it => it.dateDeadline).filter(Boolean).sort();
+  const dateDeadline = deadlines[0] || '';
+
+  // Judul auto
+  const title = items.length === 1
+    ? items[0].name
+    : items[0].name + ' (+' + (items.length - 1) + ' item lainnya)';
+
+  const payload = {
+    title, priority, clientId, client, notes, items,
+    dateRequest, dateDeadline,
+    updatedAt: serverTimestamp()
+  };
 
   if (editId) {
-    await updateDoc(doc(db,'requests',editId), {
-      title, type, priority, clientId, client, notes, items,
-      ...timeline, updatedAt: serverTimestamp()
-    });
-    showToast('✓ Request berhasil diperbarui','success');
+    await updateDoc(doc(db, 'requests', editId), payload);
+    showToast('\u2713 Request berhasil diperbarui', 'success');
   } else {
-    await addDoc(collection(db,'requests'), {
-      title, type, priority, clientId, client, notes, items, ...timeline,
-      status:'pending',
+    await addDoc(collection(db, 'requests'), {
+      ...payload,
+      status: 'pending',
       submittedBy: currentUser.uid,
       submittedByName: currentUserData?.name || currentUser.email,
       createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-      comments:[]
+      comments: []
     });
-    showToast('✓ Request berhasil dikirim!','success');
+    showToast('\u2713 Request berhasil dikirim!', 'success');
   }
   closeModal('modal-request-form');
 };
