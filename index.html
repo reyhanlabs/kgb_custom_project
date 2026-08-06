@@ -1417,30 +1417,7 @@ function renderClientDetailRow(r) {
           <div style="background:var(--indigo-dim);padding:9px 14px 9px;border-radius:10px 10px 0 0;font-size:11px;font-weight:800;color:var(--indigo);">
             📦 ${(r.items||[]).length} Item Custom
           </div>
-          ${(r.items||[]).map((item,i)=>`
-            <div style="${i>0?'border-top:1px solid var(--border);':''}">
-              <!-- ITEM HEADER — klik untuk expand -->
-              <div class='acc-hdr' onclick='accToggle(this)'>
-                <span style="font-size:11px;font-weight:800;color:var(--indigo);min-width:20px;">${i+1}.</span>
-                <span style="font-size:13px;font-weight:700;color:var(--text);flex:1;">${item.name||'—'}</span>
-                ${item.type?`<span class="badge badge-type-${item.type}" style="font-size:10px;">${TYPE_LABELS[item.type]||item.type}</span>`:''}
-                ${item.specs&&item.specs.length>0?`<span style="font-size:10px;color:var(--text-dim);font-weight:600;">${item.specs.length} spec</span>`:''}
-                <span class="acc-icon" style="font-size:12px;color:var(--text-dim);transition:transform .2s;display:inline-block;flex-shrink:0;">▸</span>
-              </div>
-              <!-- ITEM DETAIL — hidden by default -->
-              <div id="item-${r.id}-${i}" style="display:none;padding:12px 14px 14px 44px;background:var(--inset);border-top:1px solid var(--border);">
-                ${item.desc?`<div style="font-size:13px;color:var(--text);line-height:1.7;margin-bottom:${item.specs?.length?'10px':'0'};">${item.desc}</div>`:''}
-                ${item.specs&&item.specs.length>0?`
-                  <div style="display:flex;flex-wrap:wrap;gap:5px;">
-                    ${item.specs.map(s=>`
-                      <span style="font-size:11px;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:3px 9px;color:var(--text-muted);">
-                        <strong style="color:var(--text);">${s.key}:</strong> ${s.value}
-                      </span>`).join('')}
-                  </div>`:(!item.desc?`<span style="font-size:12px;color:var(--text-dim);font-style:italic;">Tidak ada detail tambahan</span>`:'')}
-              </div>
-            </div>
-          `).join('')}
-        </div>`:
+          ${(r.items||[]).map(renderAccItem).join('')}       </div>`:
         r.description?`
         <div style="background:var(--inset);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px;">
           <div style="font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Deskripsi</div>
@@ -2222,6 +2199,33 @@ document.addEventListener('click', () => {
   document.querySelectorAll('.status-popup').forEach(el => el.style.display = 'none');
 });
 
+
+function renderAccItem(item, i) {
+  var border = i > 0 ? 'border-top:1px solid var(--border);' : '';
+  var tl = item.type ? (TYPE_LABELS[item.type] || item.type) : '';
+  var tb = item.type ? '<span class="badge badge-type-' + item.type + '" style="font-size:10px;">' + tl + '</span>' : '';
+  var sb = (item.specs && item.specs.length > 0) ? '<span style="font-size:10px;color:var(--text-dim);font-weight:600;">' + item.specs.length + ' spec</span>' : '';
+  var dd = item.desc ? '<div style="font-size:13px;color:var(--text);line-height:1.7;margin-bottom:' + (item.specs && item.specs.length ? '10' : '0') + 'px;">' + item.desc + '</div>' : '';
+  var sd = '';
+  if (item.specs && item.specs.length > 0) {
+    var pills = item.specs.map(function(s) {
+      return '<span style="font-size:11px;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:3px 9px;color:var(--text-muted);"><strong style="color:var(--text);">' + s.key + ':</strong> ' + s.value + '</span>';
+    }).join('');
+    sd = '<div style="display:flex;flex-wrap:wrap;gap:5px;">' + pills + '</div>';
+  }
+  var empty = (!dd && !sd) ? '<span style="font-size:12px;color:var(--text-dim);font-style:italic;">Tidak ada detail</span>' : '';
+  return '<div style="' + border + '">' +
+    '<div class="acc-hdr" onclick="accToggle(this)">' +
+      '<span style="font-size:11px;font-weight:800;color:var(--indigo);min-width:20px;flex-shrink:0;">' + (i + 1) + '.</span>' +
+      '<span style="font-size:13px;font-weight:700;color:var(--text);flex:1;">' + (item.name || '—') + '</span>' +
+      tb + sb +
+      '<span class="acc-icon" style="font-size:12px;color:var(--text-dim);transition:transform .2s;flex-shrink:0;">▶</span>' +
+    '</div>' +
+    '<div style="display:none;padding:12px 14px 14px 36px;background:var(--inset);border-top:1px solid var(--border);">' +
+      dd + sd + empty +
+    '</div>' +
+  '</div>';
+}
 window.accToggle = function(hdr) {
   var det = hdr.nextElementSibling;
   var ico = hdr.querySelector('.acc-icon');
