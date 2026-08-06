@@ -618,38 +618,68 @@
         <div class="auth-brand-name">Konsultama Global Bisnis</div>
         <div class="auth-brand-sub">Custom Request System</div>
       </div>
-      <div class="tagline">Kelola permintaan fitur dan laporan dari klien — dari pengajuan hingga selesai dikerjakan.</div>
+      <div class="tagline">Manage feature and report requests from clients — from submission to completion.</div>
     </div>
     <div class="auth-panel-right">
-      <div class="auth-section-title">Masuk ke akun</div>
-      <div class="auth-section-sub">Gunakan email dan password yang terdaftar</div>
+      <div class="auth-section-title">Sign In</div>
+      <div class="auth-section-sub">Use your registered email and password</div>
       <div class="field">
         <label>Email</label>
-        <input type="email" id="login-email" placeholder="nama@konsultama.co.id">
+        <input type="email" id="login-email" placeholder="name@konsultama.co.id">
       </div>
       <div class="field">
         <label>Password</label>
         <input type="password" id="login-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
       </div>
-      <button class="btn-primary" onclick="doLogin()">Masuk</button>
+      <button class="btn-primary" onclick="doLogin()">Sign In</button>
       <div id="login-error" class="error-msg"></div>
       <hr class="auth-divider">
-      <div class="auth-register-label">Daftar akun baru</div>
-      <div class="field"><label>Nama Lengkap</label><input type="text" id="reg-name" placeholder="Nama Anda"></div>
-      <div class="field-row">
-        <div class="field"><label>Email</label><input type="email" id="reg-email" placeholder="nama@email.com"></div>
-        <div class="field"><label>Password</label><input type="password" id="reg-password" placeholder="min. 6 karakter"></div>
+      <div style="text-align:center;">
+        <button onclick="openModal('modal-register')"
+          style="background:none;border:none;color:var(--indigo);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:underline;text-underline-offset:3px;">
+          Create new account
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: REGISTER -->
+<div class="modal-overlay" id="modal-register">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-header">
+      <div class="modal-header-inner">
+        <div class="modal-title">Create Account</div>
+        <div class="modal-title-sub">Fill in your details to get started</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('modal-register')">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Full Name <span style="color:var(--red)">*</span></label>
+        <input type="text" id="reg-name" placeholder="Your full name">
       </div>
       <div class="field">
-        <label>Role</label>
+        <label>Email <span style="color:var(--red)">*</span></label>
+        <input type="email" id="reg-email" placeholder="name@email.com">
+      </div>
+      <div class="field">
+        <label>Password <span style="color:var(--red)">*</span></label>
+        <input type="password" id="reg-password" placeholder="min. 6 characters">
+      </div>
+      <div class="field">
+        <label>Role <span style="color:var(--red)">*</span></label>
         <select id="reg-role">
           <option value="marketing">Marketing / Trainer</option>
           <option value="cto">CTO — Validator</option>
-          <option value="dev">Developer (Design dan Dev)</option>
+          <option value="dev">Developer (Design & Dev)</option>
         </select>
       </div>
-      <button class="btn-register" onclick="doRegister()">Buat akun</button>
       <div id="reg-error" class="error-msg"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-register')">Cancel</button>
+      <button class="btn-submit" onclick="doRegister()">Create Account</button>
     </div>
   </div>
 </div>
@@ -682,7 +712,7 @@
         </div>
         <div id="nav-validate" class="nav-item" data-page="validate" onclick="navigate('validate')" style="display:none">
           <div class="nav-icon-pill"><span>✓</span></div>
-          <span class="nav-text">Perlu Approval</span>
+          <span class="nav-text">Needs Approval</span>
           <span class="nav-badge" id="badge-validate" style="display:none">0</span>
         </div>
         <div id="nav-dev" class="nav-item" data-page="devboard" onclick="navigate('devboard')" style="display:none">
@@ -691,8 +721,12 @@
         </div>
         <div class="nav-label" id="nav-label-master">Master Data</div>
         <div id="nav-clients" class="nav-item" data-page="clients" onclick="navigate('clients')" style="display:none">
-          <div class="nav-icon-pill"><span>🏢</span></div>
-          <span class="nav-text">Data Klien</span>
+          <div class="nav-icon-pill"><span>&#x1F3E2;</span></div>
+          <span class="nav-text">Clients</span>
+        </div>
+        <div id="nav-gantt" class="nav-item" data-page="gantt" onclick="navigate('gantt')" style="display:none">
+          <div class="nav-icon-pill"><span>&#x1F4C5;</span></div>
+          <span class="nav-text">Gantt Chart</span>
         </div>
       </div>
       <div class="sidebar-user">
@@ -702,7 +736,7 @@
             <div class="uname" id="user-name">—</div>
             <div class="urole" id="user-role">—</div>
           </div>
-          <button class="btn-logout" onclick="doLogout()" title="Keluar">⏻</button>
+          <button class="btn-logout" onclick="doLogout()" title="Sign Out">⏻</button>
         </div>
       </div>
     </aside>
@@ -713,7 +747,7 @@
           <button class="hamburger-btn" onclick="openSidebar()" title="Menu">☰</button>
           <div>
             <div class="page-title" id="page-title">Dashboard</div>
-            <div class="page-sub" id="page-sub">Selamat datang di Custom Request System</div>
+            <div class="page-sub" id="page-sub">Welcome to the Custom Request System</div>
           </div>
         </div>
         <div class="topbar-actions">
@@ -724,7 +758,7 @@
         </div>
       </div>
       <div class="content" id="page-content">
-        <div class="loading"><div class="spinner"></div><div style="margin-top:12px;font-size:13px;color:var(--text-dim);">Memuat data...</div></div>
+        <div class="loading"><div class="spinner"></div><div style="margin-top:12px;font-size:13px;color:var(--text-dim);">Loading data...</div></div>
       </div>
     </main>
   </div>
@@ -751,22 +785,22 @@
   <div class="modal" style="max-width:560px;">
     <div class="modal-header">
       <div class="modal-header-inner">
-        <div class="modal-title" id="client-form-title">Tambah Klien Baru</div>
-        <div class="modal-title-sub">Data perusahaan klien</div>
+        <div class="modal-title" id="client-form-title">Add New Client</div>
+        <div class="modal-title-sub">Client company data</div>
       </div>
       <button class="modal-close" onclick="closeModal('modal-client-form')">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="client-edit-id">
       <div class="field">
-        <label>Nama Perusahaan <span style="color:var(--red)">*</span></label>
-        <input type="text" id="cl-name" placeholder="PT. Nama Perusahaan">
+        <label>Company Name <span style="color:var(--red)">*</span></label>
+        <input type="text" id="cl-name" placeholder="PT. Company Name">
       </div>
       <div class="field-row">
         <div class="field">
-          <label>Industri</label>
+          <label>Industry</label>
           <select id="cl-industry">
-            <option value="">-- Pilih --</option>
+            <option value="">-- Select --</option>
             <option>Manufaktur</option>
             <option>Perdagangan</option>
             <option>Jasa / Konsultan</option>
@@ -780,9 +814,9 @@
           </select>
         </div>
         <div class="field">
-          <label>Ukuran Perusahaan</label>
+          <label>Company Size</label>
           <select id="cl-size">
-            <option value="">-- Pilih --</option>
+            <option value="">-- Select --</option>
             <option>Mikro (1–9 karyawan)</option>
             <option>Kecil (10–49)</option>
             <option>Menengah (50–249)</option>
@@ -793,16 +827,16 @@
       <div class="field-row">
         <div class="field">
           <label>PIC / Narahubung</label>
-          <input type="text" id="cl-pic" placeholder="Nama PIC klien">
+          <input type="text" id="cl-pic" placeholder="PIC Name klien">
         </div>
         <div class="field">
-          <label>Jabatan PIC</label>
+          <label>PIC Title / Role</label>
           <input type="text" id="cl-pic-role" placeholder="Manajer IT, Direktur, dll.">
         </div>
       </div>
       <div class="field-row">
         <div class="field">
-          <label>Telepon / WA</label>
+          <label>Phone / WA</label>
           <input type="text" id="cl-phone" placeholder="08xx-xxxx-xxxx">
         </div>
         <div class="field">
@@ -811,21 +845,21 @@
         </div>
       </div>
       <div class="field">
-        <label>Alamat</label>
-        <textarea id="cl-address" placeholder="Alamat lengkap kantor klien" style="min-height:64px;"></textarea>
+        <label>Address</label>
+        <textarea id="cl-address" placeholder="Address lengkap kantor klien" style="min-height:64px;"></textarea>
       </div>
       <div class="field">
-        <label>Produk / Software yang Digunakan</label>
+        <label>Products / Software Used</label>
         <input type="text" id="cl-products" placeholder="Zahir ERP, Zahir POS, dll. (pisahkan koma)">
       </div>
       <div class="field">
-        <label>Catatan</label>
-        <textarea id="cl-notes" placeholder="Info tambahan tentang klien ini" style="min-height:60px;"></textarea>
+        <label>Notes</label>
+        <textarea id="cl-notes" placeholder="Info addan tentang klien ini" style="min-height:60px;"></textarea>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeModal('modal-client-form')">Batal</button>
-      <button class="btn-submit" onclick="saveClient()">Simpan Klien</button>
+      <button class="btn-secondary" onclick="closeModal('modal-client-form')">Cancel</button>
+      <button class="btn-submit" onclick="saveClient()">Save Client</button>
     </div>
   </div>
 </div>
@@ -835,8 +869,8 @@
   <div class="modal" style="max-width:680px;">
     <div class="modal-header">
       <div class="modal-header-inner">
-        <div class="modal-title" id="req-form-title">Request Custom Baru</div>
-        <div class="modal-title-sub" id="req-form-sub">Tambahkan item-item yang dibutuhkan</div>
+        <div class="modal-title" id="req-form-title">New Custom Request</div>
+        <div class="modal-title-sub" id="req-form-sub">Add the required items</div>
       </div>
       <button class="modal-close" onclick="closeModal('modal-request-form')">&#x2715;</button>
     </div>
@@ -851,17 +885,17 @@
       <div id="req-client-badge" style="display:none;margin-bottom:14px;padding:10px 14px;background:var(--indigo-dim);border:1.5px solid var(--indigo-dim2);border-radius:10px;align-items:center;gap:10px;">
         <span style="font-size:18px;">&#x1F3E2;</span>
         <div>
-          <div style="font-size:11px;color:var(--indigo);font-weight:700;text-transform:uppercase;letter-spacing:.05em;">Klien</div>
+          <div style="font-size:11px;color:var(--indigo);font-weight:700;text-transform:uppercase;letter-spacing:.05em;">Client</div>
           <div style="font-size:14px;font-weight:800;color:var(--text);" id="req-client-badge-name">&#x2014;</div>
         </div>
       </div>
       <!-- Selector: pilih klien (dari tombol + Request Baru topbar) -->
       <div id="req-client-selector" style="display:none;margin-bottom:14px;">
         <div class="field" style="margin:0;">
-          <label>Klien <span style="color:var(--red)">*</span></label>
+          <label>Client <span style="color:var(--red)">*</span></label>
           <select id="req-client-select-dropdown" onchange="document.getElementById('req-client-id').value=this.value"
             style="font-size:14px;font-weight:600;">
-            <option value="">-- Pilih Klien --</option>
+            <option value="">-- Select Client --</option>
           </select>
         </div>
       </div>
@@ -875,24 +909,24 @@
       <div id="req-items-empty" style="display:none;"></div>
       <button type="button" onclick="addItemRow()"
         style="width:100%;margin-top:8px;padding:11px;border:2px dashed var(--border-md);border-radius:10px;background:transparent;color:var(--text-muted);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">
-        &#xFF0B; Tambah Item
+        &#xFF0B; Add Item
       </button>
 
       <!-- CATATAN OPSIONAL -->
       <div style="margin-top:14px;">
         <button type="button" onclick="toggleNotes(this)"
           style="background:none;border:none;color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;padding:0;display:flex;align-items:center;gap:6px;font-family:inherit;">
-          <span id="notes-toggle-icon">&#x25B8;</span> Tambah catatan (opsional)
+          <span id="notes-toggle-icon">&#x25B8;</span> Add note (optional)
         </button>
         <div id="req-notes-wrap" style="display:none;margin-top:8px;">
-          <textarea id="req-notes" placeholder="Konteks pertemuan, referensi, link dokumen, dll."
+          <textarea id="req-notes" placeholder="Meeting context, references, document links, etc."
             style="width:100%;min-height:70px;padding:10px 12px;background:var(--inset);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;outline:none;resize:vertical;"></textarea>
         </div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeModal('modal-request-form')">Batal</button>
-      <button class="btn-submit" onclick="saveRequest()">&#x1F4BE; Simpan Request</button>
+      <button class="btn-secondary" onclick="closeModal('modal-request-form')">Cancel</button>
+      <button class="btn-submit" onclick="saveRequest()">&#x1F4BE; Save Request</button>
     </div>
   </div>
 </div>
@@ -902,7 +936,7 @@
   <div class="modal" style="max-width:560px;">
     <div class="modal-header">
       <div class="modal-header-inner">
-        <div class="modal-title" id="modal-desc-title">Deskripsi Lengkap</div>
+        <div class="modal-title" id="modal-desc-title">Description Lengkap</div>
         <div class="modal-title-sub">Detail kebutuhan klien</div>
       </div>
       <button class="modal-close" onclick="closeModal('modal-desc')">✕</button>
@@ -960,8 +994,8 @@ let allRequests = [];
 let allClients = [];
 let unsubRequests = null;
 let unsubClients = null;
-let expandedGroups = new Set(); // menyimpan id grup klien yang sedang terbuka (accordion)
-let expandedRequests = new Set(); // menyimpan id request yang detailnya sedang terbuka (dropdown inline)
+let expandedGroups = new Set(); // menyimpan id grup clients yang sedang terbuka (accordion)
+let expandedRequests = new Set(); // menyimpan id requests yang detailnya sedang terbuka (dropdown inline)
 function safeGroupId(s){ return String(s||'').replace(/[^a-zA-Z0-9_-]/g,'_'); }
 function clientColorFor(name) {
   const palette = ['#027fb3','#8B5CF6','#10B981','#F59E0B','#EF4444','#EC4899','#0891B2','#6366F1','#059669','#D97706','#DC2626','#DB2777','#7C3AED','#0EA5E9','#65A30D','#EA580C','#9333EA','#0D9488'];
@@ -977,17 +1011,17 @@ function hexToRgba(hex, alpha) {
 }
 
 const STATUS_LABELS = {
-  pending: 'Menunggu Approval',
+  pending: 'Awaiting Approval',
   validated: 'Approved',
-  rejected: 'Ditolak',
-  design: 'Desain UI/UX',
-  'dev-be': 'Dev Backend',
-  'dev-fe': 'Dev Frontend',
+  rejected: 'Rejected',
+  design: 'UI/UX Design',
+  'dev-be': 'Backend Dev',
+  'dev-fe': 'Frontend Dev',
   testing: 'Testing/QA',
-  done: 'Selesai'
+  done: 'Done'
 };
 const STATUS_ORDER = ['pending','validated','design','dev-be','dev-fe','testing','done'];
-const TYPE_LABELS = { feature:'Fitur Baru', menu:'Menu / Modul', function:'Fungsi / Logic', report:'Laporan' };
+const TYPE_LABELS = { feature:'New Feature', menu:'Menu / Module', function:'Function / Logic', report:'Report' };
 
 // --- AUTH ---
 function setupAuth() {
@@ -1031,7 +1065,7 @@ window.doLogin = async function() {
   try {
     await signInWithEmailAndPassword(auth, email, pass);
   } catch(e) {
-    errEl.textContent = 'Email atau password salah.';
+    errEl.textContent = 'Incorrect email or password.';
   }
 };
 
@@ -1042,11 +1076,15 @@ window.doRegister = async function() {
   const role = document.getElementById('reg-role').value;
   const errEl = document.getElementById('reg-error');
   errEl.textContent = '';
-  if (!name || !email || !pass) { errEl.textContent = 'Semua field wajib diisi.'; return; }
+  if (!name || !email || !pass) { errEl.textContent = 'Please fill in all required fields.'; return; }
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     await setDoc(doc(db, 'users', cred.user.uid), { uid: cred.user.uid, name, email, role });
-    showToast('Akun berhasil dibuat! Silakan masuk.', 'success');
+    showToast('Account created! Please sign in.', 'success');
+    closeModal('modal-register');
+    ['reg-name','reg-email','reg-password'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';}); 
+  closeModal('modal-register');
+  ['reg-name','reg-email','reg-password'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
   } catch(e) {
     errEl.textContent = e.message;
   }
@@ -1073,10 +1111,11 @@ function showApp() {
   const tb = document.getElementById('btn-theme');
   if (tb) tb.textContent = isDark ? '☀' : '🌙';
 
-  // Semua menu tampil untuk semua role
+  // Show all menus for all roles
   document.getElementById('nav-clients').style.display = 'flex';
   document.getElementById('nav-dev').style.display = 'flex';
   document.getElementById('nav-validate').style.display = 'flex';
+  document.getElementById('nav-gantt').style.display = 'flex';
   // start listening
   listenRequests();
   listenClients();
@@ -1102,9 +1141,9 @@ function listenRequests() {
   const role = currentUserData?.role;
   let q;
   if (role === 'marketing') {
-    q = query(collection(db,'requests'), where('submittedBy','==',currentUser.uid));
+    q = query(collection(db,'requestss'), where('submittedBy','==',currentUser.uid));
   } else {
-    q = collection(db,'requests');
+    q = collection(db,'requestss');
   }
   unsubRequests = onSnapshot(q, snap => {
     allRequests = snap.docs.map(d => ({ id: d.id, ...d.data() }))
@@ -1121,7 +1160,7 @@ function listenRequests() {
     }
   }, err => {
     console.error('listenRequests error:', err);
-    showToast('Gagal memuat request: ' + err.message, 'error');
+    showToast('Failed to load requests: ' + err.message, 'error');
   });
 }
 
@@ -1133,7 +1172,7 @@ function listenClients() {
     if (currentPage === 'clients') renderPage('clients');
   }, err => {
     console.error('listenClients error:', err);
-    showToast('Gagal memuat data klien: ' + err.message, 'error');
+    showToast('Failed to load data clients: ' + err.message, 'error');
   });
 }
 
@@ -1160,7 +1199,7 @@ window.navigate = function(page, param) {
     currentClientId = param;
   }
   document.querySelectorAll('.nav-item').forEach(el =>
-    el.classList.toggle('active', el.dataset.page === (page === 'client-detail' ? 'requests' : page))
+    el.classList.toggle('active', el.dataset.page === (page === 'client-detail' ? 'requestss' : page))
   );
   renderPage(page);
   closeSidebar();
@@ -1177,23 +1216,24 @@ window.closeSidebar = function() {
 };
 
 const PAGE_TITLES = {
-  dashboard:     ['Dashboard',       'Ringkasan aktivitas dan statistik request'],
-  requests:      ['Custom Request',  'Kelola seluruh permintaan custom — dikelompokkan per klien'],
-  validate:      ['Perlu Approval',  'Review dan approve custom request dari klien'],
-  devboard:      ['Dev Board',       'Pantau dan update progress pengerjaan request'],
-  clients:       ['Data Klien',      'Master data perusahaan klien'],
+  dashboard:     ['Dashboard',       'Activity summary and requests statistics'],
+  requestss:      ['Custom Request',  'Manage all custom requestss grouped by client'],
+  validate:      ['Needs Approval',  'Review and approve custom requestss from clients'],
+  devboard:      ['Dev Board',       'Track and update requests progress'],
+  gantt:         ['Gantt Chart',  'Visual timeline of all requests items'],
+  clients:       ['Clients',      'Master data perusahaan clients'],
   'client-detail': ['',              ''],
 };
 
 function renderPage(page) {
   const role   = currentUserData?.role;
-  const btnNew = document.getElementById('btn-new-request');
+  const btnNew = document.getElementById('btn-new-requests');
   const c      = document.getElementById('page-content');
 
   if (page === 'client-detail') {
     const cl = allClients.find(x => x.id === currentClientId);
-    document.getElementById('page-title').textContent = cl ? cl.name : 'Detail Klien';
-    document.getElementById('page-sub').textContent   = 'Semua custom request dari klien ini';
+    document.getElementById('page-title').textContent = cl ? cl.name : 'Detail Client';
+    document.getElementById('page-sub').textContent   = 'All custom requests from this client';
     if (btnNew) {
       btnNew.style.display = 'flex';
       btnNew.innerHTML = '＋ Request Baru';
@@ -1211,9 +1251,9 @@ function renderPage(page) {
     btnNew.style.display = 'none';
     if (page === 'clients') {
       btnNew.style.display = 'flex';
-      btnNew.innerHTML = '＋ Tambah Klien';
+      btnNew.innerHTML = '＋ Add Client';
       btnNew.onclick = () => openClientForm('');
-    } else if (page === 'requests') {
+    } else if (page === 'requestss') {
       btnNew.style.display = 'flex';
       btnNew.innerHTML = '＋ Request Baru';
       btnNew.onclick = () => openRequestForm('');
@@ -1221,11 +1261,244 @@ function renderPage(page) {
   }
 
   if      (page === 'dashboard')  c.innerHTML = renderDashboard();
-  else if (page === 'requests')   c.innerHTML = renderRequestList(allRequests);
+  else if (page === 'requestss')   c.innerHTML = renderRequestList(allRequests);
   else if (page === 'validate')   c.innerHTML = renderValidateBoard();
   else if (page === 'devboard')   c.innerHTML = renderDevBoard();
   else if (page === 'clients')    c.innerHTML = renderClientsPage();
+  else if (page === 'gantt')       c.innerHTML = renderGanttChart();
 }
+
+
+// --- GANTT CHART ---
+function renderGanttChart() {
+  const reqs = allRequests.filter(r => r.dateRequest || r.createdAt);
+
+  if (!reqs.length) return `
+    <div style="text-align:center;padding:80px 20px;">
+      <div style="font-size:48px;opacity:.3;margin-bottom:16px;">&#x1F4C5;</div>
+      <div style="font-size:16px;font-weight:700;color:var(--text-muted);">No requests with dates yet</div>
+    </div>`;
+
+  // Compute date range
+  const toDate = str => str ? new Date(str) : null;
+  const validDates = reqs.flatMap(r => [
+    toDate(r.dateRequest), toDate(r.dateDeadline)
+  ]).filter(Boolean);
+
+  const minDate = new Date(Math.min(...validDates.map(d => d.getTime())));
+  const maxDate = new Date(Math.max(...validDates.map(d => d.getTime())));
+  // Padding 3 days each side
+  minDate.setDate(minDate.getDate() - 3);
+  maxDate.setDate(maxDate.getDate() + 7);
+
+  const totalDays = Math.ceil((maxDate - minDate) / 86400000);
+  const today     = new Date();
+  today.setHours(0,0,0,0);
+
+  const DAY_W   = 32;  // px per day
+  const ROW_H   = 44;
+  const HDR_H   = 56;
+  const LABEL_W = 240;
+  const chartW  = totalDays * DAY_W;
+
+  const STATUS_COLOR = {
+    pending:   '#F59E0B', validated: '#0891B2', rejected: '#EF4444',
+    design:    '#7C3AED', 'dev-be':  '#027fb3', 'dev-fe': '#0369A1',
+    testing:   '#D97706', done:      '#10B981'
+  };
+
+  // Build month headers
+  let monthHtml = '';
+  let d = new Date(minDate);
+  while (d <= maxDate) {
+    const start = Math.floor((d - minDate) / 86400000);
+    const yr = d.getFullYear(), mo = d.getMonth();
+    let days = 0;
+    let cur = new Date(d);
+    while (cur <= maxDate && cur.getFullYear() === yr && cur.getMonth() === mo) {
+      days++; cur.setDate(cur.getDate() + 1);
+    }
+    const label = d.toLocaleDateString('id-ID', { month: 'short', year: 'numeric' });
+    monthHtml += `<div style="position:absolute;left:${start*DAY_W}px;width:${days*DAY_W}px;height:${HDR_H/2}px;border-right:1px solid var(--border);display:flex;align-items:center;padding-left:6px;font-size:11px;font-weight:800;color:var(--text-muted);overflow:hidden;white-space:nowrap;">${label}</div>`;
+    d = new Date(yr, mo+1, 1);
+  }
+
+  // Build day headers
+  let dayHtml = '';
+  for (let i = 0; i < totalDays; i++) {
+    const day = new Date(minDate);
+    day.setDate(day.getDate() + i);
+    const isToday = day.toDateString() === today.toDateString();
+    const isWeekend = day.getDay() === 0 || day.getDay() === 6;
+    const label = day.getDate();
+    dayHtml += `<div style="position:absolute;left:${i*DAY_W}px;width:${DAY_W}px;height:${HDR_H/2}px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:${isToday?'800':'500'};color:${isToday?'var(--indigo)':isWeekend?'var(--text-dim)':'var(--text-muted)'};border-right:1px solid var(--border);background:${isToday?'var(--indigo-dim)':'transparent'};">${label}</div>`;
+  }
+
+  // Build grid columns (zebra by week)
+  let gridHtml = '';
+  for (let i = 0; i < totalDays; i++) {
+    const day = new Date(minDate);
+    day.setDate(day.getDate() + i);
+    const isToday = day.toDateString() === today.toDateString();
+    const isWeekend = day.getDay() === 0 || day.getDay() === 6;
+    gridHtml += `<div style="position:absolute;left:${i*DAY_W}px;width:${DAY_W}px;top:0;bottom:0;background:${isToday?'rgba(2,127,179,0.08)':isWeekend?'rgba(0,0,0,0.03)':'transparent'};border-right:1px solid var(--border);pointer-events:none;"></div>`;
+  }
+
+  // Today line
+  const todayOffset = Math.floor((today - minDate) / 86400000);
+  const todayLine = todayOffset >= 0 && todayOffset <= totalDays
+    ? `<div style="position:absolute;left:${todayOffset*DAY_W + DAY_W/2}px;top:0;bottom:0;width:2px;background:var(--red);z-index:3;pointer-events:none;">
+        <div style="position:absolute;top:-4px;left:-18px;background:var(--red);color:#fff;font-size:9px;font-weight:800;padding:2px 5px;border-radius:4px;white-space:nowrap;">Today</div>
+       </div>` : '';
+
+  // Sort by dateRequest then client
+  const sorted = [...reqs].sort((a,b) => {
+    const da = new Date(a.dateRequest||a.createdAt?.toDate?.()?.toISOString()||'2099');
+    const db = new Date(b.dateRequest||b.createdAt?.toDate?.()?.toISOString()||'2099');
+    return da - db || (a.client||'').localeCompare(b.client||'');
+  });
+
+  // Build rows
+  let rowsLabel = '';
+  let rowsBar   = '';
+
+  sorted.forEach((r, idx) => {
+    const bg   = idx % 2 === 0 ? 'transparent' : 'rgba(2,127,179,0.03)';
+    const col  = STATUS_COLOR[r.status] || '#94A3B8';
+    const name = r.name || r.title || '—';
+    const client = r.client || '—';
+
+    const startRaw = r.dateRequest || r.createdAt?.toDate?.()?.toISOString()?.split('T')[0];
+    const endRaw   = r.dateDeadline;
+    const startD   = startRaw ? new Date(startRaw) : null;
+    const endD     = endRaw   ? new Date(endRaw)   : null;
+
+    let barHtml = '';
+    // Only show bars for approved (non-pending, non-rejected) requestss
+    const showBar = r.status !== 'pending' && r.status !== 'rejected';
+    if (startD && showBar) {
+      const s = Math.max(0, Math.floor((startD - minDate) / 86400000));
+      const e = endD
+        ? Math.min(totalDays, Math.ceil((endD - minDate) / 86400000) + 1)
+        : s + 1;
+      const w = Math.max(DAY_W, (e - s) * DAY_W);
+      const pct = r.status === 'done' ? 100
+        : STATUS_ORDER.indexOf(r.status) >= 0
+          ? Math.round((STATUS_ORDER.indexOf(r.status) / (STATUS_ORDER.length-1)) * 100)
+          : 0;
+
+      barHtml = `
+        <div onclick="openRequestForm('${r.id}')"
+          title="${name} | ${client} | ${STATUS_LABELS[r.status]||r.status}"
+          style="position:absolute;left:${s*DAY_W}px;top:7px;width:${w}px;height:${ROW_H-14}px;
+                 border-radius:6px;cursor:pointer;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,0.18);
+                 background:${col}22;border:1.5px solid ${col};transition:transform .12s,box-shadow .12s;z-index:2;"
+          onmouseover="this.style.transform='scaleY(1.08)';this.style.boxShadow='0 4px 14px rgba(0,0,0,0.25)'"
+          onmouseout="this.style.transform='';this.style.boxShadow='0 2px 6px rgba(0,0,0,0.18)'">
+          <!-- Progress fill -->
+          <div style="position:absolute;left:0;top:0;height:100%;width:${pct}%;background:${col};opacity:.35;border-radius:4px 0 0 4px;"></div>
+          <!-- Label -->
+          <div style="position:absolute;inset:0;display:flex;align-items:center;padding:0 7px;gap:4px;overflow:hidden;">
+            <div style="width:6px;height:6px;border-radius:50%;background:${col};flex-shrink:0;"></div>
+            <span style="font-size:10px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${name}</span>
+          </div>
+        </div>`;
+    }
+
+    // Label column
+    rowsLabel += `
+      <div style="height:${ROW_H}px;display:flex;align-items:center;padding:0 10px 0 14px;gap:8px;background:${bg};border-bottom:1px solid var(--border);overflow:hidden;cursor:pointer;" onclick="openRequestForm('${r.id}')">
+        <div style="width:6px;height:28px;border-radius:3px;background:${col};flex-shrink:0;"></div>
+        <div style="min-width:0;flex:1;">
+          <div style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${name}</div>
+          <div style="font-size:10px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${client}</div>
+        </div>
+        <span class="badge badge-status-${r.status}" style="font-size:9px;flex-shrink:0;">${STATUS_LABELS[r.status]||r.status}</span>
+      </div>`;
+
+    // Bar row
+    rowsBar += `
+      <div style="position:relative;height:${ROW_H}px;background:${bg};border-bottom:1px solid var(--border);">
+        ${barHtml}
+      </div>`;
+  });
+
+  const totalH = sorted.length * ROW_H;
+
+  return `
+    <div style="display:flex;flex-direction:column;gap:0;background:var(--card);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--sh-card);">
+
+      <!-- TOOLBAR -->
+      <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1.5px solid var(--border);flex-wrap:wrap;">
+        <div style="font-size:14px;font-weight:800;color:var(--text);">&#x1F4C5; Request Timeline</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-left:auto;">
+          ${Object.entries(STATUS_COLOR).map(([s,col]) =>
+            allRequests.some(r=>r.status===s)
+              ? `<span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-muted);">
+                   <span style="width:10px;height:10px;border-radius:3px;background:${col};display:inline-block;"></span>
+                   ${STATUS_LABELS[s]||s}
+                 </span>` : ''
+          ).join('')}
+        </div>
+      </div>
+
+      <!-- MAIN GANTT -->
+      <div style="display:flex;overflow:hidden;">
+
+        <!-- LABEL COLUMN (fixed) -->
+        <div style="width:${LABEL_W}px;flex-shrink:0;border-right:2px solid var(--border-md);z-index:5;background:var(--card);">
+          <!-- Header spacer -->
+          <div style="height:${HDR_H}px;background:var(--inset);border-bottom:1.5px solid var(--border);display:flex;align-items:flex-end;padding:0 14px 8px;">
+            <span style="font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;">Item Request</span>
+          </div>
+          <!-- Rows -->
+          <div style="overflow-y:hidden;">
+            ${rowsLabel}
+          </div>
+        </div>
+
+        <!-- CHART AREA (scrollable) -->
+        <div id="gantt-scroll" style="flex:1;overflow-x:auto;overflow-y:hidden;" onscroll="syncGanttScroll(this)">
+
+          <!-- Month + Day header -->
+          <div style="position:sticky;top:0;z-index:4;background:var(--inset);border-bottom:1.5px solid var(--border);">
+            <div style="position:relative;height:${HDR_H/2}px;width:${chartW}px;border-bottom:1px solid var(--border);">
+              ${monthHtml}
+            </div>
+            <div style="position:relative;height:${HDR_H/2}px;width:${chartW}px;">
+              ${dayHtml}
+            </div>
+          </div>
+
+          <!-- Bars -->
+          <div id="gantt-bars" style="position:relative;width:${chartW}px;height:${totalH}px;">
+            ${gridHtml}
+            ${todayLine}
+            ${rowsBar}
+          </div>
+        </div>
+      </div>
+
+      <!-- FOOTER STATS -->
+      <div style="display:flex;gap:20px;flex-wrap:wrap;padding:12px 18px;border-top:1.5px solid var(--border);background:var(--inset);">
+        <div style="font-size:12px;color:var(--text-muted);">
+          <strong style="color:var(--text);">${reqs.length}</strong> items shown
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);">
+          Range: <strong style="color:var(--text);">${minDate.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})}</strong>
+          &ndash; <strong style="color:var(--text);">${maxDate.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})}</strong>
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);">
+          Click a bar or row to edit the item
+        </div>
+      </div>
+    </div>`;
+}
+
+window.syncGanttScroll = function(el) {
+  // Sync horizontal scroll (header already sticky, nothing extra needed)
+};
+
 
 // --- DASHBOARD ---
 function renderDashboard() {
@@ -1236,28 +1509,28 @@ function renderDashboard() {
   const recent = allRequests.slice(0, 5);
   return `
     <div class="stats-row">
-      <div class="stat-card s-total"><div class="stat-icon">\uD83D\uDCCA</div><div class="stat-num">${total}</div><div class="stat-label">Total Request</div></div>
-      <div class="stat-card s-pending"><div class="stat-icon">\u23F3</div><div class="stat-num">${pending}</div><div class="stat-label">Menunggu Approval</div></div>
+      <div class="stat-card s-total"><div class="stat-icon">\uD83D\uDCCA</div><div class="stat-num">${total}</div><div class="stat-label">Total Requestss</div></div>
+      <div class="stat-card s-pending"><div class="stat-icon">\u23F3</div><div class="stat-num">${pending}</div><div class="stat-label">Awaiting Approval</div></div>
       <div class="stat-card s-validated"><div class="stat-icon">\u26A1</div><div class="stat-num">${validated}</div><div class="stat-label">Sedang Dikerjakan</div></div>
-      <div class="stat-card s-done"><div class="stat-icon">\u2705</div><div class="stat-num">${done}</div><div class="stat-label">Selesai</div></div>
+      <div class="stat-card s-done"><div class="stat-icon">\u2705</div><div class="stat-num">${done}</div><div class="stat-label">Done</div></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
       ${renderMiniChart(allRequests)}
       ${renderRecentActivity(allRequests)}
     </div>
     <div style="margin-bottom:10px;font-size:13px;font-weight:600;color:var(--text-muted);">Request Terbaru</div>
-    <div class="requests-grid">${recent.length ? recent.map(r=>renderRequestCard(r,currentUserData?.role)).join('') : renderEmpty('Belum ada request','Klik tombol \uFF0B Request Baru di kanan atas')}</div>
+    <div class="requestss-grid">${recent.length ? recent.map(r=>renderRequestCard(r,currentUserData?.role)).join('') : renderEmpty('No requestss yet','Click tombol \uFF0B Request Baru di kanan atas')}</div>
   `;
 }
 
-function renderMiniChart(requests) {
+function renderMiniChart(requestss) {
   const types = ['feature','menu','function','report'];
-  const counts = types.map(t => requests.filter(r => r.type===t).length);
+  const counts = types.map(t => requestss.filter(r => r.type===t).length);
   const max = Math.max(...counts, 1);
   const colors = { feature:'var(--indigo)', menu:'var(--violet)', function:'var(--cyan)', report:'var(--amber)' };
-  const labels = { feature:'Fitur', menu:'Menu', function:'Fungsi', report:'Laporan' };
+  const labels = { feature:'Fitur', menu:'Menu', function:'Fungsi', report:'Report' };
   return `<div class="stat-card" style="background:var(--card);color:var(--text);box-shadow:var(--sh-card);border:1px solid var(--border);">
-    <div style="font-size:10px;font-weight:800;color:var(--indigo);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">Request per Tipe</div>
+    <div style="font-size:10px;font-weight:800;color:var(--indigo);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">Request per Type</div>
     ${types.map((t,i) => `
       <div style="margin-bottom:10px;">
         <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
@@ -1272,9 +1545,9 @@ function renderMiniChart(requests) {
   </div>`;
 }
 
-function renderRecentActivity(requests) {
+function renderRecentActivity(requestss) {
   const statuses = ['pending','validated','design','dev-be','dev-fe','testing','done','rejected'];
-  const counts = statuses.map(s => requests.filter(r => r.status===s).length);
+  const counts = statuses.map(s => requestss.filter(r => r.status===s).length);
   const cols = {pending:'var(--amber)',validated:'var(--cyan)',design:'var(--violet)','dev-be':'var(--indigo)','dev-fe':'var(--cyan)',testing:'var(--amber)',done:'var(--green)',rejected:'var(--red)'};
   return `<div class="stat-card" style="background:var(--card);color:var(--text);box-shadow:var(--sh-card);border:1px solid var(--border);">
     <div style="font-size:10px;font-weight:800;color:var(--indigo);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">Status Overview</div>
@@ -1291,31 +1564,31 @@ function renderRecentActivity(requests) {
 }
 
 // --- REQUEST LIST — Grouped by Client ---
-function renderRequestList(requests) {
+function renderRequestList(requestss) {
   const groups = {};
-  requests.forEach(r => {
+  requestss.forEach(r => {
     const key = r.clientId || ('__manual__' + r.client);
-    if (!groups[key]) groups[key] = { clientId:r.clientId||'', name:r.client||'(Tanpa Klien)', items:[] };
+    if (!groups[key]) groups[key] = { clientId:r.clientId||'', name:r.client||'(Tanpa Client)', items:[] };
     groups[key].items.push(r);
   });
   const sorted = Object.values(groups).sort((a,b)=>a.name.localeCompare(b.name,'id'));
-  if (!sorted.length) return renderEmpty('Belum ada request','Klik ＋ Request Baru untuk mulai');
+  if (!sorted.length) return renderEmpty('No requestss yet','Click ＋ New Request to get started');
 
   return `
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px;flex-wrap:wrap;">
-      <input class="filter-search" id="search-input" placeholder="\uD83D\uDD0D Cari klien atau request..." oninput="filterRequests()" style="max-width:260px;flex:1;">
+      <input class="filter-search" id="search-input" placeholder="\uD83D\uDD0D Search clients or requestss..." oninput="filterRequests()" style="max-width:260px;flex:1;">
       <select class="filter-select" id="filter-status" onchange="filterRequests()">
-        <option value="">Semua Status</option>
+        <option value="">All Status</option>
         ${Object.entries(STATUS_LABELS).map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}
       </select>
       <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-        <span onclick="expandAllClientGroups()" style="padding:3px 10px;background:var(--indigo-dim);color:var(--indigo);border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">Buka Semua</span>
-        <span onclick="collapseAllClientGroups()" style="padding:3px 10px;background:var(--inset);color:var(--text-muted);border:1px solid var(--border-md);border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">Tutup Semua</span>
+        <span onclick="expandAllClientGroups()" style="padding:3px 10px;background:var(--indigo-dim);color:var(--indigo);border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">Expand All</span>
+        <span onclick="collapseAllClientGroups()" style="padding:3px 10px;background:var(--inset);color:var(--text-muted);border:1px solid var(--border-md);border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">Collapse All</span>
         <span id="filter-active-tag" style="display:none;padding:3px 10px;background:var(--indigo-dim2);color:var(--indigo);border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;" onclick="clearFilters()">\u2715 Reset</span>
-        <span style="font-size:12px;color:var(--text-dim);" id="filter-count">${requests.length} request \u00B7 ${sorted.length} klien</span>
+        <span style="font-size:12px;color:var(--text-dim);" id="filter-count">${requestss.length} requests \u00B7 ${sorted.length} clients</span>
       </div>
     </div>
-    <div id="requests-grid" style="display:flex;flex-direction:column;gap:14px;">
+    <div id="requestss-grid" style="display:flex;flex-direction:column;gap:14px;">
       ${sorted.map(g=>renderClientGroupCard(g)).join('')}
     </div>`;
 }
@@ -1355,7 +1628,7 @@ function renderClientGroupCard(group) {
           ${done>0?`<span style="padding:3px 9px;border-radius:20px;background:var(--green-dim);color:var(--green);font-size:11px;font-weight:800;">✓ ${done}</span>`:''}
           ${rejected>0?`<span style="padding:3px 9px;border-radius:20px;background:var(--red-dim);color:var(--red);font-size:11px;font-weight:800;">✕ ${rejected}</span>`:''}
           <span style="font-size:12px;color:var(--text-dim);font-weight:700;">${group.items.length} item</span>
-          ${group.clientId?`<button onclick="event.stopPropagation();navToClient(${group.clientId})" style="padding:5px 12px;background:var(--indigo);color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">Buka Detail ›</button>`:''}
+          ${group.clientId?`<button onclick="event.stopPropagation();navToClient(${group.clientId})" style="padding:5px 12px;background:var(--indigo);color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">View Detail ›</button>`:''}
         </div>
       </div>
       <!-- TABLE REQUEST (accordion body) -->
@@ -1363,7 +1636,7 @@ function renderClientGroupCard(group) {
         <table class="req-table" style="width:100%;border-collapse:collapse;">
           <thead>
             <tr style="border-bottom:1.5px solid var(--border);">
-              <th style="text-align:left;padding:10px 8px 8px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;">Nama Item</th>
+              <th style="text-align:left;padding:10px 8px 8px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;">Item Name</th>
               <th style="text-align:left;padding:10px 8px 8px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;width:130px;">Status</th>
               <th style="text-align:left;padding:10px 8px 8px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;width:100px;">Deadline</th>
               <th style="width:64px;"></th>
@@ -1374,7 +1647,7 @@ function renderClientGroupCard(group) {
               const safeName = (r.name||'').replace(/'/g,"\'");
               const cd = calcCountdown(r.dateDeadline);
               const cdColor = cd===null?'var(--text-dim)':cd<0?'var(--red)':cd<=3?'var(--amber)':'var(--green)';
-              const cdText  = cd===null?'\u2014':cd<0?`\u26a0 ${Math.abs(cd)}h`:cd===0?'\uD83D\uDD34 Hari ini':`${cd}h lagi`;
+              const cdText  = cd===null?'\u2014':cd<0?`\u26a0 ${Math.abs(cd)}h`:cd===0?'\uD83D\uDD34 Today':`${cd}h left`;
               const tl = r.type ? (TYPE_LABELS[r.type]||r.type) : '';
               const sc = r.status==='done'?'#10B981':r.status==='rejected'?'#EF4444':r.status==='pending'?'#F59E0B':r.status==='validated'?'#6366F1':'#027fb3';
               const rowId = 'item-detail-' + r.id;
@@ -1404,7 +1677,7 @@ function renderClientGroupCard(group) {
                   <div style="display:flex;gap:4px;">
                     <button onclick="event.stopPropagation();openRequestForm('${r.id}')" title="Edit"
                       style="width:26px;height:26px;border-radius:6px;border:1.5px solid var(--border-md);background:var(--inset);color:var(--indigo);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;">\u270F</button>
-                    <button onclick="event.stopPropagation();deleteRequest('${r.id}','${safeName}')" title="Hapus"
+                    <button onclick="event.stopPropagation();deleteRequest('${r.id}','${safeName}')" title="Delete"
                       style="width:26px;height:26px;border-radius:6px;border:1.5px solid rgba(220,38,38,0.2);background:var(--red-dim);color:var(--red);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;">\uD83D\uDDD1</button>
                   </div>
                 </td>
@@ -1418,7 +1691,7 @@ function renderClientGroupCard(group) {
                       ${r.dateDeadline?`<span style="font-size:11px;background:var(--amber-dim);color:var(--amber);border-radius:6px;padding:3px 9px;font-weight:700;">\uD83D\uDCC5 ${r.dateDeadline}</span>`:''}
                       ${r.duration?`<span style="font-size:11px;background:var(--inset);border:1px solid var(--border);border-radius:6px;padding:3px 9px;color:var(--text-muted);">\u23F1 ${r.duration}</span>`:''}
                     </div>`:''}
-                    ${!r.desc&&!specHtml&&!r.dateDeadline&&!r.duration?'<span style="font-size:12px;color:var(--text-dim);font-style:italic;">Tidak ada detail</span>':''}
+                    ${!r.desc&&!specHtml&&!r.dateDeadline&&!r.duration?'<span style="font-size:12px;color:var(--text-dim);font-style:italic;">No details</span>':''}
                   </div>
                 </td>
               </tr>`;
@@ -1430,7 +1703,7 @@ function renderClientGroupCard(group) {
           style="width:100%;margin-top:10px;padding:8px;border:1.5px dashed var(--border-md);border-radius:8px;background:transparent;color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;"
           onmouseover="this.style.background='var(--indigo-dim)';this.style.color='var(--indigo)';this.style.borderColor='var(--indigo)'"
           onmouseout="this.style.background='transparent';this.style.color='var(--text-muted)';this.style.borderColor='var(--border-md)'">
-          \uFF0B Tambah Request
+          \uFF0B Add Request
         </button>
       </div>
     </div>`;
@@ -1439,7 +1712,7 @@ function renderClientGroupCard(group) {
 // --- HALAMAN DETAIL KLIEN ---
 function renderClientDetail(clientId) {
   const cl = allClients.find(c=>c.id===clientId);
-  if (!cl) return renderEmpty('Klien tidak ditemukan','');
+  if (!cl) return renderEmpty('Client not found','');
 
   const reqs = allRequests.filter(r=>r.clientId===clientId)
     .sort((a,b)=>(b.createdAt?.toMillis?.()??0)-(a.createdAt?.toMillis?.()??0));
@@ -1449,9 +1722,9 @@ function renderClientDetail(clientId) {
   const initials = cl.name.split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?';
 
   return `
-    <button onclick="navigate('requests')"
+    <button onclick="navigate('requestss')"
       style="background:none;border:none;color:var(--indigo);font-size:13px;font-weight:700;cursor:pointer;padding:0;margin-bottom:16px;display:flex;align-items:center;gap:6px;">
-      \u2190 Kembali ke Custom Request
+      \u2190 Back ke Custom Request
     </button>
     <!-- PROFIL KLIEN -->
     <div style="background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:20px 24px;margin-bottom:20px;box-shadow:var(--sh-card);">
@@ -1476,7 +1749,7 @@ function renderClientDetail(clientId) {
           <button onclick="openClientForm('${clientId}')"
             style="padding:8px 14px;background:var(--inset);border:1.5px solid var(--border-md);border-radius:8px;color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;"
             onmouseover="this.style.color='var(--indigo)';this.style.borderColor='var(--indigo)'"
-            onmouseout="this.style.color='var(--text-muted)';this.style.borderColor='var(--border-md)'">\u270F Edit Klien</button>
+            onmouseout="this.style.color='var(--text-muted)';this.style.borderColor='var(--border-md)'">\u270F Edit Client</button>
         </div>
       </div>
     </div>
@@ -1486,13 +1759,13 @@ function renderClientDetail(clientId) {
       ${reqs.length ? reqs.map(r=>renderClientDetailRow(r)).join('') : `
         <div style="background:var(--card);border:2px dashed var(--border-md);border-radius:14px;padding:48px;text-align:center;">
           <div style="font-size:40px;margin-bottom:12px;opacity:.3;">📋</div>
-          <div style="font-size:15px;font-weight:700;color:var(--text-muted);">Belum ada request</div>
+          <div style="font-size:15px;font-weight:700;color:var(--text-muted);">No requestss yet</div>
         </div>`}
       <button onclick="openRequestFormForClient('${clientId}')"
         style="padding:14px;border:2px dashed var(--border-md);border-radius:14px;background:transparent;color:var(--text-muted);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;transition:all .15s;"
         onmouseover="this.style.background='var(--indigo-dim)';this.style.color='var(--indigo)';this.style.borderColor='var(--indigo)'"
         onmouseout="this.style.background='transparent';this.style.color='var(--text-muted)';this.style.borderColor='var(--border-md)'">
-        \uFF0B Tambah Request
+        \uFF0B Add Request
       </button>
     </div>`;
 }
@@ -1503,7 +1776,7 @@ function renderClientDetailRow(r) {
   const fillColor = r.status==='done'?'#10B981':r.status==='rejected'?'#EF4444':'#027fb3';
   const cd = calcCountdown(r.dateDeadline);
   const cdColor = cd===null?'var(--text-dim)':cd<0?'var(--red)':cd<=3?'var(--amber)':'var(--green)';
-  const safeTitle = (r.title||'').replace(/'/g,"\'");
+  const safeTitle = (r.name||r.title||'—'||'').replace(/'/g,"\'");
 
   return `
     <div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--sh-card);">
@@ -1512,8 +1785,8 @@ function renderClientDetailRow(r) {
         <!-- JUDUL + STATUS + ACTIONS -->
         <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;">
           <div style="flex:1;min-width:0;">
-            <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:4px;">${r.title||'\u2014'}</div>
-            <div style="font-size:11px;color:var(--text-dim);font-family:monospace;">#${r.id.slice(-8).toUpperCase()} \u00B7 Diajukan ${r.createdAt?.toDate?r.createdAt.toDate().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}):'\u2014'} oleh ${r.submittedByName||'\u2014'}</div>
+            <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:4px;">${r.name||r.name||r.title||'\u2014'||'\u2014'}</div>
+            <div style="font-size:11px;color:var(--text-dim);font-family:monospace;">#${r.id.slice(-8).toUpperCase()} \u00B7 Submitted ${r.createdAt?.toDate?r.createdAt.toDate().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}):'\u2014'} by ${r.submittedByName||'\u2014'}</div>
           </div>
           <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
             <span class="badge badge-status-${r.status}">${STATUS_LABELS[r.status]||r.status}</span>
@@ -1525,8 +1798,8 @@ function renderClientDetailRow(r) {
         <div style="display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;margin-bottom:14px;">
           <div>
             <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
-              <span style="font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;">Progress Pengerjaan</span>
-              <span style="font-size:11px;font-weight:800;color:${fillColor};">${r.status==='rejected'?'Ditolak':r.status==='done'?'\u2713 Selesai':pct+'%'}</span>
+              <span style="font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;">Progress</span>
+              <span style="font-size:11px;font-weight:800;color:${fillColor};">${r.status==='rejected'?'Rejected':r.status==='done'?'\u2713 Done':pct+'%'}</span>
             </div>
             <div style="height:8px;background:var(--border);border-radius:99px;overflow:hidden;">
               <div style="height:100%;width:${pct}%;background:${fillColor};border-radius:99px;transition:width .5s;"></div>
@@ -1544,7 +1817,7 @@ function renderClientDetailRow(r) {
             ${r.dateDeadline?`
               <div style="font-size:10px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;">Deadline</div>
               <div style="font-size:13px;font-weight:800;color:${cdColor};">${formatDate(r.dateDeadline)}</div>
-              <div style="font-size:11px;font-weight:700;color:${cdColor};">${cd<0?`\u26A0 ${Math.abs(cd)}h lewat`:cd===0?'🔴 Hari ini':`\u23F1 ${cd}h lagi`}</div>
+              <div style="font-size:11px;font-weight:700;color:${cdColor};">${cd<0?`\u26A0 ${Math.abs(cd)}h overdue`:cd===0?'🔴 Today':`\u23F1 ${cd}h left`}</div>
             `:r.duration?`<div style="font-size:11px;color:var(--text-muted);">${r.duration}</div>`:''}
           </div>
         </div>
@@ -1553,12 +1826,12 @@ function renderClientDetailRow(r) {
         ${(r.items||[]).length>0?`
         <div style="border:1.5px solid var(--border);border-radius:10px;overflow:visible;margin-bottom:14px;">
           <div style="background:var(--indigo-dim);padding:9px 14px 9px;border-radius:10px 10px 0 0;font-size:11px;font-weight:800;color:var(--indigo);">
-            📦 ${(r.items||[]).length} Item Custom
+            📦 ${(r.items||[]).length} Custom Items
           </div>
           ${(r.items||[]).map(renderAccItem).join('')}       </div>`:
         r.description?`
         <div style="background:var(--inset);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px;">
-          <div style="font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Deskripsi</div>
+          <div style="font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Description</div>
           <div style="font-size:13px;color:var(--text);line-height:1.65;">${r.description}</div>
         </div>`:''
         }
@@ -1569,7 +1842,7 @@ function renderClientDetailRow(r) {
             style="padding:8px 14px;border-radius:8px;border:1.5px solid var(--border-md);background:var(--inset);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;"
             onmouseover="this.style.color='var(--indigo)';this.style.borderColor='var(--indigo)';this.style.background='var(--indigo-dim)'"
             onmouseout="this.style.color='var(--text-muted)';this.style.borderColor='var(--border-md)';this.style.background='var(--inset)'">
-            \uD83D\uDCAC Komentar & Approval
+            \uD83D\uDCAC Comments & Approval
           </button>
           <button onclick="openRequestForm('${r.id}')"
             style="padding:8px 14px;border-radius:8px;border:1.5px solid var(--indigo-dim2);background:var(--indigo-dim);color:var(--indigo);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;"
@@ -1579,7 +1852,7 @@ function renderClientDetailRow(r) {
           <button onclick="printRequest('${r.id}')"
             style="padding:8px 14px;border-radius:8px;border:1.5px solid rgba(5,150,105,0.3);background:var(--green-dim);color:var(--green);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;"
             onmouseover="this.style.background='rgba(5,150,105,0.2)'" onmouseout="this.style.background='var(--green-dim)'">
-            \uD83D\uDDA8 Cetak
+            \uD83D\uDDA8 Print
           </button>
           <div style="margin-left:auto;display:flex;gap:6px;align-items:center;">
             <select onchange="if(this.value){updateStatus('${r.id}',this.value);this.value=''}"
@@ -1632,7 +1905,7 @@ window.showDescById = function(rid) {
   if (!r) return;
   const desc = r.description ||
     (r.items||[]).map((it,i) => (i+1)+'. '+it.name+(it.desc?' — '+it.desc:'')).join('\n') || '—';
-  document.getElementById('modal-desc-title').textContent = r.title || '—';
+  document.getElementById('modal-desc-title').textContent = r.name || r.name||r.title||'—' || '—';
   document.getElementById('modal-desc-body').textContent  = desc;
   openModal('modal-desc');
 };
@@ -1642,7 +1915,7 @@ window.filterRequests = function() {
   const status = document.getElementById('filter-status')?.value||'';
   let filtered = allRequests.filter(r => {
     if (status && r.status!==status) return false;
-    if (search && !(r.title?.toLowerCase().includes(search)||r.client?.toLowerCase().includes(search)||r.id?.toLowerCase().includes(search))) return false;
+    if (search && !(r.name||r.title||'—'?.toLowerCase().includes(search)||r.client?.toLowerCase().includes(search)||r.id?.toLowerCase().includes(search))) return false;
     return true;
   });
   const groups = {};
@@ -1652,10 +1925,10 @@ window.filterRequests = function() {
     groups[key].items.push(r);
   });
   const sorted = Object.values(groups).sort((a,b)=>a.name.localeCompare(b.name,'id'));
-  const grid = document.getElementById('requests-grid');
-  if (grid) grid.innerHTML = sorted.length ? sorted.map(g=>renderClientGroupCard(g)).join('') : renderEmpty('Tidak ada hasil','Coba ubah filter');
+  const grid = document.getElementById('requestss-grid');
+  if (grid) grid.innerHTML = sorted.length ? sorted.map(g=>renderClientGroupCard(g)).join('') : renderEmpty('No results','Try changing the filter');
   const countEl = document.getElementById('filter-count');
-  if (countEl) countEl.textContent = `${filtered.length} request \u00B7 ${sorted.length} klien`;
+  if (countEl) countEl.textContent = `${filtered.length} requests \u00B7 ${sorted.length} clients`;
   const tag = document.getElementById('filter-active-tag');
   if (tag) tag.style.display = (status||search)?'inline-block':'none';
 };
@@ -1737,7 +2010,7 @@ function renderTimelineCard(r) {
     const color = isOverdue ? 'var(--red)' : isUrgent ? 'var(--amber)' : 'var(--green)';
     const bg    = isOverdue ? 'var(--red-dim)' : isUrgent ? 'var(--amber-dim)' : 'var(--green-dim)';
     const label = isOverdue
-      ? `\u26A0 ${Math.abs(countdown)} hari telah lewat`
+      ? `\u26A0 ${Math.abs(countdown)} hari telah overdue`
       : countdown === 0
         ? '🔴 Deadline hari ini!'
         : `\u23F1 ${countdown} hari lagi`;
@@ -1750,7 +2023,7 @@ function renderTimelineCard(r) {
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
         ${r.dateRequest ? `
           <div>
-            <div style="font-size:10px;color:var(--text-dim);font-weight:600;">Tgl Request</div>
+            <div style="font-size:10px;color:var(--text-dim);font-weight:600;">Request Date</div>
             <div style="font-size:12px;font-weight:600;color:var(--text);">${formatDate(r.dateRequest)}</div>
           </div>` : ''}
         ${r.dateDeadline ? `
@@ -1765,12 +2038,12 @@ function renderTimelineCard(r) {
           </div>` : ''}
         ${r.dateEnd ? `
           <div>
-            <div style="font-size:10px;color:var(--text-dim);font-weight:600;">Est. Selesai</div>
+            <div style="font-size:10px;color:var(--text-dim);font-weight:600;">Est. Done</div>
             <div style="font-size:12px;font-weight:600;color:var(--text);">${formatDate(r.dateEnd)}</div>
           </div>` : ''}
         ${r.duration ? `
           <div style="grid-column:1/-1;">
-            <div style="font-size:10px;color:var(--text-dim);font-weight:600;">Durasi</div>
+            <div style="font-size:10px;color:var(--text-dim);font-weight:600;">Duration</div>
             <div style="font-size:12px;font-weight:600;color:var(--text);">${r.duration}</div>
           </div>` : ''}
       </div>
@@ -1787,14 +2060,14 @@ function renderRequestCard(r, role) {
   const progressPct = r.status === 'rejected' ? 0 : Math.round((pipelineIdx / (STATUS_ORDER.length-1)) * 100);
   const fillColor   = r.status === 'done' ? '#10B981' : r.status === 'rejected' ? '#EF4444' : '#027fb3';
   const date = r.createdAt?.toDate ? r.createdAt.toDate().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '—';
-  const safeTitle = (r.title||'').replace(/'/g,"\\'");
+  const safeTitle = (r.name||r.title||'—'||'').replace(/'/g,"\\'");
   return `
     <div class="req-card status-${r.status}" style="overflow:visible;">
       <!-- PROGRESS BAR \u2014 jelas, terpisah dari stripe atas -->
       <div style="padding:8px 16px 0;background:var(--card);">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
           <div style="font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;">Progress</div>
-          <div style="font-size:11px;font-weight:800;color:${fillColor};">${r.status==='rejected'?'Ditolak':r.status==='done'?'Selesai \u2713':progressPct+'%'}</div>
+          <div style="font-size:11px;font-weight:800;color:${fillColor};">${r.status==='rejected'?'Rejected':r.status==='done'?'Done \u2713':progressPct+'%'}</div>
         </div>
         <div style="height:8px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:8px;">
           <div style="height:100%;width:${progressPct}%;background:${fillColor};border-radius:99px;transition:width .5s;"></div>
@@ -1805,10 +2078,10 @@ function renderRequestCard(r, role) {
         <!-- JUDUL + ACTION BUTTONS -->
         <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;">
           <div style="flex:1;min-width:0;cursor:pointer;" onclick="openDetail('${r.id}')">
-            <div class="req-title">${r.title || '\u2014'}</div>
+            <div class="req-title">${r.name || r.name||r.title||'\u2014' || '\u2014'}</div>
             <div class="req-id">#${r.id.slice(-8).toUpperCase()} \u00B7
               ${r.clientId
-                ? `<span onclick="event.stopPropagation();filterByClient('${r.clientId}','${(r.client||'').replace(/'/g,"\\'")}');" style="cursor:pointer;color:var(--indigo);font-weight:700;text-decoration:underline;text-underline-offset:2px;" title="Lihat semua request ${r.client}">${r.client||'—'}</span>`
+                ? `<span onclick="event.stopPropagation();filterByClient('${r.clientId}','${(r.client||'').replace(/'/g,"\\'")}');" style="cursor:pointer;color:var(--indigo);font-weight:700;text-decoration:underline;text-underline-offset:2px;" title="Lihat semua requests ${r.client}">${r.client||'—'}</span>`
                 : (r.client||'\u2014')}
             </div>
           </div>
@@ -1817,11 +2090,11 @@ function renderRequestCard(r, role) {
               style="width:28px;height:28px;border-radius:7px;border:1.5px solid var(--border-md);background:var(--inset);color:var(--indigo);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;"
               onmouseover="this.style.background='var(--indigo-dim2)';this.style.borderColor='var(--indigo)'"
               onmouseout="this.style.background='var(--inset)';this.style.borderColor='var(--border-md)'">\u270F</button>
-            <button onclick="printRequest('${r.id}')" title="Cetak"
+            <button onclick="printRequest('${r.id}')" title="Print"
               style="width:28px;height:28px;border-radius:7px;border:1.5px solid rgba(5,150,105,0.3);background:var(--green-dim);color:var(--green);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;"
               onmouseover="this.style.background='rgba(5,150,105,0.2)'"
               onmouseout="this.style.background='var(--green-dim)'">\uD83D\uDDA8</button>
-            <button onclick="deleteRequest('${r.id}','${safeTitle}')" title="Hapus"
+            <button onclick="deleteRequest('${r.id}','${safeTitle}')" title="Delete"
               style="width:28px;height:28px;border-radius:7px;border:1.5px solid rgba(220,38,38,0.25);background:var(--red-dim);color:var(--red);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;"
               onmouseover="this.style.background='rgba(220,38,38,0.2)'"
               onmouseout="this.style.background='var(--red-dim)'">\uD83D\uDDD1</button>
@@ -1835,15 +2108,15 @@ function renderRequestCard(r, role) {
             <span class="badge badge-status-${r.status}" style="font-size:11px;">${statusLabel}</span>
           </div>
           <div style="background:var(--inset);border:1px solid var(--border);border-radius:8px;padding:7px 10px;">
-            <div style="font-size:10px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Item Custom</div>
+            <div style="font-size:10px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Custom Items</div>
             <div style="font-size:14px;font-weight:800;color:var(--indigo);">${(r.items||[]).length} item</div>
           </div>
           <div style="background:var(--inset);border:1px solid var(--border);border-radius:8px;padding:7px 10px;">
-            <div style="font-size:10px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Prioritas</div>
+            <div style="font-size:10px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Priority</div>
             <span class="priority-badge priority-${r.priority}" style="font-size:11px;">${(r.priority||'').toUpperCase()}</span>
           </div>
           <div style="background:var(--inset);border:1px solid var(--border);border-radius:8px;padding:7px 10px;">
-            <div style="font-size:10px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Diajukan</div>
+            <div style="font-size:10px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Submitted</div>
             <div style="font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.submittedByName||'\u2014'}</div>
           </div>
         </div>
@@ -1851,7 +2124,7 @@ function renderRequestCard(r, role) {
         <!-- PREVIEW ITEMS -->
         ${(r.items||[]).length > 0 ? `
         <div style="background:var(--inset);border:1px solid var(--border);border-radius:8px;padding:9px 12px;margin-bottom:10px;">
-          <div style="font-size:10px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Daftar Item</div>
+          <div style="font-size:10px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Item List</div>
           ${(r.items||[]).map((item,i) => `
             <div style="display:flex;align-items:center;gap:8px;padding:4px 0;${i>0?'border-top:1px solid var(--border);margin-top:4px;':''}">
               <span style="font-size:11px;font-weight:800;color:var(--indigo);min-width:16px;flex-shrink:0;">${i+1}.</span>
@@ -1863,7 +2136,7 @@ function renderRequestCard(r, role) {
 
         <!-- DESKRIPSI -->
         <div style="background:var(--inset);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:10px;">
-          <div style="font-size:10px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;">Deskripsi</div>
+          <div style="font-size:10px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;">Description</div>
           <div style="font-size:12px;color:var(--text-muted);margin:0;line-height:1.6;">${r.description || (r.items&&r.items[0]?r.items.map(it=>it.name).join(', '):'\u2014')}</div>
           ${(r.description||'').length > 120 ? `
           <button onclick="showDescById('${r.id}')"
@@ -1882,7 +2155,7 @@ function renderRequestCard(r, role) {
             style="width:100%;padding:8px 12px;border-radius:8px;border:1.5px solid var(--border-md);background:var(--inset);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;"
             onmouseover="this.style.background='var(--indigo-dim)';this.style.color='var(--indigo)';this.style.borderColor='var(--indigo)'"
             onmouseout="this.style.background='var(--inset)';this.style.color='var(--text-muted)';this.style.borderColor='var(--border-md)'">
-            \uD83D\uDCAC Detail & Komentar
+            \uD83D\uDCAC Detail & Comment
           </button>
         </div>
       </div>
@@ -1896,7 +2169,7 @@ function renderValidateBoard() {
   return `
     <div style="margin-bottom:28px;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-        <div style="font-size:14px;font-weight:800;color:var(--text);">\u23F3 Menunggu Approval</div>
+        <div style="font-size:14px;font-weight:800;color:var(--text);">\u23F3 Awaiting Approval</div>
         <span style="background:var(--amber-dim);color:var(--amber);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:800;">${pendingReqs.length}</span>
       </div>
       ${pendingReqs.length ? `
@@ -1906,8 +2179,8 @@ function renderValidateBoard() {
       ` : `
         <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:48px;text-align:center;">
           <div style="font-size:48px;margin-bottom:14px;opacity:.7;">✅</div>
-          <div style="font-size:15px;font-weight:800;color:var(--text-muted);margin-bottom:4px;">Tidak ada request yang menunggu approval</div>
-          <div style="font-size:13px;color:var(--text-dim);">Semua request sudah di-approve atau ditolak</div>
+          <div style="font-size:15px;font-weight:800;color:var(--text-muted);margin-bottom:4px;">No requests awaiting approval</div>
+          <div style="font-size:13px;color:var(--text-dim);">All requests have been approved or rejected</div>
         </div>
       `}
     </div>
@@ -1917,13 +2190,13 @@ function renderValidateBoard() {
 function renderValidateCard(r) {
   const typeLabel = TYPE_LABELS[r.type] || r.type;
   const date = r.createdAt?.toDate ? r.createdAt.toDate().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '—';
-  const safeTitle = (r.title||'').replace(/'/g,"\\'");
+  const safeTitle = (r.name||r.title||'—'||'').replace(/'/g,"\\'");
   const countdown = calcCountdown(r.dateDeadline);
   const countdownHtml = countdown !== null ? `
     <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;
       background:${countdown<0?'var(--red-dim)':countdown<=3?'var(--amber-dim)':'var(--green-dim)'};
       color:${countdown<0?'var(--red)':countdown<=3?'var(--amber)':'var(--green)'};">
-      ${countdown<0?'\u26A0 '+Math.abs(countdown)+' hari lewat':countdown===0?'\uD83D\uDD34 Hari ini':'\u23F1 '+countdown+' hari lagi'}
+      ${countdown<0?'\u26A0 '+Math.abs(countdown)+' hari lewat':countdown===0?'\uD83D\uDD34 Today':'\u23F1 '+countdown+' hari lagi'}
     </span>` : '';
   return `
     <div style="background:var(--card);border:2px solid var(--amber-dim);border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(217,119,6,0.10);">
@@ -1933,18 +2206,18 @@ function renderValidateCard(r) {
         <!-- header -->
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;">
           <div>
-            <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:3px;">${r.title||'\u2014'}</div>
+            <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:3px;">${r.name||r.name||r.title||'\u2014'||'\u2014'}</div>
             <div style="font-size:12px;color:var(--text-muted);">#${r.id.slice(-8).toUpperCase()} \u00B7 <strong>${r.client||'\u2014'}</strong> \u00B7 ${typeLabel}</div>
           </div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;">
-            <span class="badge badge-status-pending" style="white-space:nowrap;">\u23F3 Menunggu Approval</span>
+            <span class="badge badge-status-pending" style="white-space:nowrap;">\u23F3 Awaiting Approval</span>
             <span class="priority-badge priority-${r.priority}">${(r.priority||'').toUpperCase()}</span>
           </div>
         </div>
 
         <!-- deskripsi -->
         <div style="background:var(--inset);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:12px;">
-          <div style="font-size:10px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Deskripsi Kebutuhan</div>
+          <div style="font-size:10px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Requirements Description</div>
           <div style="font-size:13px;color:var(--text);line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">${r.description||'\u2014'}</div>
         </div>
 
@@ -1971,11 +2244,11 @@ function renderValidateCard(r) {
           </button>
           <div style="display:flex;gap:6px;align-items:center;flex:1;min-width:200px;">
             <input id="reject-reason-${r.id}" style="flex:1;padding:9px 12px;background:var(--inset);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-size:12px;font-family:inherit;outline:none;"
-              placeholder="Alasan penolakan..." onfocus="this.style.borderColor='var(--red)'" onblur="this.style.borderColor='var(--border)'">
+              placeholder="Reason for rejection..." onfocus="this.style.borderColor='var(--red)'" onblur="this.style.borderColor='var(--border)'">
             <button onclick="quickReject('${r.id}')"
               style="padding:9px 14px;background:var(--red-dim);border:1.5px solid rgba(220,38,38,0.25);border-radius:9px;color:var(--red);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .15s;"
               onmouseover="this.style.background='rgba(220,38,38,0.2)'" onmouseout="this.style.background='var(--red-dim)'">
-              \u2715 Tolak
+              \u2715 Reject
             </button>
           </div>
         </div>
@@ -1988,15 +2261,15 @@ function renderValidateCard(r) {
 function renderDevBoard() {
   const COLS = [
     { status:'validated', label:'Approved',    bg:'linear-gradient(135deg,#0891B2,#0EA5E9)', icon:'✓',  next:'design'  },
-    { status:'design',    label:'Desain UI/UX', bg:'linear-gradient(135deg,#7C3AED,#A855F7)', icon:'✏',  next:'dev-be'  },
-    { status:'dev-be',    label:'Dev Backend',  bg:'linear-gradient(135deg,#025f87,#027fb3)', icon:'⚙',  next:'dev-fe'  },
-    { status:'dev-fe',    label:'Dev Frontend', bg:'linear-gradient(135deg,#0369A1,#0EA5E9)', icon:'◈',  next:'testing' },
+    { status:'design',    label:'UI/UX Design', bg:'linear-gradient(135deg,#7C3AED,#A855F7)', icon:'✏',  next:'dev-be'  },
+    { status:'dev-be',    label:'Backend Dev',  bg:'linear-gradient(135deg,#025f87,#027fb3)', icon:'⚙',  next:'dev-fe'  },
+    { status:'dev-fe',    label:'Frontend Dev', bg:'linear-gradient(135deg,#0369A1,#0EA5E9)', icon:'◈',  next:'testing' },
     { status:'testing',   label:'Testing / QA', bg:'linear-gradient(135deg,#B45309,#D97706)', icon:'🔍', next:'done'    },
-    { status:'done',      label:'Selesai',      bg:'linear-gradient(135deg,#059669,#10B981)', icon:'✅', next:null      },
+    { status:'done',      label:'Done',      bg:'linear-gradient(135deg,#059669,#10B981)', icon:'✅', next:null      },
   ];
   const NEXT_LABEL = {
-    'design':'Mulai Desain','dev-be':'Mulai Dev BE','dev-fe':'Mulai Dev FE',
-    'testing':'Mulai Testing','done':'Tandai Selesai'
+    'design':'Start Design','dev-be':'Start Dev BE','dev-fe':'Start Dev FE',
+    'testing':'Start Testing','done':'Tandai Done'
   };
   const PRIORITY_COLORS = { high:'#DC2626', medium:'#D97706', low:'#059669' };
   const TYPE_ICONS = { feature:'⚡', menu:'☰', function:'⚙', report:'📊' };
@@ -2004,7 +2277,7 @@ function renderDevBoard() {
 
   return `
     <div style="margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-      <div style="font-size:13px;color:var(--text-muted);">${total} request aktif</div>
+      <div style="font-size:13px;color:var(--text-muted);">${total} active requestss</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         ${COLS.map(col => {
           const n = allRequests.filter(r => r.status === col.status).length;
@@ -2031,7 +2304,7 @@ function renderDevBoard() {
                   <span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;
                     background:${deadline<0?'var(--red-dim)':deadline<=3?'var(--amber-dim)':'var(--green-dim)'};
                     color:${deadline<0?'var(--red)':deadline<=3?'var(--amber)':'var(--green)'};">
-                    ${deadline<0?'\u26A0 '+Math.abs(deadline)+'h lewat':deadline===0?'\uD83D\uDD34 Hari ini':'\u23F1 '+deadline+'h lagi'}
+                    ${deadline<0?'\u26A0 '+Math.abs(deadline)+'h overdue':deadline===0?'\uD83D\uDD34 Today':'\u23F1 '+deadline+'h left'}
                   </span>` : '';
                 return `
                 <div style="background:var(--inset);border:1.5px solid var(--border);border-radius:10px;margin-bottom:8px;overflow:visible;position:relative;transition:box-shadow .15s;"
@@ -2041,7 +2314,7 @@ function renderDevBoard() {
                   <div onclick="openDetail('${r.id}')" style="padding:10px 12px;cursor:pointer;position:relative;">
                     <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:${PRIORITY_COLORS[r.priority]||'#94A3B8'};"></div>
                     <div style="padding-left:8px;">
-                      <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.4;">${r.title}</div>
+                      <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.4;">${r.name||r.name||r.title||'\u2014'||"\u2014"}</div>
                       <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                         <span style="font-size:10px;color:var(--text-dim);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.client||'\u2014'}</span>
                         <span style="font-size:10px;">${TYPE_ICONS[r.type]||'\u2022'}</span>
@@ -2060,20 +2333,20 @@ function renderDevBoard() {
                       onmouseover="this.style.opacity='.82'" onmouseout="this.style.opacity='1'">
                       → ${NEXT_LABEL[col.next]}
                     </button>
-                    <button onclick="openDetail('${r.id}')" title="Komentar"
+                    <button onclick="openDetail('${r.id}')" title="Comment"
                       style="padding:6px 9px;background:var(--inset);border:1.5px solid var(--border-md);border-radius:7px;color:var(--text-muted);font-size:13px;cursor:pointer;transition:all .15s;white-space:nowrap;"
                       onmouseover="this.style.color='var(--indigo)';this.style.borderColor='var(--indigo)'"
                       onmouseout="this.style.color='var(--text-muted)';this.style.borderColor='var(--border-md)'">💬</button>
                     ` : `
                     <div style="flex:1;text-align:center;">
-                      <span style="font-size:11px;font-weight:800;color:var(--green);">✅ Selesai</span>
+                      <span style="font-size:11px;font-weight:800;color:var(--green);">✅ Done</span>
                     </div>`}
                   </div>
                 </div>`;
               }).join('') : `
                 <div style="text-align:center;padding:28px 10px;">
                   <div style="font-size:24px;margin-bottom:6px;opacity:.3;">\uD83D\uDCED</div>
-                  <div style="font-size:11px;color:var(--text-dim);">Tidak ada item</div>
+                  <div style="font-size:11px;color:var(--text-dim);">No items</div>
                 </div>`}
             </div>
           </div>
@@ -2086,8 +2359,8 @@ function renderDevBoard() {
 
 // --- SUBMIT REQUEST ---
 async function createRequest(title, type, priority, clientId, client, desc, notes, specs) {
-  if (!title || !type || !client || !desc) { showToast('Lengkapi semua field wajib','error'); return false; }
-  await addDoc(collection(db,'requests'), {
+  if (!title || !type || !client || !desc) { showToast('Please fill in all required fields','error'); return false; }
+  await addDoc(collection(db,'requestss'), {
     title, type, priority, clientId: clientId||'', client,
     description: desc, notes: notes||'',
     specs: specs||[],
@@ -2098,7 +2371,7 @@ async function createRequest(title, type, priority, clientId, client, desc, note
     updatedAt: serverTimestamp(),
     comments: []
   });
-  showToast('Request berhasil dikirim!', 'success');
+  showToast('Request sent successfully!', 'success');
   return true;
 }
 
@@ -2107,13 +2380,13 @@ async function createRequest(title, type, priority, clientId, client, desc, note
 // --- DETAIL / UPDATE ---
 window.openDetail = async function(id) {
   openModal('modal-detail');
-  document.getElementById('detail-title').textContent = 'Memuat...';
+  document.getElementById('detail-title').textContent = 'Loading...';
   document.getElementById('detail-id').textContent = '';
   document.getElementById('detail-body').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
-  const snap = await getDoc(doc(db,'requests',id));
-  if (!snap.exists()) { document.getElementById('detail-body').innerHTML = '<div class="loading">Request tidak ditemukan.</div>'; return; }
+  const snap = await getDoc(doc(db,'requestss',id));
+  if (!snap.exists()) { document.getElementById('detail-body').innerHTML = '<div class="loading">Request not found.</div>'; return; }
   const r = { id: snap.id, ...snap.data() };
-  document.getElementById('detail-title').textContent = r.title;
+  document.getElementById('detail-title').textContent = r.name||r.title||'—';
   document.getElementById('detail-id').textContent = `#${r.id.slice(-8).toUpperCase()} \u00B7 ${r.client}`;
   document.getElementById('detail-body').innerHTML = renderDetailBody(r);
 };
@@ -2126,15 +2399,15 @@ function renderDetailBody(r) {
   const pct = r.status === 'rejected' ? 0 : Math.max(0, Math.round((pipelineIdx/(STATUS_ORDER.length-1))*100));
 
   let actionsHtml = '';
-  // Approval — tampil untuk semua saat status pending
+  // Approval — visible to all when status is pending
   if (r.status === 'pending') {
     actionsHtml = `
       <div class="detail-section">
-        <h4>Tindakan Approval</h4>
+        <h4>Approval Actions</h4>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button class="btn-approve" onclick="updateStatus('${r.id}','validated')">\u2713 Approve & Teruskan ke Tim Dev</button>
-          <div style="flex:1;min-width:180px;"><input id="reject-reason" style="width:100%;padding:8px 10px;background:var(--inset);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;" placeholder="Alasan penolakan (opsional)"></div>
-          <button class="btn-danger" onclick="rejectRequest('${r.id}')">\u2715 Tolak</button>
+          <div style="flex:1;min-width:180px;"><input id="reject-reason" style="width:100%;padding:8px 10px;background:var(--inset);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;" placeholder="Alasan penolakan (optional)"></div>
+          <button class="btn-danger" onclick="rejectRequest('${r.id}')">\u2715 Reject</button>
         </div>
       </div>
     `;
@@ -2143,7 +2416,7 @@ function renderDetailBody(r) {
   if (['validated','design','dev-be','dev-fe','testing'].includes(r.status)) {
     actionsHtml += `
       <div class="detail-section">
-        <h4>Update Status Pengerjaan</h4>
+        <h4>Update Status</h4>
         <div class="status-actions">
           ${Object.entries(STATUS_LABELS).filter(([s]) => ['validated','design','dev-be','dev-fe','testing','done'].includes(s)).map(([s,l]) => `
             <button class="btn-status" style="${r.status===s?'border-color:var(--indigo);color:var(--indigo);background:var(--indigo-dim);':'border-color:var(--border-md);color:var(--text-muted);'}" onclick="updateStatus('${r.id}','${s}')">${l}</button>
@@ -2156,49 +2429,49 @@ function renderDetailBody(r) {
   const comments = r.comments || [];
   return `
     <div class="detail-section">
-      <h4>Informasi Request</h4>
-      <div class="detail-row"><span class="detail-key">Tipe</span><span class="detail-val"><span class="badge badge-type-${r.type}">${TYPE_LABELS[r.type]||r.type}</span></span></div>
+      <h4>Request Information</h4>
+      <div class="detail-row"><span class="detail-key">Type</span><span class="detail-val"><span class="badge badge-type-${r.type}">${TYPE_LABELS[r.type]||r.type}</span></span></div>
       <div class="detail-row"><span class="detail-key">Status</span><span class="detail-val"><span class="badge badge-status-${r.status}">${STATUS_LABELS[r.status]||r.status}</span></span></div>
-      <div class="detail-row"><span class="detail-key">Prioritas</span><span class="detail-val"><span class="priority-badge priority-${r.priority}">${(r.priority||'').toUpperCase()}</span></span></div>
-      <div class="detail-row"><span class="detail-key">Diajukan oleh</span><span class="detail-val">${r.submittedByName||'\u2014'}</span></div>
-      <div class="detail-row"><span class="detail-key">Tgl Dibuat</span><span class="detail-val">${date}</span></div>
-      <div class="detail-row"><span class="detail-key">Terakhir update</span><span class="detail-val">${updDate}</span></div>
+      <div class="detail-row"><span class="detail-key">Priority</span><span class="detail-val"><span class="priority-badge priority-${r.priority}">${(r.priority||'').toUpperCase()}</span></span></div>
+      <div class="detail-row"><span class="detail-key">Submitted by</span><span class="detail-val">${r.submittedByName||'\u2014'}</span></div>
+      <div class="detail-row"><span class="detail-key">Date Dibuat</span><span class="detail-val">${date}</span></div>
+      <div class="detail-row"><span class="detail-key">Last update</span><span class="detail-val">${updDate}</span></div>
     </div>
     ${(r.dateDeadline || r.dateStart || r.dateEnd || r.dateRequest || r.duration) ? `
     <div class="detail-section">
-      <h4>📅 Timeline & Estimasi</h4>
+      <h4>📅 Timeline & Estimates</h4>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
         ${r.dateRequest ? `<div style="background:var(--inset);border:1px solid var(--border);border-radius:8px;padding:10px 12px;">
-          <div style="font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Tgl Request</div>
+          <div style="font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Request Date</div>
           <div style="font-size:13px;font-weight:700;color:var(--text);">${formatDate(r.dateRequest)}</div>
         </div>` : ''}
         ${r.dateDeadline ? `<div style="background:${calcCountdown(r.dateDeadline)<0?'var(--red-dim)':calcCountdown(r.dateDeadline)<=3?'var(--amber-dim)':'var(--inset)'};border:1px solid ${calcCountdown(r.dateDeadline)<0?'rgba(220,38,38,0.25)':calcCountdown(r.dateDeadline)<=3?'rgba(217,119,6,0.25)':'var(--border)'};border-radius:8px;padding:10px 12px;">
           <div style="font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Target Deadline</div>
           <div style="font-size:13px;font-weight:800;color:${calcCountdown(r.dateDeadline)<0?'var(--red)':calcCountdown(r.dateDeadline)<=3?'var(--amber)':'var(--text)'};">${formatDate(r.dateDeadline)}</div>
-          ${calcCountdown(r.dateDeadline)!==null ? `<div style="font-size:11px;font-weight:700;margin-top:3px;color:${calcCountdown(r.dateDeadline)<0?'var(--red)':calcCountdown(r.dateDeadline)<=3?'var(--amber)':'var(--green)'};">${calcCountdown(r.dateDeadline)<0?'⚠ '+Math.abs(calcCountdown(r.dateDeadline))+' hari terlewat':calcCountdown(r.dateDeadline)===0?'🔴 Hari ini!':'⏱ '+calcCountdown(r.dateDeadline)+' hari lagi'}</div>` : ''}
+          ${calcCountdown(r.dateDeadline)!==null ? `<div style="font-size:11px;font-weight:700;margin-top:3px;color:${calcCountdown(r.dateDeadline)<0?'var(--red)':calcCountdown(r.dateDeadline)<=3?'var(--amber)':'var(--green)'};">${calcCountdown(r.dateDeadline)<0?'⚠ '+Math.abs(calcCountdown(r.dateDeadline))+' hari terlewat':calcCountdown(r.dateDeadline)===0?'🔴 Today!':'⏱ '+calcCountdown(r.dateDeadline)+' hari lagi'}</div>` : ''}
         </div>` : ''}
         ${r.dateStart ? `<div style="background:var(--inset);border:1px solid var(--border);border-radius:8px;padding:10px 12px;">
-          <div style="font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Estimasi Mulai</div>
+          <div style="font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Estimated Start</div>
           <div style="font-size:13px;font-weight:700;color:var(--text);">${formatDate(r.dateStart)}</div>
         </div>` : ''}
         ${r.dateEnd ? `<div style="background:var(--inset);border:1px solid var(--border);border-radius:8px;padding:10px 12px;">
-          <div style="font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Estimasi Selesai</div>
+          <div style="font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Estimated Completion</div>
           <div style="font-size:13px;font-weight:700;color:var(--text);">${formatDate(r.dateEnd)}</div>
         </div>` : ''}
         ${r.duration ? `<div style="grid-column:1/-1;background:var(--indigo-dim);border:1px solid var(--indigo-dim2);border-radius:8px;padding:10px 12px;">
-          <div style="font-size:10px;font-weight:700;color:var(--indigo);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Estimasi Durasi</div>
+          <div style="font-size:10px;font-weight:700;color:var(--indigo);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Estimated Duration</div>
           <div style="font-size:13px;font-weight:700;color:var(--indigo);">${r.duration}</div>
         </div>` : ''}
       </div>
     </div>` : ''}
     <div class="detail-section">
-      <h4>Deskripsi Kebutuhan</h4>
+      <h4>Requirements Description</h4>
       <div class="detail-desc">${r.description||'\u2014'}</div>
-      ${r.notes ? `<div style="margin-top:10px;padding:10px 12px;background:var(--amber-dim);border:1px solid rgba(245,158,11,0.2);border-radius:8px;font-size:12px;color:var(--text-muted);"><strong style="color:var(--amber)">Catatan:</strong> ${r.notes}</div>` : ''}
+      ${r.notes ? `<div style="margin-top:10px;padding:10px 12px;background:var(--amber-dim);border:1px solid rgba(245,158,11,0.2);border-radius:8px;font-size:12px;color:var(--text-muted);"><strong style="color:var(--amber)">Notes:</strong> ${r.notes}</div>` : ''}
     </div>
     ${r.specs && r.specs.length > 0 ? `
     <div class="detail-section">
-      <h4>Spesifikasi Custom</h4>
+      <h4>Custom Specifications</h4>
       <div style="border:1.5px solid var(--border);border-radius:10px;overflow:hidden;">
         <div style="display:grid;grid-template-columns:1fr 2fr;background:var(--indigo-dim);padding:8px 14px;">
           <div style="font-size:11px;font-weight:800;color:var(--indigo);text-transform:uppercase;letter-spacing:.05em;">Field</div>
@@ -2214,7 +2487,7 @@ function renderDetailBody(r) {
     </div>` : ''}
     ${r.items && r.items.length > 0 ? `
     <div class="detail-section">
-      <h4>📦 Item Custom (${r.items.length})</h4>
+      <h4>📦 Custom Items (${r.items.length})</h4>
       <div style="border:1.5px solid var(--border);border-radius:10px;overflow:hidden;">
         ${r.items.map((item, idx) => `
           <div style="${idx>0?'border-top:1px solid var(--border);':''}">
@@ -2235,7 +2508,7 @@ function renderDetailBody(r) {
                       <div style="font-size:12px;color:var(--text);">${s.value}</div>
                     </div>
                   `).join('')}
-                </div>`:(!item.desc?`<span style="font-size:12px;color:var(--text-dim);font-style:italic;">Tidak ada detail</span>`:'')}
+                </div>`:(!item.desc?`<span style="font-size:12px;color:var(--text-dim);font-style:italic;">No details</span>`:'')}
             </div>
           </div>
         `).join('')}
@@ -2256,10 +2529,10 @@ function renderDetailBody(r) {
           </div>`;
         }).join('')}
       </div>
-    </div>` : `<div style="background:var(--red-dim);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:10px 12px;margin-bottom:16px;font-size:13px;color:#FCA5A5;"><strong>Ditolak</strong>${r.rejectedReason ? ': '+r.rejectedReason : ''}</div>`}
+    </div>` : `<div style="background:var(--red-dim);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:10px 12px;margin-bottom:16px;font-size:13px;color:#FCA5A5;"><strong>Rejected</strong>${r.rejectedReason ? ': '+r.rejectedReason : ''}</div>`}
     ${actionsHtml}
     <div class="detail-section">
-      <h4>Diskusi & Komentar</h4>
+      <h4>Diskusi & Comment</h4>
       <div class="comments">
         ${comments.length ? comments.map(c => `
           <div class="comment-item">
@@ -2272,25 +2545,25 @@ function renderDetailBody(r) {
               <div class="comment-text">${c.text||''}</div>
             </div>
           </div>
-        `).join('') : '<div style="color:var(--text-dim);font-size:12px;text-align:center;padding:16px;">Belum ada komentar</div>'}
+        `).join('') : '<div style="color:var(--text-dim);font-size:12px;text-align:center;padding:16px;">No commentss</div>'}
       </div>
       <div class="comment-input-row">
-        <input class="comment-input" id="comment-input-${r.id}" placeholder="Tulis komentar atau catatan..." onkeydown="if(event.key==='Enter')addComment('${r.id}')">
-        <button class="btn-send" onclick="addComment('${r.id}')">Kirim</button>
+        <input class="comment-input" id="comment-input-${r.id}" placeholder="Write a comment or note..." onkeydown="if(event.key==='Enter')addComment('${r.id}')">
+        <button class="btn-send" onclick="addComment('${r.id}')">Send</button>
       </div>
     </div>
   `;
 }
 
 window.updateStatus = async function(id, status) {
-  await updateDoc(doc(db,'requests',id), { status, updatedAt: serverTimestamp() });
+  await updateDoc(doc(db,'requestss',id), { status, updatedAt: serverTimestamp() });
   showToast(`\u2713 Status diperbarui: ${STATUS_LABELS[status]}`, 'success');
   await openDetail(id);
 };
 
 window.rejectRequest = async function(id) {
   const reason = document.getElementById('reject-reason')?.value.trim() || '';
-  await updateDoc(doc(db,'requests',id), { status:'rejected', rejectedReason:reason, updatedAt:serverTimestamp() });
+  await updateDoc(doc(db,'requestss',id), { status:'rejected', rejectedReason:reason, updatedAt:serverTimestamp() });
   showToast('Request ditolak.', 'info');
   closeModal('modal-detail');
 };
@@ -2299,14 +2572,14 @@ window.addComment = async function(id) {
   const inp = document.getElementById(`comment-input-${id}`);
   const text = inp?.value.trim();
   if (!text) return;
-  const snap = await getDoc(doc(db,'requests',id));
+  const snap = await getDoc(doc(db,'requestss',id));
   const existing = snap.data()?.comments || [];
   const newComment = {
     author: currentUserData?.name || currentUser.email,
     text,
     time: new Date().toLocaleString('id-ID')
   };
-  await updateDoc(doc(db,'requests',id), { comments: [...existing, newComment], updatedAt:serverTimestamp() });
+  await updateDoc(doc(db,'requestss',id), { comments: [...existing, newComment], updatedAt:serverTimestamp() });
   inp.value = '';
   await openDetail(id);
 };
@@ -2314,7 +2587,7 @@ window.addComment = async function(id) {
 // --- REQUEST FORM (ADD / EDIT) ---
 window.openRequestForm = async function(id) {
   id = id || '';
-  openModal('modal-request-form');
+  openModal('modal-requests-form');
   document.getElementById('req-edit-id').value = id;
   const itemsList = document.getElementById('req-items-list');
   if (itemsList) itemsList.innerHTML = '';
@@ -2329,12 +2602,12 @@ window.openRequestForm = async function(id) {
   const selector = document.getElementById('req-client-selector');
   if (badge)    badge.style.display    = 'none';
   if (selector) selector.style.display = 'none';
-  document.getElementById('req-date-request').value = new Date().toISOString().split('T')[0];
+  document.getElementById('req-date-requests').value = new Date().toISOString().split('T')[0];
   if (id) {
-    document.getElementById('req-form-title').textContent = 'Edit Item Request';
-    document.getElementById('req-form-sub').textContent   = 'Perbarui detail item ini';
-    const snap = await getDoc(doc(db, 'requests', id));
-    if (!snap.exists()) { showToast('Request tidak ditemukan', 'error'); return; }
+    document.getElementById('req-form-title').textContent = 'Edit Request Item';
+    document.getElementById('req-form-sub').textContent   = 'Update this item details';
+    const snap = await getDoc(doc(db, 'requestss', id));
+    if (!snap.exists()) { showToast('Request not found', 'error'); return; }
     const r = snap.data();
     document.getElementById('req-client-id').value = r.clientId || '';
     document.getElementById('req-priority').value  = r.priority  || 'medium';
@@ -2353,11 +2626,11 @@ window.openRequestForm = async function(id) {
       if (bn) bn.textContent = cl.name;
     }
   } else {
-    document.getElementById('req-form-title').textContent = 'Request Custom Baru';
-    document.getElementById('req-form-sub').textContent   = 'Tiap item = 1 request tersendiri';
+    document.getElementById('req-form-title').textContent = 'New Custom Request';
+    document.getElementById('req-form-sub').textContent   = 'Each item = 1 separate requests';
     if (selector) selector.style.display = 'block';
     const ddEl = document.getElementById('req-client-select-dropdown');
-    if (ddEl) ddEl.innerHTML = '<option value="">-- Pilih Klien --</option>' +
+    if (ddEl) ddEl.innerHTML = '<option value="">-- Select Client --</option>' +
       allClients.map(cl => '<option value="' + cl.id + '">' + cl.name + '</option>').join('');
     addItemRow();
   }
@@ -2390,11 +2663,11 @@ window.showFullDesc = function(id, title, desc) {
 
 // --- ITEM ROWS (multi-item per dokumen) ---
 const TYPE_OPTS = `
-  <option value="">-- Pilih Tipe --</option>
-  <option value="feature">Fitur Baru</option>
-  <option value="menu">Menu / Modul</option>
-  <option value="function">Fungsi / Logic</option>
-  <option value="report">Laporan</option>
+  <option value="">-- Select Type --</option>
+  <option value="feature">New Feature</option>
+  <option value="menu">Menu / Module</option>
+  <option value="function">Function / Logic</option>
+  <option value="report">Report</option>
   <option value="other">Lainnya</option>
 `;
 
@@ -2416,17 +2689,17 @@ window.addItemRow = function(item = {}) {
       <div style="font-size:12px;font-weight:800;color:var(--indigo);">Item #${itemNum}</div>
       <button type="button" onclick="removeItemRow('item-row-${id}')"
         style="padding:3px 10px;background:var(--red-dim);border:1.5px solid rgba(220,38,38,0.2);border-radius:6px;color:var(--red);font-size:11px;font-weight:700;cursor:pointer;">
-        \u2715 Hapus
+        \u2715 Delete
       </button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
       <div class="field" style="margin:0;">
-        <label>Nama / Judul Item <span style="color:var(--red)">*</span></label>
-        <input type="text" class="item-name" value="${item.name||''}" placeholder="Contoh: Laporan Rekap Penjualan"
+        <label>Item Name / Title <span style="color:var(--red)">*</span></label>
+        <input type="text" class="item-name" value="${item.name||''}" placeholder="Contoh: Report Rekap Penjualan"
           style="padding:9px 12px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;outline:none;width:100%;">
       </div>
       <div class="field" style="margin:0;">
-        <label>Tipe</label>
+        <label>Type</label>
         <select class="item-type"
           style="width:100%;padding:9px 12px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;outline:none;">
           ${TYPE_OPTS}
@@ -2434,14 +2707,14 @@ window.addItemRow = function(item = {}) {
       </div>
     </div>
     <div class="field" style="margin-bottom:10px;">
-      <label>Deskripsi Kebutuhan</label>
-      <textarea class="item-desc" placeholder="Jelaskan detail kebutuhan item ini..."
+      <label>Requirements Description</label>
+      <textarea class="item-desc" placeholder="Describe the requirements for this item..."
         style="width:100%;min-height:70px;padding:9px 12px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;outline:none;resize:vertical;">${item.desc||''}</textarea>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">
       <div class="field" style="margin:0;">
-        <label style="font-size:11px;">Tgl Request</label>
-        <input type="date" class="item-date-request" value="${item.dateRequest||today}" readonly
+        <label style="font-size:11px;">Request Date</label>
+        <input type="date" class="item-date-requests" value="${item.dateRequest||today}" readonly
           style="padding:7px 10px;background:var(--inset);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text-muted);font-size:12px;font-family:inherit;outline:none;width:100%;">
       </div>
       <div class="field" style="margin:0;">
@@ -2450,23 +2723,23 @@ window.addItemRow = function(item = {}) {
           style="padding:7px 10px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:12px;font-family:inherit;outline:none;width:100%;">
       </div>
       <div class="field" style="margin:0;">
-        <label style="font-size:11px;">Est. Durasi</label>
-        <input type="text" class="item-duration" value="${item.duration||''}" placeholder="2 minggu"
+        <label style="font-size:11px;">Est. Duration</label>
+        <input type="text" class="item-duration" value="${item.duration||''}" placeholder="2 weeks"
           style="padding:7px 10px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:12px;font-family:inherit;outline:none;width:100%;">
       </div>
     </div>
     <div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-        <label style="font-size:12px;color:var(--text-muted);font-weight:600;">Spesifikasi / Parameter</label>
+        <label style="font-size:12px;color:var(--text-muted);font-weight:600;">Specifications / Parameters</label>
         <button type="button" onclick="addSpecRowInItem('item-row-${id}')"
           style="font-size:11px;font-weight:700;color:var(--indigo);background:var(--indigo-dim);border:1.5px solid var(--indigo-dim2);border-radius:6px;padding:3px 10px;cursor:pointer;">
-          \uFF0B Tambah Spec
+          \uFF0B Add Spec
         </button>
       </div>
       <div class="item-specs-list" id="specs-${id}"></div>
       <div class="item-specs-empty" id="specs-empty-${id}"
         style="padding:8px 12px;border:1.5px dashed var(--border-md);border-radius:8px;font-size:12px;color:var(--text-dim);text-align:center;">
-        Belum ada spec \u2014 opsional
+        No specs \u2014 optional
       </div>
     </div>
   `;
@@ -2491,7 +2764,7 @@ window.addSpecRowInItem = function(itemId, key='', val='') {
   const row = document.createElement('div');
   row.style.cssText = 'display:grid;grid-template-columns:1fr 1.6fr auto;gap:6px;margin-bottom:6px;';
   row.innerHTML = `
-    <input type="text" value="${key}" placeholder="Nama spec" class="spec-key"
+    <input type="text" value="${key}" placeholder="Name spec" class="spec-key"
       style="padding:7px 10px;background:var(--card);border:1.5px solid var(--border);border-radius:7px;color:var(--text);font-size:12px;font-family:inherit;outline:none;"
       onfocus="this.style.borderColor='var(--indigo)'" onblur="this.style.borderColor='var(--border)'">
     <input type="text" value="${val}" placeholder="Nilai" class="spec-val"
@@ -2539,7 +2812,7 @@ function collectItems() {
     const name         = row.querySelector('.item-name')?.value.trim() || '';
     const type         = row.querySelector('.item-type')?.value || '';
     const desc         = row.querySelector('.item-desc')?.value.trim() || '';
-    const dateRequest  = row.querySelector('.item-date-request')?.value || '';
+    const dateRequest  = row.querySelector('.item-date-requests')?.value || '';
     const dateDeadline = row.querySelector('.item-date-deadline')?.value || '';
     const duration     = row.querySelector('.item-duration')?.value.trim() || '';
     const specs = [];
@@ -2563,7 +2836,7 @@ window.addSpecRow = function(containerId, key='', val='') {
   row.id = `spec-row-${idx}`;
   row.style.cssText = 'display:grid;grid-template-columns:1fr 1.6fr auto;gap:8px;margin-bottom:8px;align-items:start;';
   row.innerHTML = `
-    <input type="text" value="${key}" placeholder="Nama field" class="spec-key"
+    <input type="text" value="${key}" placeholder="Name field" class="spec-key"
       style="padding:9px 12px;background:var(--inset);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;outline:none;"
       onfocus="this.style.borderColor='var(--indigo)'" onblur="this.style.borderColor='var(--border)'">
     <input type="text" value="${val}" placeholder="Nilai / keterangan" class="spec-val"
@@ -2626,24 +2899,24 @@ window.saveRequest = async function() {
   const dd = document.getElementById('req-client-select-dropdown');
   if (!clientId && dd?.value) clientId = dd.value;
   const client = allClients.find(x => x.id === clientId)?.name || '';
-  if (!clientId || !client) { showToast('Pilih klien terlebih dahulu', 'error'); return; }
-  if (items.length === 0)   { showToast('Tambahkan minimal 1 item', 'error'); return; }
+  if (!clientId || !client) { showToast('Please select a client first', 'error'); return; }
+  if (items.length === 0)   { showToast('Add at least 1 item', 'error'); return; }
   const unnamed = items.findIndex(it => !it.name);
-  if (unnamed >= 0) { showToast('Item #' + (unnamed+1) + ' belum ada nama', 'error'); return; }
+  if (unnamed >= 0) { showToast('Item #' + (unnamed+1) + ' has no name yet', 'error'); return; }
   const priority = document.getElementById('req-priority')?.value || 'medium';
   const notes    = document.getElementById('req-notes')?.value.trim() || '';
   const baseDate = new Date().toISOString().split('T')[0];
   if (editId) {
     const item = items[0];
-    await updateDoc(doc(db, 'requests', editId), {
+    await updateDoc(doc(db, 'requestss', editId), {
       name: item.name, type: item.type||'', desc: item.desc||'',
       specs: item.specs||[], dateRequest: item.dateRequest||baseDate,
       dateDeadline: item.dateDeadline||'', duration: item.duration||'',
       priority, clientId, client, notes, updatedAt: serverTimestamp()
     });
-    showToast('\u2713 Request berhasil diperbarui', 'success');
+    showToast('\u2713 Request updated successfully', 'success');
   } else {
-    await Promise.all(items.map(item => addDoc(collection(db, 'requests'), {
+    await Promise.all(items.map(item => addDoc(collection(db, 'requestss'), {
       name: item.name, type: item.type||'', desc: item.desc||'',
       specs: item.specs||[], dateRequest: item.dateRequest||baseDate,
       dateDeadline: item.dateDeadline||'', duration: item.duration||'',
@@ -2652,33 +2925,33 @@ window.saveRequest = async function() {
       submittedByName: currentUserData?.name || currentUser.email,
       createdAt: serverTimestamp(), updatedAt: serverTimestamp(), comments: []
     })));
-    showToast('\u2713 ' + items.length + ' item berhasil dikirim!', 'success');
+    showToast('\u2713 ' + items.length + ' items sent successfully!', 'success');
   }
-  closeModal('modal-request-form');
+  closeModal('modal-requests-form');
 };
 
 window.quickApprove = async function(id) {
-  await updateDoc(doc(db,'requests',id), { status:'validated', updatedAt:serverTimestamp() });
+  await updateDoc(doc(db,'requestss',id), { status:'validated', updatedAt:serverTimestamp() });
   showToast('✓ Request di-approve! Masuk ke Dev Board','success');
 };
 
 window.quickReject = async function(id) {
   const inp = document.getElementById('reject-reason-'+id);
   const reason = inp?.value.trim() || '';
-  await updateDoc(doc(db,'requests',id), { status:'rejected', rejectedReason:reason, updatedAt:serverTimestamp() });
+  await updateDoc(doc(db,'requestss',id), { status:'rejected', rejectedReason:reason, updatedAt:serverTimestamp() });
   showToast('Request ditolak','info');
 };
 
 window.deleteRequest = async function(id, title) {
-  if (!confirm(`Hapus request berikut?\n\n"${title}"\n\nTindakan ini tidak dapat dibatalkan.`)) return;
-  await deleteDoc(doc(db,'requests',id));
+  if (!confirm(`Delete requests berikut?\n\n"${title}"\n\nTindakan ini tidak dapat dibatalkan.`)) return;
+  await deleteDoc(doc(db,'requestss',id));
   showToast('Request dihapus','info');
 };
 
 // --- PRINT REQUEST ---
 window.printRequest = async function(id) {
-  const snap = await getDoc(doc(db,'requests',id));
-  if (!snap.exists()) { showToast('Data tidak ditemukan','error'); return; }
+  const snap = await getDoc(doc(db,'requestss',id));
+  if (!snap.exists()) { showToast('Data not found','error'); return; }
   const r = { id:snap.id, ...snap.data() };
   const date     = r.createdAt?.toDate  ? r.createdAt.toDate().toLocaleString('id-ID')  : '—';
   const updDate  = r.updatedAt?.toDate  ? r.updatedAt.toDate().toLocaleString('id-ID')  : '—';
@@ -2704,14 +2977,14 @@ window.printRequest = async function(id) {
           </table>` : ''}
       </div>
     </div>
-  `).join('') : '<p style="color:#aaa;font-size:12px;font-style:italic;margin:0;">Tidak ada item custom</p>';
+  `).join('') : '<p style="color:#aaa;font-size:12px;font-style:italic;margin:0;">No items custom</p>';
 
   const commentsHtml = r.comments && r.comments.length > 0 ? r.comments.map(c=>`
     <div style="margin-bottom:8px;padding:8px 12px;border:1px solid #E5E7EB;border-left:2px solid #374151;border-radius:3px;">
       <div style="font-size:11px;font-weight:700;color:#111;">${c.author||'\u2014'} <span style="color:#aaa;font-weight:400;">\u00B7 ${c.time||''}</span></div>
       <div style="font-size:12px;margin-top:3px;color:#374151;">${c.text||''}</div>
     </div>
-  `).join('') : '<p style="color:#aaa;font-size:12px;font-style:italic;margin:0;">Tidak ada komentar</p>';
+  `).join('') : '<p style="color:#aaa;font-size:12px;font-style:italic;margin:0;">No commentss yet</p>';
 
   const printHtml = `
     <div style="font-family:'Inter',Arial,sans-serif;max-width:780px;margin:0 auto;padding:40px 48px;color:#111;background:#fff;">
@@ -2732,32 +3005,32 @@ window.printRequest = async function(id) {
 
       <!-- JUDUL REQUEST -->
       <div style="margin-bottom:20px;">
-        <div style="font-size:16px;font-weight:800;color:#111;line-height:1.4;">${r.title||'\u2014'}</div>
+        <div style="font-size:16px;font-weight:800;color:#111;line-height:1.4;">${r.name||r.name||r.title||'\u2014'||'\u2014'}</div>
       </div>
 
       <!-- INFO GRID -->
       <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
         <tbody>
           <tr style="border-bottom:1px solid #E5E7EB;">
-            <td style="padding:7px 0;font-size:11px;color:#777;width:150px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Klien</td>
+            <td style="padding:7px 0;font-size:11px;color:#777;width:150px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Client</td>
             <td style="padding:7px 0;font-size:13px;font-weight:700;color:#111;">${r.client||'\u2014'}</td>
             <td style="padding:7px 0;font-size:11px;color:#777;width:150px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Status</td>
             <td style="padding:7px 0;font-size:13px;font-weight:700;color:#111;">${statusLabel}</td>
           </tr>
           <tr style="border-bottom:1px solid #E5E7EB;">
-            <td style="padding:7px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Diajukan Oleh</td>
+            <td style="padding:7px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Submitted By</td>
             <td style="padding:7px 0;font-size:13px;color:#111;">${r.submittedByName||'\u2014'}</td>
-            <td style="padding:7px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Tipe Request</td>
+            <td style="padding:7px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Type Request</td>
             <td style="padding:7px 0;font-size:13px;color:#111;">${typeLabel}</td>
           </tr>
           <tr style="border-bottom:1px solid #E5E7EB;">
-            <td style="padding:7px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Tanggal Dibuat</td>
+            <td style="padding:7px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Created Date</td>
             <td style="padding:7px 0;font-size:13px;color:#111;">${date}</td>
-            <td style="padding:7px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Prioritas</td>
+            <td style="padding:7px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Priority</td>
             <td style="padding:7px 0;font-size:13px;font-weight:700;color:#111;">${priorityMap[r.priority]||r.priority||'\u2014'}</td>
           </tr>
           <tr>
-            <td style="padding:7px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Terakhir Update</td>
+            <td style="padding:7px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Last Updated</td>
             <td style="padding:7px 0;font-size:13px;color:#111;" colspan="3">${updDate}</td>
           </tr>
         </tbody>
@@ -2765,52 +3038,52 @@ window.printRequest = async function(id) {
 
       <!-- DESKRIPSI KEBUTUHAN -->
       <div style="margin-bottom:20px;">
-        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#555;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #E5E7EB;">Timeline & Estimasi</div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#555;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #E5E7EB;">Timeline & Estimates</div>
         <table style="width:100%;border-collapse:collapse;">
           <tr style="border-bottom:1px solid #E5E7EB;">
-            <td style="padding:6px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;width:150px;">Tgl Request</td>
+            <td style="padding:6px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;width:150px;">Request Date</td>
             <td style="padding:6px 0;font-size:13px;color:#111;">${formatDate(r.dateRequest)}</td>
             <td style="padding:6px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;width:150px;">Target Deadline</td>
-            <td style="padding:6px 0;font-size:13px;font-weight:700;color:${calcCountdown(r.dateDeadline)<0?'#DC2626':calcCountdown(r.dateDeadline)<=3?'#D97706':'#111'};">${formatDate(r.dateDeadline)}${calcCountdown(r.dateDeadline)!==null?' ('+( calcCountdown(r.dateDeadline)<0?Math.abs(calcCountdown(r.dateDeadline))+' hari terlewat':calcCountdown(r.dateDeadline)===0?'Hari ini':calcCountdown(r.dateDeadline)+' hari lagi')+')':''}</td>
+            <td style="padding:6px 0;font-size:13px;font-weight:700;color:${calcCountdown(r.dateDeadline)<0?'#DC2626':calcCountdown(r.dateDeadline)<=3?'#D97706':'#111'};">${formatDate(r.dateDeadline)}${calcCountdown(r.dateDeadline)!==null?' ('+( calcCountdown(r.dateDeadline)<0?Math.abs(calcCountdown(r.dateDeadline))+' hari terlewat':calcCountdown(r.dateDeadline)===0?'Today':calcCountdown(r.dateDeadline)+' hari lagi')+')':''}</td>
           </tr>
           <tr style="border-bottom:1px solid #E5E7EB;">
             <td style="padding:6px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;">Est. Mulai</td>
             <td style="padding:6px 0;font-size:13px;color:#111;">${formatDate(r.dateStart)}</td>
-            <td style="padding:6px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;">Est. Selesai</td>
+            <td style="padding:6px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;">Est. Done</td>
             <td style="padding:6px 0;font-size:13px;color:#111;">${formatDate(r.dateEnd)}</td>
           </tr>
-          ${r.duration?`<tr><td style="padding:6px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;">Durasi</td><td colspan="3" style="padding:6px 0;font-size:13px;font-weight:700;color:#111;">${r.duration}</td></tr>`:''}
+          ${r.duration?`<tr><td style="padding:6px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;">Duration</td><td colspan="3" style="padding:6px 0;font-size:13px;font-weight:700;color:#111;">${r.duration}</td></tr>`:''}
         </table>
       </div>
 
       <!-- DESKRIPSI KEBUTUHAN -->
       <div style="margin-bottom:20px;">
-        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#555;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #E5E7EB;">Deskripsi Kebutuhan</div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#555;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #E5E7EB;">Requirements Description</div>
         <p style="font-size:13px;line-height:1.8;color:#111;white-space:pre-wrap;margin:0;">${r.description||'\u2014'}</p>
-        ${r.notes ? `<div style="margin-top:12px;padding:10px 14px;border:1px solid #D1D5DB;border-left:3px solid #374151;border-radius:4px;font-size:12px;color:#374151;"><strong>Catatan:</strong> ${r.notes}</div>` : ''}
+        ${r.notes ? `<div style="margin-top:12px;padding:10px 14px;border:1px solid #D1D5DB;border-left:3px solid #374151;border-radius:4px;font-size:12px;color:#374151;"><strong>Notes:</strong> ${r.notes}</div>` : ''}
       </div>
 
       <!-- ITEM CUSTOM -->
       <div style="margin-bottom:20px;">
-        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#555;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #E5E7EB;">Daftar Item Custom</div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#555;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #E5E7EB;">Custom Items List</div>
         ${itemsPrintHtml}
       </div>
 
       <!-- KOMENTAR -->
       <div style="margin-bottom:24px;">
-        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#555;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #E5E7EB;">Diskusi & Komentar</div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#555;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #E5E7EB;">Diskusi & Comment</div>
         ${commentsHtml}
       </div>
 
       <!-- TTD -->
       <div style="margin-top:36px;padding-top:20px;border-top:1px solid #E5E7EB;">
-        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#555;margin-bottom:20px;">Persetujuan</div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#555;margin-bottom:20px;">Approval</div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;">
-          ${['Diajukan Oleh','Divalidasi Oleh (CTO)','Dikerjakan Oleh (Dev)'].map(label => `
+          ${['Submitted By','Divalidasi Oleh (CTO)','Assigned To (Dev)'].map(label => `
             <div style="text-align:center;">
               <div style="height:56px;border-bottom:1px solid #111;margin-bottom:6px;"></div>
               <div style="font-size:11px;color:#555;font-weight:600;">${label}</div>
-              <div style="font-size:10px;color:#aaa;margin-top:2px;">Nama & Tanda Tangan</div>
+              <div style="font-size:10px;color:#aaa;margin-top:2px;">Name & Tanda Tangan</div>
             </div>
           `).join('')}
         </div>
@@ -2837,18 +3110,18 @@ function renderClientsPage() {
     return `
       <div style="text-align:center;padding:80px 20px;">
         <div style="font-size:64px;margin-bottom:16px;opacity:.35;">\uD83C\uDFE2</div>
-        <div style="font-size:18px;font-weight:800;color:var(--text-muted);margin-bottom:8px;">Belum ada data klien</div>
-        <div style="font-size:13px;color:var(--text-dim);margin-bottom:28px;">Belum ada klien terdaftar. Tambahkan klien pertama untuk mulai membuat request.</div>
-        ${canEdit ? `<button class="btn-new" onclick="openClientForm('')" style="display:inline-flex;margin:0 auto;">＋ Tambah Klien Pertama</button>` : '<div style="font-size:13px;color:var(--text-dim);">Hubungi Marketing atau CTO untuk menambahkan klien.</div>'}
+        <div style="font-size:18px;font-weight:800;color:var(--text-muted);margin-bottom:8px;">No data clients</div>
+        <div style="font-size:13px;color:var(--text-dim);margin-bottom:28px;">No clients registered yet. Add your first client to start creating requests.</div>
+        ${canEdit ? `<button class="btn-new" onclick="openClientForm('')" style="display:inline-flex;margin:0 auto;">＋ Add Client Pertama</button>` : '<div style="font-size:13px;color:var(--text-dim);">Contact Marketing or CTO to add clients.</div>'}
       </div>
     `;
   }
   return `
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
-      <input class="filter-search" style="max-width:280px;" id="client-search" placeholder="Cari nama, PIC, industri..." oninput="filterClients()">
+      <input class="filter-search" style="max-width:280px;" id="client-search" placeholder="Search name, PIC, industry..." oninput="filterClients()">
       <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
-        <span style="font-size:13px;color:var(--text-muted);">${allClients.length} klien</span>
-        ${canEdit ? `<button class="btn-new" onclick="openClientForm('')" style="display:inline-flex;">＋ Tambah Klien</button>` : ''}
+        <span style="font-size:13px;color:var(--text-muted);">${allClients.length} clients</span>
+        ${canEdit ? `<button class="btn-new" onclick="openClientForm('')" style="display:inline-flex;">＋ Add Client</button>` : ''}
       </div>
     </div>
     <div id="clients-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;">
@@ -2869,7 +3142,7 @@ window.filterClients = function() {
   const grid = document.getElementById('clients-grid');
   if (grid) grid.innerHTML = filtered.length
     ? filtered.map(cl => renderClientCard(cl, canEdit)).join('')
-    : `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-dim);font-size:13px;">Tidak ada hasil untuk "<strong>${q}</strong>"</div>`;
+    : `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-dim);font-size:13px;">No results for "<strong>${q}</strong>"</div>`;
 };
 
 function renderClientCard(cl, canEdit) {
@@ -2913,7 +3186,7 @@ function renderClientCard(cl, canEdit) {
           ${cl.pic   ? `<div style="font-size:12px;color:var(--text-muted);display:flex;gap:6px;"><span style="color:var(--text-dim);min-width:56px;">PIC</span><span style="font-weight:600;color:var(--text);">${cl.pic}${cl.picRole?' · <span style="font-weight:400;">'+cl.picRole+'</span>':''}</span></div>` : ''}
           ${cl.phone ? `<div style="font-size:12px;color:var(--text-muted);display:flex;gap:6px;"><span style="color:var(--text-dim);min-width:56px;">Telp</span><span>${cl.phone}</span></div>` : ''}
           ${cl.email ? `<div style="font-size:12px;color:var(--text-muted);display:flex;gap:6px;"><span style="color:var(--text-dim);min-width:56px;">Email</span><span style="color:#027fb3;">${cl.email}</span></div>` : ''}
-          ${cl.products ? `<div style="font-size:12px;color:var(--text-muted);display:flex;gap:6px;"><span style="color:var(--text-dim);min-width:56px;">Produk</span><span>${cl.products}</span></div>` : ''}
+          ${cl.products ? `<div style="font-size:12px;color:var(--text-muted);display:flex;gap:6px;"><span style="color:var(--text-dim);min-width:56px;">Products</span><span>${cl.products}</span></div>` : ''}
         </div>
 
         <!-- REQUEST SUMMARY -->
@@ -2954,7 +3227,7 @@ window.openClientForm = async function(id) {
   id = id || '';
   document.getElementById('client-edit-id').value = id;
   if (id) {
-    document.getElementById('client-form-title').textContent = 'Edit Data Klien';
+    document.getElementById('client-form-title').textContent = 'Edit Clients';
     const snap = await getDoc(doc(db,'clients',id));
     if (snap.exists()) {
       const c = snap.data();
@@ -2970,7 +3243,7 @@ window.openClientForm = async function(id) {
       document.getElementById('cl-notes').value = c.notes||'';
     }
   } else {
-    document.getElementById('client-form-title').textContent = 'Tambah Klien Baru';
+    document.getElementById('client-form-title').textContent = 'Add Client Baru';
     ['cl-name','cl-industry','cl-size','cl-pic','cl-pic-role','cl-phone','cl-email','cl-address','cl-products','cl-notes'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
   }
   openModal('modal-client-form');
@@ -2978,7 +3251,7 @@ window.openClientForm = async function(id) {
 
 window.saveClient = async function() {
   const name = document.getElementById('cl-name').value.trim();
-  if (!name) { showToast('Nama perusahaan wajib diisi','error'); return; }
+  if (!name) { showToast('Name perusahaan wajib diisi','error'); return; }
   const data = {
     name,
     industry: document.getElementById('cl-industry').value,
@@ -2995,19 +3268,19 @@ window.saveClient = async function() {
   const editId = document.getElementById('client-edit-id').value;
   if (editId) {
     await updateDoc(doc(db,'clients',editId), data);
-    showToast('✓ Data klien berhasil diperbarui','success');
+    showToast('✓ Data clients updated successfully','success');
   } else {
     data.createdAt = serverTimestamp();
     await addDoc(collection(db,'clients'), data);
-    showToast('✓ Klien berhasil ditambahkan','success');
+    showToast('✓ Client berhasil diaddkan','success');
   }
   closeModal('modal-client-form');
 };
 
 window.deleteClient = async function(id, name) {
-  if (!confirm(`Hapus klien berikut?\n\n"${name}"\n\nTindakan ini tidak dapat dibatalkan.`)) return;
+  if (!confirm(`Delete clients berikut?\n\n"${name}"\n\nTindakan ini tidak dapat dibatalkan.`)) return;
   await deleteDoc(doc(db,'clients',id));
-  showToast('Klien dihapus','info');
+  showToast('Client dihapus','info');
 };
 
 // --- MODAL HELPERS ---
