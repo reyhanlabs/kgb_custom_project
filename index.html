@@ -2603,68 +2603,64 @@ window.onReqClientChange = function() {
 };
 
 window.saveRequest = async function() {
-  const priority    = document.getElementById('req-priority').value;
-  const notes       = document.getElementById('req-notes')?.value.trim() || '';
-  const items       = collectItems();
-  const dateRequest = document.getElementById('req-date-request').value || '';
-  const dateDeadline= document.getElementById('req-date-deadline').value || '';
-  const dateStart   = document.getElementById('req-date-start')?.value || '';
-  const dateEnd     = document.getElementById('req-date-end')?.value || '';
-  const duration    = document.getElementById('req-duration').value.trim();
-  const selVal      = document.getElementById('req-client-id').value;
+  const items  = collectItems();
+  const editId = document.getElementById('req-edit-id').value;
 
-  let clientId = '', client = '';
-  if (selVal === '__manual__') {
-    client = document.getElementById('req-client-manual').value.trim();
-  } else if (selVal) {
-    clientId = selVal;
-    client   = allClients.find(c=>c.id===selVal)?.name || '';
-  }
+  // Ambil clientId — bisa dari hidden field atau dropdown selector
+  let clientId = document.getElementById('req-client-id')?.value || '';
+  // Kalau pakai selector dropdown
+  const dd = document.getElementById('req-client-select-dropdown');
+  if (!clientId && dd && dd.value) clientId = dd.value;
 
-  if (!client) {
-    showToast('Pilih klien terlebih dahulu','error');
+  const client = allClients.find(x => x.id === clientId)?.name || '';
+
+  if (!clientId || !client) {
+    showToast('Pilih klien terlebih dahulu', 'error');
     return;
   }
   if (items.length === 0) {
-    showToast('Tambahkan minimal 1 item custom','error');
+    showToast('Tambahkan minimal 1 item', 'error');
+    return;
+  }
+  // Pastikan semua item punya nama
+  const unnamed = items.findIndex(it => !it.name);
+  if (unnamed >= 0) {
+    showToast('Item #' + (unnamed+1) + ' belum ada nama/judulnya', 'error');
     return;
   }
 
-  // Judul: ambil dari nama/judul item request (bukan lagi "Custom Request {klien} — tanggal")
-  const itemNames = items.map(it => (it.name||'').trim()).filter(Boolean);
-  let title;
-  if (itemNames.length === 0) {
-    // fallback jika item tidak punya nama sama sekali
-    const dateLabel = dateRequest
-      ? new Date(dateRequest).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})
-      : new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'});
-    title = `Custom Request ${client} \u2014 ${dateLabel}`;
-  } else if (itemNames.length === 1) {
-    title = itemNames[0];
-  } else {
-    title = `${itemNames[0]} (+${itemNames.length - 1} item lainnya)`;
-  }
-  const type      = items[0]?.type || 'other';
-  const timeline  = { dateRequest, dateDeadline, dateStart, dateEnd, duration };
-  const editId    = document.getElementById('req-edit-id').value;
+  const priority    = document.getElementById('req-priority')?.value || 'medium';
+  const notes       = document.getElementById('req-notes')?.value.trim() || '';
+  const dateRequest = new Date().toISOString().split('T')[0];
+
+  // Deadline dokumen = deadline paling awal dari semua item
+  const deadlines = items.map(it => it.dateDeadline).filter(Boolean).sort();
+  const dateDeadline = deadlines[0] || '';
+
+  // Judul auto dari item pertama
+  const title = items.length === 1
+    ? items[0].name
+    : items[0].name + ' (+' + (items.length - 1) + ' item lainnya)';
+
+  const payload = {
+    title, priority, clientId, client, notes, items,
+    dateRequest, dateDeadline,
+    updatedAt: serverTimestamp()
+  };
 
   if (editId) {
-    await updateDoc(doc(db,'requests',editId), {
-      title, type, priority, clientId, client, notes, items,
-      ...timeline, updatedAt: serverTimestamp()
-    });
-    showToast('✓ Request berhasil diperbarui','success');
+    await updateDoc(doc(db, 'requests', editId), payload);
+    showToast('\u2713 Request berhasil diperbarui', 'success');
   } else {
-    await addDoc(collection(db,'requests'), {
-      title, type, priority, clientId, client, notes, items, ...timeline,
-      status:'pending',
+    await addDoc(collection(db, 'requests'), {
+      ...payload,
+      status: 'pending',
       submittedBy: currentUser.uid,
       submittedByName: currentUserData?.name || currentUser.email,
       createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-      comments:[]
+      comments: []
     });
-    showToast('✓ Request berhasil dikirim!','success');
+    showToast('\u2713 Request berhasil dikirim!', 'success');
   }
   closeModal('modal-request-form');
 };
