@@ -1002,6 +1002,20 @@ function showApp() {
 }
 
 // --- REALTIME LISTENER ---
+
+// Event delegation untuk accordion - tidak pakai inline onclick
+document.addEventListener('click', function(e) {
+  var hdr = e.target.closest('[data-acc]');
+  if (!hdr) return;
+  var det = hdr.nextElementSibling;
+  if (!det) return;
+  var ico = hdr.querySelector('.acc-icon');
+  var open = det.style.display !== 'block';
+  det.style.display = open ? 'block' : 'none';
+  if (ico) ico.style.transform = open ? 'rotate(90deg)' : 'rotate(0deg)';
+  hdr.style.background = open ? 'var(--inset)' : 'var(--card)';
+});
+
 function listenRequests() {
   const role = currentUserData?.role;
   let q;
@@ -1592,7 +1606,7 @@ function renderRequestCard(r, role) {
   const progressPct = r.status === 'rejected' ? 0 : Math.round((pipelineIdx / (STATUS_ORDER.length-1)) * 100);
   const fillColor   = r.status === 'done' ? '#10B981' : r.status === 'rejected' ? '#EF4444' : '#027fb3';
   const date = r.createdAt?.toDate ? r.createdAt.toDate().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '—';
-  const safeTitle = (r.title||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+  const safeTitle = (r.title||'').replace(/'/g,"\\'");
   return `
     <div class="req-card status-${r.status}" style="overflow:visible;">
       <!-- PROGRESS BAR — jelas, terpisah dari stripe atas -->
@@ -1722,7 +1736,7 @@ function renderValidateBoard() {
 function renderValidateCard(r) {
   const typeLabel = TYPE_LABELS[r.type] || r.type;
   const date = r.createdAt?.toDate ? r.createdAt.toDate().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '—';
-  const safeTitle = (r.title||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+  const safeTitle = (r.title||'').replace(/'/g,"\\'");
   const countdown = calcCountdown(r.dateDeadline);
   const countdownHtml = countdown !== null ? `
     <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;
@@ -2215,13 +2229,13 @@ function renderAccItem(item, i) {
   }
   var empty = (!dd && !sd) ? '<span style="font-size:12px;color:var(--text-dim);font-style:italic;">Tidak ada detail</span>' : '';
   return '<div style="' + border + '">' +
-    '<div class="acc-hdr" data-acc="1" style="display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;background:var(--card);transition:background .15s;user-select:none;">' +
+    '<div class="acc-hdr" data-acc="1">' +
       '<span style="font-size:11px;font-weight:800;color:var(--indigo);min-width:20px;flex-shrink:0;">' + (i + 1) + '.</span>' +
       '<span style="font-size:13px;font-weight:700;color:var(--text);flex:1;">' + (item.name || '—') + '</span>' +
       tb + sb +
       '<span class="acc-icon" style="font-size:12px;color:var(--text-dim);transition:transform .2s;flex-shrink:0;">▶</span>' +
     '</div>' +
-    '<div class="acc-body" style="display:none;padding:12px 14px 14px 36px;background:var(--inset);border-top:1px solid var(--border);">' +
+    '<div style="display:none;padding:12px 14px 14px 36px;background:var(--inset);border-top:1px solid var(--border);">' +
       dd + sd + empty +
     '</div>' +
   '</div>';
@@ -2234,19 +2248,6 @@ window.accToggle = function(hdr) {
   det.style.display = open ? 'block' : 'none';
   if (ico) ico.style.transform = open ? 'rotate(90deg)' : 'rotate(0deg)';
 };
-
-// Event delegation for accordion - catches clicks even after innerHTML update
-document.addEventListener('click', function(e) {
-  var hdr = e.target.closest('[data-acc="1"]');
-  if (!hdr) return;
-  var det = hdr.nextElementSibling;
-  var ico = hdr.querySelector('.acc-icon');
-  if (!det || !det.classList.contains('acc-body')) return;
-  var open = det.style.display !== 'block';
-  det.style.display = open ? 'block' : 'none';
-  if (ico) ico.style.transform = open ? 'rotate(90deg)' : 'rotate(0deg)';
-  hdr.style.background = open ? 'var(--inset)' : 'var(--card)';
-});
 
 window.toggleItem = function(header) {
   const detail = header.nextElementSibling;
