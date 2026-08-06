@@ -833,76 +833,62 @@
     <div class="modal-header">
       <div class="modal-header-inner">
         <div class="modal-title" id="req-form-title">Request Custom Baru</div>
-        <div class="modal-title-sub" id="req-form-sub">Tambahkan item-item custom yang dibutuhkan klien</div>
+        <div class="modal-title-sub" id="req-form-sub">Tambahkan item-item yang dibutuhkan</div>
       </div>
-      <button class="modal-close" onclick="closeModal('modal-request-form')">✕</button>
+      <button class="modal-close" onclick="closeModal('modal-request-form')">&#x2715;</button>
     </div>
-
-    <div class="modal-body" style="max-height:80vh;overflow-y:auto;scroll-behavior:smooth;">
+    <div class="modal-body" style="max-height:80vh;overflow-y:auto;">
       <input type="hidden" id="req-edit-id">
       <input type="hidden" id="req-title">
+      <input type="hidden" id="req-client-id">
+      <input type="hidden" id="req-client-manual">
+      <input type="hidden" id="req-priority" value="medium">
+      <input type="hidden" id="req-date-request">
+      <input type="hidden" id="req-date-deadline">
+      <input type="hidden" id="req-date-start">
+      <input type="hidden" id="req-date-end">
+      <input type="hidden" id="req-duration">
 
-      <!-- KLIEN + PRIORITAS -->
-      <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start;">
-        <div class="field" style="margin-bottom:0;">
+      <!-- CLIENT — badge (from client page) or selector (from topbar) -->
+      <!-- Badge: klien sudah diketahui dari konteks -->
+      <div id="req-client-badge" style="display:none;margin-bottom:14px;padding:10px 14px;background:var(--indigo-dim);border:1.5px solid var(--indigo-dim2);border-radius:10px;align-items:center;gap:10px;">
+        <span style="font-size:18px;">&#x1F3E2;</span>
+        <div>
+          <div style="font-size:11px;color:var(--indigo);font-weight:700;text-transform:uppercase;letter-spacing:.05em;">Klien</div>
+          <div style="font-size:14px;font-weight:800;color:var(--text);" id="req-client-badge-name">—</div>
+        </div>
+      </div>
+      <!-- Selector: pilih klien (dari tombol ＋ Request Baru topbar) -->
+      <div id="req-client-selector" style="display:none;margin-bottom:14px;">
+        <div class="field" style="margin:0;">
           <label>Klien <span style="color:var(--red)">*</span></label>
-          <select id="req-client-id" onchange="onReqClientChange()"
+          <select id="req-client-select-dropdown" onchange="onReqClientSelectChange(this.value)"
             style="font-size:14px;font-weight:600;">
             <option value="">-- Pilih Klien --</option>
           </select>
         </div>
-        <div class="field" style="margin-bottom:0;">
-          <label>Prioritas</label>
-          <select id="req-priority" style="font-size:13px;">
-            <option value="low">🟢 Low</option>
-            <option value="medium" selected>🟡 Medium</option>
-            <option value="high">🔴 High</option>
-          </select>
-        </div>
-      </div>
-      <div class="field" id="req-client-manual-wrap" style="display:none;margin-top:8px;">
-        <input type="text" id="req-client-manual" placeholder="Nama perusahaan / klien">
       </div>
 
-      <!-- DEADLINE — penting, letakkan di atas -->
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:4px;">
-        <div class="field" style="margin:0;">
-          <label>Tanggal Request</label>
-          <input type="date" id="req-date-request" readonly style="background:var(--inset);color:var(--text-muted);font-size:13px;">
-        </div>
-        <div class="field" style="margin:0;">
-          <label>Target Deadline</label>
-          <input type="date" id="req-date-deadline" style="font-size:13px;">
-        </div>
-        <div class="field" style="margin:0;">
-          <label>Est. Durasi</label>
-          <input type="text" id="req-duration" placeholder="2 minggu" style="font-size:13px;">
-        </div>
+      <!-- ITEM LIST -->
+      <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:10px;">
+        Item Custom
+        <span id="tab-items-count" style="background:var(--indigo-dim);color:var(--indigo);border-radius:20px;padding:1px 8px;font-size:11px;font-weight:800;margin-left:6px;">0</span>
       </div>
+      <div id="req-items-list"></div>
+      <div id="req-items-empty" style="display:none;"></div>
+      <!-- TAMBAH ITEM — di bawah list -->
+      <button type="button" onclick="addItemRow()"
+        style="width:100%;margin-top:8px;padding:11px;border:2px dashed var(--border-md);border-radius:10px;background:transparent;color:var(--text-muted);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;"
+        onmouseover="this.style.background='var(--indigo-dim)';this.style.color='var(--indigo)';this.style.borderColor='var(--indigo)'"
+        onmouseout="this.style.background='transparent';this.style.color='var(--text-muted)';this.style.borderColor='var(--border-md)'">
+        &#xFF0B; Tambah Item
+      </button>
 
-      <!-- ITEM CUSTOM -->
-      <div style="border-top:2px solid var(--border);margin-top:16px;padding-top:14px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-          <div style="font-size:13px;font-weight:800;color:var(--text);">
-            Item Custom
-            <span id="tab-items-count" style="background:var(--indigo-dim);color:var(--indigo);border-radius:20px;padding:1px 8px;font-size:11px;font-weight:800;margin-left:6px;">0</span>
-          </div>
-          <button type="button" onclick="addItemRow()"
-            style="padding:7px 14px;background:var(--indigo);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">
-            ＋ Tambah Item
-          </button>
-        </div>
-        <div id="req-items-list"></div>
-        <div id="req-items-empty" style="text-align:center;padding:28px;border:2px dashed var(--border-md);border-radius:10px;color:var(--text-dim);font-size:13px;">
-          Belum ada item — klik <strong>＋ Tambah Item</strong>
-        </div>
-      </div>
-
-      <!-- CATATAN (collapsed, opsional) -->
+      <!-- CATATAN OPSIONAL -->
       <div style="margin-top:14px;">
         <button type="button" onclick="toggleNotes(this)"
           style="background:none;border:none;color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;padding:0;display:flex;align-items:center;gap:6px;font-family:inherit;">
-          <span id="notes-toggle-icon">▸</span> Tambah catatan / konteks (opsional)
+          <span id="notes-toggle-icon">&#x25B8;</span> Tambah catatan / konteks (opsional)
         </button>
         <div id="req-notes-wrap" style="display:none;margin-top:8px;">
           <textarea id="req-notes" placeholder="Konteks pertemuan, referensi, link dokumen, dll."
@@ -911,13 +897,11 @@
         </div>
       </div>
     </div>
-
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('modal-request-form')">Batal</button>
-      <button class="btn-submit" onclick="saveRequest()">💾 Simpan Request</button>
+      <button class="btn-submit" onclick="saveRequest()">&#x1F4BE; Simpan Request</button>
     </div>
   </div>
-</div>
 
 <!-- MODAL: FULL DESCRIPTION -->
 <div class="modal-overlay" id="modal-desc">
@@ -1359,16 +1343,16 @@ function renderClientGroupCard(group) {
     <div style="background:var(--card);border:1.5px solid var(--border);border-left:5px solid ${color};border-radius:16px;overflow:hidden;box-shadow:var(--sh-card);">
       <!-- HEADER KLIEN (klik untuk buka/tutup) -->
       <div class="client-group-header" onclick="toggleClientGroup('${gid}')" style="display:flex;align-items:flex-start;gap:14px;padding:14px 20px;background:linear-gradient(90deg, ${hexToRgba(color,0.14)}, var(--inset) 55%);border-bottom:1px solid var(--border);cursor:pointer;user-select:none;">
-        <span id="chev-${gid}" style="flex-shrink:0;font-size:11px;color:var(--text-dim);transition:transform .2s;transform:rotate(${isOpen?'90deg':'0deg'});display:inline-block;margin-top:4px;">▶</span>
+        <span id="chev-${gid}" style="flex-shrink:0;font-size:11px;color:var(--text-dim);transition:transform .2s;transform:rotate(${isOpen?'90deg':'0deg'});display:inline-block;margin-top:4px;">\u25B6</span>
         <div style="width:40px;height:40px;border-radius:10px;background:${color};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;">${initials}</div>
         <div style="flex:1;min-width:0;">
           <div style="font-size:15px;font-weight:800;color:var(--text);">${group.name}</div>
-          <div style="font-size:11px;color:var(--text-muted);margin-top:1px;">${cl?.industry||''}${cl?.size?' · '+cl.size:''}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:1px;">${cl?.industry||''}${cl?.size?' \u00B7 '+cl.size:''}</div>
           ${cl && (cl.pic||cl.phone||cl.email) ? `
           <div style="display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:5px;">
-            ${cl.pic?`<span style="font-size:11px;color:var(--text-muted);display:inline-flex;align-items:center;gap:4px;">👤 <strong style="color:var(--text);">${cl.pic}</strong>${cl.picRole?` <span style="color:var(--text-dim);">(${cl.picRole})</span>`:''}</span>`:''}
-            ${cl.phone?`<a href="tel:${cl.phone.replace(/[^0-9+]/g,'')}" onclick="event.stopPropagation()" style="font-size:11px;color:var(--indigo);text-decoration:none;display:inline-flex;align-items:center;gap:4px;">📞 ${cl.phone}</a>`:''}
-            ${cl.email?`<a href="mailto:${cl.email}" onclick="event.stopPropagation()" style="font-size:11px;color:var(--indigo);text-decoration:none;display:inline-flex;align-items:center;gap:4px;">✉ ${cl.email}</a>`:''}
+            ${cl.pic?`<span style="font-size:11px;color:var(--text-muted);display:inline-flex;align-items:center;gap:4px;">\uD83D\uDC64 <strong style="color:var(--text);">${cl.pic}</strong>${cl.picRole?` <span style="color:var(--text-dim);">(${cl.picRole})</span>`:''}</span>`:''}
+            ${cl.phone?`<a href="tel:${cl.phone.replace(/[^0-9+]/g,'')}" onclick="event.stopPropagation()" style="font-size:11px;color:var(--indigo);text-decoration:none;display:inline-flex;align-items:center;gap:4px;">\uD83D\uDCDE ${cl.phone}</a>`:''}
+            ${cl.email?`<a href="mailto:${cl.email}" onclick="event.stopPropagation()" style="font-size:11px;color:var(--indigo);text-decoration:none;display:inline-flex;align-items:center;gap:4px;">\u2709 ${cl.email}</a>`:''}
           </div>` : ''}
         </div>
         <div class="client-group-badges" style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
@@ -1612,12 +1596,28 @@ function renderClientDetailRow(r) {
     </div>`;
 }
 
+
+window.onReqClientSelectChange = function(clientId) {
+  document.getElementById('req-client-id').value = clientId;
+};
+
 window.openRequestFormForClient = function(clientId) {
   openRequestForm('');
+  if (!clientId) return;
+  document.getElementById('req-client-id').value = clientId;
+  // Show client badge
+  const cl = allClients.find(x => x.id === clientId);
+  const badge = document.getElementById('req-client-badge');
+  const badgeName = document.getElementById('req-client-badge-name');
+  if (badge && cl) {
+    badge.style.display = 'flex';
+    if (badgeName) badgeName.textContent = cl.name;
+  }
+  // Scroll ke item pertama
   setTimeout(() => {
-    const sel = document.getElementById('req-client-id');
-    if (sel && clientId) sel.value = clientId;
-  }, 150);
+    const firstItem = document.querySelector('#req-items-list [id^="item-row"]');
+    if (firstItem) firstItem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
 };
 
 
@@ -2315,110 +2315,78 @@ window.openRequestForm = async function(id) {
   openModal('modal-request-form');
 
   document.getElementById('req-edit-id').value = id;
-  document.getElementById('req-client-manual-wrap').style.display = 'none';
 
   // Reset items
   const itemsList = document.getElementById('req-items-list');
   if (itemsList) itemsList.innerHTML = '';
   const itemsEmpty = document.getElementById('req-items-empty');
-  if (itemsEmpty) itemsEmpty.style.display = 'block';
+  if (itemsEmpty) itemsEmpty.style.display = 'none';
   updateItemCount();
 
-  // Reset notes toggle
+  // Reset notes
   const notesWrap = document.getElementById('req-notes-wrap');
   const notesIcon = document.getElementById('notes-toggle-icon');
   if (notesWrap) notesWrap.style.display = 'none';
-  if (notesIcon) notesIcon.textContent = '▸';
+  if (notesIcon) notesIcon.textContent = '\u25b8';
   const notesEl = document.getElementById('req-notes');
   if (notesEl) notesEl.value = '';
 
-  // Tanggal hari ini
-  const todayStr = new Date().toISOString().split('T')[0];
-  document.getElementById('req-date-request').value = todayStr;
-  ['req-date-deadline','req-date-start','req-date-end'].forEach(fid => {
-    const el = document.getElementById(fid);
-    if (el) { el.min = todayStr; el.value = ''; }
-  });
-  document.getElementById('req-duration').value = '';
+  // Hide both client UI elements first
+  const badge    = document.getElementById('req-client-badge');
+  const selector = document.getElementById('req-client-selector');
+  if (badge)    badge.style.display    = 'none';
+  if (selector) selector.style.display = 'none';
 
-  // Dropdown klien
-  const sel = document.getElementById('req-client-id');
-  sel.innerHTML = `<option value="">-- Pilih Klien --</option>
-    ${allClients.map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}
-    <option value="__manual__">+ Input manual...</option>`;
+  // Set tanggal request hari ini
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('req-date-request').value = today;
 
   if (id) {
+    // MODE EDIT
     document.getElementById('req-form-title').textContent = 'Edit Custom Request';
-    document.getElementById('req-form-sub').textContent   = 'Perbarui item dan timeline request';
+    document.getElementById('req-form-sub').textContent   = 'Perbarui item dan timeline';
 
     const snap = await getDoc(doc(db,'requests',id));
     if (!snap.exists()) { showToast('Request tidak ditemukan','error'); return; }
     const r = snap.data();
 
-    document.getElementById('req-priority').value = r.priority || 'medium';
-    document.getElementById('req-duration').value  = r.duration || '';
-    if (r.dateRequest)  document.getElementById('req-date-request').value  = r.dateRequest;
-    if (r.dateDeadline) document.getElementById('req-date-deadline').value = r.dateDeadline;
-    if (r.dateStart)    document.getElementById('req-date-start').value    = r.dateStart;
-    if (r.dateEnd)      document.getElementById('req-date-end').value      = r.dateEnd;
-
-    // Notes — show if ada isi
+    document.getElementById('req-client-id').value    = r.clientId || '';
+    document.getElementById('req-priority').value     = r.priority || 'medium';
     if (r.notes) {
       if (notesWrap) notesWrap.style.display = 'block';
-      if (notesIcon) notesIcon.textContent = '▾';
+      if (notesIcon) notesIcon.textContent = '\u25be';
       if (notesEl)   notesEl.value = r.notes;
     }
-
     if (r.items && r.items.length > 0) r.items.forEach(item => addItemRow(item));
 
-    if (r.clientId && allClients.find(c=>c.id===r.clientId)) {
-      sel.value = r.clientId;
-    } else if (r.client) {
-      sel.value = '__manual__';
-      document.getElementById('req-client-manual-wrap').style.display = 'block';
-      document.getElementById('req-client-manual').value = r.client;
+    // Show client badge
+    const cl = allClients.find(x => x.id === r.clientId);
+    const badge = document.getElementById('req-client-badge');
+    const badgeName = document.getElementById('req-client-badge-name');
+    if (badge && cl) {
+      badge.style.display = 'flex';
+      if (badgeName) badgeName.textContent = cl.name;
+    } else if (badge) {
+      badge.style.display = 'none';
     }
 
   } else {
+    // MODE ADD
     document.getElementById('req-form-title').textContent = 'Request Custom Baru';
-    document.getElementById('req-form-sub').textContent   = 'Tambahkan item-item custom yang dibutuhkan klien';
-    document.getElementById('req-priority').value = 'medium';
-    sel.value = '';
+    document.getElementById('req-form-sub').textContent   = 'Tambahkan item-item yang dibutuhkan';
+    // Show client selector (dari topbar, belum ada konteks klien)
+    const sel2 = document.getElementById('req-client-selector');
+    const dd   = document.getElementById('req-client-select-dropdown');
+    if (sel2) sel2.style.display = 'block';
+    if (dd) {
+      dd.innerHTML = '<option value="">-- Pilih Klien --</option>' +
+        allClients.map(cl => '<option value="' + cl.id + '">' + cl.name + '</option>').join('');
+    }
+    // Auto-add 1 item kosong
+    addItemRow();
   }
 };
 
-// tutup semua menu saat klik di luar
-document.addEventListener('click', () => {
-  document.querySelectorAll('.status-popup').forEach(el => el.style.display = 'none');
-});
-
-
-function renderAccItem(item, i) {
-  var border = i > 0 ? 'border-top:1px solid var(--border);' : '';
-  var tl = item.type ? (TYPE_LABELS[item.type] || item.type) : '';
-  var tb = item.type ? '<span class="badge badge-type-' + item.type + '" style="font-size:10px;">' + tl + '</span>' : '';
-  var sb = (item.specs && item.specs.length > 0) ? '<span style="font-size:10px;color:var(--text-dim);font-weight:600;">' + item.specs.length + ' spec</span>' : '';
-  var dd = item.desc ? '<div style="font-size:13px;color:var(--text);line-height:1.7;margin-bottom:' + (item.specs && item.specs.length ? '10' : '0') + 'px;">' + item.desc + '</div>' : '';
-  var sd = '';
-  if (item.specs && item.specs.length > 0) {
-    var pills = item.specs.map(function(s) {
-      return '<span style="font-size:11px;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:3px 9px;color:var(--text-muted);"><strong style="color:var(--text);">' + s.key + ':</strong> ' + s.value + '</span>';
-    }).join('');
-    sd = '<div style="display:flex;flex-wrap:wrap;gap:5px;">' + pills + '</div>';
-  }
-  var empty = (!dd && !sd) ? '<span style="font-size:12px;color:var(--text-dim);font-style:italic;">Tidak ada detail</span>' : '';
-  return '<div style="' + border + '">' +
-    '<div class="acc-hdr" data-acc="1">' +
-      '<span style="font-size:11px;font-weight:800;color:var(--indigo);min-width:20px;flex-shrink:0;">' + (i + 1) + '.</span>' +
-      '<span style="font-size:13px;font-weight:700;color:var(--text);flex:1;">' + (item.name || '—') + '</span>' +
-      tb + sb +
-      '<span class="acc-icon" style="font-size:12px;color:var(--text-dim);transition:transform .2s;flex-shrink:0;">▶</span>' +
-    '</div>' +
-    '<div style="display:none;padding:12px 14px 14px 36px;background:var(--inset);border-top:1px solid var(--border);">' +
-      dd + sd + empty +
-    '</div>' +
-  '</div>';
-}
 window.accToggle = function(hdr) {
   var det = hdr.nextElementSibling;
   var ico = hdr.querySelector('.acc-icon');
@@ -2461,65 +2429,81 @@ window.addItemRow = function(item = {}) {
 
   const idx = Date.now() + Math.random();
   const div = document.createElement('div');
-  div.id = `item-row-${idx}`;
+  div.id = 'item-row-' + idx;
   div.style.cssText = 'background:var(--inset);border:1.5px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;';
 
   const itemNum = list ? list.children.length + 1 : 1;
-  div.innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-      <div style="font-size:12px;font-weight:800;color:var(--indigo);">Item #${itemNum}</div>
-      <button type="button" onclick="removeItemRow('item-row-${idx}')"
-        style="padding:3px 10px;background:var(--red-dim);border:1.5px solid rgba(220,38,38,0.2);border-radius:6px;color:var(--red);font-size:11px;font-weight:700;cursor:pointer;">
-        \u2715 Hapus
-      </button>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-      <div class="field" style="margin:0;">
-        <label>Nama / Judul Item <span style="color:var(--red)">*</span></label>
-        <input type="text" class="item-name" value="${item.name||''}" placeholder="Contoh: Laporan Rekap Penjualan"
-          style="padding:9px 12px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;outline:none;width:100%;"
-          onfocus="this.style.borderColor='var(--indigo)'" onblur="this.style.borderColor='var(--border)'">
-      </div>
-      <div class="field" style="margin:0;">
-        <label>Tipe</label>
-        <select class="item-type"
-          style="width:100%;padding:9px 32px 9px 12px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;outline:none;appearance:none;background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23027fb3%22 stroke-width=%222.5%22%3E%3Cpath d=%22M6 9l6 6 6-6%22/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 10px center;"
-          onfocus="this.style.borderColor='var(--indigo)'" onblur="this.style.borderColor='var(--border)'">
-          ${TYPE_OPTS}
-        </select>
-      </div>
-    </div>
-    <div class="field" style="margin-bottom:10px;">
-      <label>Deskripsi Kebutuhan <span style="color:var(--red)">*</span></label>
-      <textarea class="item-desc" placeholder="Jelaskan detail kebutuhan item ini..." style="width:100%;min-height:80px;padding:9px 12px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;outline:none;resize:vertical;"
-        onfocus="this.style.borderColor='var(--indigo)'" onblur="this.style.borderColor='var(--border)'">${item.desc||''}</textarea>
-    </div>
-    <div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-        <label style="font-size:12px;color:var(--text-muted);font-weight:600;">Spesifikasi / Parameter</label>
-        <button type="button" onclick="addSpecRowInItem('item-row-${idx}')"
-          style="font-size:11px;font-weight:700;color:var(--indigo);background:var(--indigo-dim);border:1.5px solid var(--indigo-dim2);border-radius:6px;padding:3px 10px;cursor:pointer;">
-          \uFF0B Tambah Spec
-        </button>
-      </div>
-      <div class="item-specs-list" id="specs-${idx}"></div>
-      <div class="item-specs-empty" id="specs-empty-${idx}" style="padding:8px 12px;border:1.5px dashed var(--border-md);border-radius:8px;font-size:12px;color:var(--text-dim);text-align:center;">
-        Belum ada spec \u2014 opsional
-      </div>
-    </div>
-  `;
+  const today = new Date().toISOString().split('T')[0];
+
+  div.innerHTML =
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">' +
+      '<div style="font-size:12px;font-weight:800;color:var(--indigo);">Item #' + itemNum + '</div>' +
+      '<button type="button" data-rmv="' + ('item-row-' + idx) + '"" ' +
+        'style="padding:3px 10px;background:var(--red-dim);border:1.5px solid rgba(220,38,38,0.2);border-radius:6px;color:var(--red);font-size:11px;font-weight:700;cursor:pointer;">' +
+        '✕ Hapus' +
+      '</button>' +
+    '</div>' +
+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">' +
+      '<div class="field" style="margin:0;">' +
+        '<label>Nama / Judul Item <span style="color:var(--red)">*</span></label>' +
+        '<input type="text" class="item-name" value="' + (item.name||'') + '" placeholder="Contoh: Laporan Rekap Penjualan" ' +
+          'style="padding:9px 12px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;outline:none;width:100%;" ' +
+      '</div>' +
+      '<div class="field" style="margin:0;">' +
+        '<label>Tipe</label>' +
+        '<select class="item-type" ' +
+          'style="width:100%;padding:9px 12px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;outline:none;" ' +
+          TYPE_OPTS +
+        '</select>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="field" style="margin-bottom:10px;">' +
+      '<label>Deskripsi Kebutuhan</label>' +
+      '<textarea class="item-desc" placeholder="Jelaskan detail kebutuhan item ini..." ' +
+        'style="width:100%;min-height:70px;padding:9px 12px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;outline:none;resize:vertical;" ' +
+    '</div>' +
+
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">' +
+      '<div class="field" style="margin:0;">' +
+        '<label style="font-size:11px;">Tgl Request</label>' +
+        '<input type="date" class="item-date-request" value="' + (item.dateRequest||today) + '" ' +
+          'style="padding:7px 10px;background:var(--inset);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text-muted);font-size:12px;font-family:inherit;outline:none;width:100%;" readonly>' +
+      '</div>' +
+      '<div class="field" style="margin:0;">' +
+        '<label style="font-size:11px;">Target Deadline</label>' +
+        '<input type="date" class="item-date-deadline" value="' + (item.dateDeadline||'') + '" ' +
+          'style="padding:7px 10px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:12px;font-family:inherit;outline:none;width:100%;">' +
+      '</div>' +
+      '<div class="field" style="margin:0;">' +
+        '<label style="font-size:11px;">Est. Durasi</label>' +
+        '<input type="text" class="item-duration" value="' + (item.duration||'') + '" placeholder="2 minggu" ' +
+          'style="padding:7px 10px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:12px;font-family:inherit;outline:none;width:100%;">' +
+      '</div>' +
+    '</div>' +
+
+    '<div>' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
+        '<label style="font-size:12px;color:var(--text-muted);font-weight:600;">Spesifikasi / Parameter</label>' +
+        '<button type="button" data-addspec="' + ('item-row-' + idx) + '" ' +
+          'style="font-size:11px;font-weight:700;color:var(--indigo);background:var(--indigo-dim);border:1.5px solid var(--indigo-dim2);border-radius:6px;padding:3px 10px;cursor:pointer;">' +
+          '＋ Tambah Spec' +
+        '</button>' +
+      '</div>' +
+      '<div class="item-specs-list" id="specs-' + idx + '"></div>' +
+      '<div class="item-specs-empty" id="specs-empty-' + idx + '" style="padding:8px 12px;border:1.5px dashed var(--border-md);border-radius:8px;font-size:12px;color:var(--text-dim);text-align:center;">' +
+        'Belum ada spec — opsional' +
+      '</div>' +
+    '</div>';
 
   if (list) list.appendChild(div);
-
-  // Set tipe jika ada
   if (item.type) div.querySelector('.item-type').value = item.type;
-  // Restore specs
   if (item.specs && item.specs.length > 0) {
     const specEmpty = div.querySelector('.item-specs-empty');
     if (specEmpty) specEmpty.style.display = 'none';
-    item.specs.forEach(s => addSpecRowInItem(`item-row-${idx}`, s.key, s.value));
+    item.specs.forEach(s => addSpecRowInItem('item-row-' + idx, s.key, s.value));
   }
-
   updateItemCount();
 };
 
@@ -2578,16 +2562,19 @@ function collectItems() {
   if (!list) return [];
   const items = [];
   list.querySelectorAll('[id^="item-row"]').forEach(row => {
-    const name = row.querySelector('.item-name')?.value.trim() || '';
-    const type = row.querySelector('.item-type')?.value || '';
-    const desc = row.querySelector('.item-desc')?.value.trim() || '';
+    const name        = row.querySelector('.item-name')?.value.trim() || '';
+    const type        = row.querySelector('.item-type')?.value || '';
+    const desc        = row.querySelector('.item-desc')?.value.trim() || '';
+    const dateRequest = row.querySelector('.item-date-request')?.value || '';
+    const dateDeadline= row.querySelector('.item-date-deadline')?.value || '';
+    const duration    = row.querySelector('.item-duration')?.value.trim() || '';
     const specs = [];
     row.querySelectorAll('.item-specs-list > div').forEach(specRow => {
       const k = specRow.querySelector('.spec-key')?.value.trim();
       const v = specRow.querySelector('.spec-val')?.value.trim();
       if (k) specs.push({ key:k, value:v||'' });
     });
-    if (name || desc) items.push({ name, type, desc, specs });
+    if (name || desc) items.push({ name, type, desc, dateRequest, dateDeadline, duration, specs });
   });
   return items;
 }
@@ -2660,68 +2647,54 @@ window.onReqClientChange = function() {
 };
 
 window.saveRequest = async function() {
-  const priority    = document.getElementById('req-priority').value;
-  const notes       = document.getElementById('req-notes')?.value.trim() || '';
-  const items       = collectItems();
-  const dateRequest = document.getElementById('req-date-request').value || '';
-  const dateDeadline= document.getElementById('req-date-deadline').value || '';
-  const dateStart   = document.getElementById('req-date-start')?.value || '';
-  const dateEnd     = document.getElementById('req-date-end')?.value || '';
-  const duration    = document.getElementById('req-duration').value.trim();
-  const selVal      = document.getElementById('req-client-id').value;
-
-  let clientId = '', client = '';
-  if (selVal === '__manual__') {
-    client = document.getElementById('req-client-manual').value.trim();
-  } else if (selVal) {
-    clientId = selVal;
-    client   = allClients.find(c=>c.id===selVal)?.name || '';
-  }
-
-  if (!client) {
-    showToast('Pilih klien terlebih dahulu','error');
-    return;
-  }
+  const items = collectItems();
   if (items.length === 0) {
-    showToast('Tambahkan minimal 1 item custom','error');
+    showToast('Tambahkan minimal 1 item custom', 'error');
     return;
   }
 
-  // Judul: ambil dari nama/judul item request (bukan lagi "Custom Request {klien} — tanggal")
-  const itemNames = items.map(it => (it.name||'').trim()).filter(Boolean);
-  let title;
-  if (itemNames.length === 0) {
-    // fallback jika item tidak punya nama sama sekali
-    const dateLabel = dateRequest
-      ? new Date(dateRequest).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})
-      : new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'});
-    title = `Custom Request ${client} \u2014 ${dateLabel}`;
-  } else if (itemNames.length === 1) {
-    title = itemNames[0];
-  } else {
-    title = `${itemNames[0]} (+${itemNames.length - 1} item lainnya)`;
-  }
-  const type      = items[0]?.type || 'other';
-  const timeline  = { dateRequest, dateDeadline, dateStart, dateEnd, duration };
+  const clientId  = document.getElementById('req-client-id').value;
+  const priority  = document.getElementById('req-priority').value || 'medium';
+  const notes     = document.getElementById('req-notes')?.value.trim() || '';
   const editId    = document.getElementById('req-edit-id').value;
 
+  let client = '';
+  if (clientId) {
+    client = allClients.find(x => x.id === clientId)?.name || '';
+  }
+  if (!client) {
+    showToast('Klien tidak diketahui — buka form lewat halaman detail klien', 'error');
+    return;
+  }
+
+  // Auto-generate judul dari klien + tanggal
+  const dateLabel = new Date().toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'});
+  const title = 'Custom Request ' + client + ' — ' + dateLabel;
+
+  // Ambil deadline tercepat dari semua item sebagai deadline dokumen
+  const deadlines = items.map(it => it.dateDeadline).filter(Boolean).sort();
+  const dateDeadline = deadlines[0] || '';
+  const dateRequest  = document.getElementById('req-date-request').value || new Date().toISOString().split('T')[0];
+
+  const payload = {
+    title, priority, clientId, client, notes, items,
+    dateRequest, dateDeadline,
+    updatedAt: serverTimestamp()
+  };
+
   if (editId) {
-    await updateDoc(doc(db,'requests',editId), {
-      title, type, priority, clientId, client, notes, items,
-      ...timeline, updatedAt: serverTimestamp()
-    });
-    showToast('✓ Request berhasil diperbarui','success');
+    await updateDoc(doc(db,'requests',editId), payload);
+    showToast('\u2713 Request berhasil diperbarui', 'success');
   } else {
     await addDoc(collection(db,'requests'), {
-      title, type, priority, clientId, client, notes, items, ...timeline,
-      status:'pending',
+      ...payload,
+      status: 'pending',
       submittedBy: currentUser.uid,
       submittedByName: currentUserData?.name || currentUser.email,
       createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-      comments:[]
+      comments: []
     });
-    showToast('✓ Request berhasil dikirim!','success');
+    showToast('\u2713 Request berhasil dikirim!', 'success');
   }
   closeModal('modal-request-form');
 };
