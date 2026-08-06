@@ -378,7 +378,7 @@
   .req-id { font-size:11px; color:var(--text-dim); font-family:monospace; margin-top:2px; }
   .req-badges { display:flex; flex-direction:column; align-items:flex-end; gap:5px; flex-shrink:0; }
 
-  /* ── BADGES ── */
+  /* -- BADGES -- */
   .badge { padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:4px; white-space:nowrap; }
   .badge-type-feature  { background:#DBEAFE; color:#1D4ED8; }
   .badge-type-menu     { background:#EDE9FE; color:#6D28D9; }
@@ -866,7 +866,7 @@ import {
   query, where, orderBy, serverTimestamp, onSnapshot
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-// ─── FIREBASE INIT ───────────────────────────────────────────────
+// --- FIREBASE INIT ---
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyB2j4rdFVXT_CAy1AbTV9T4yn_hLeU7HYM",
   authDomain: "customkgb-5ff70.firebaseapp.com",
@@ -881,11 +881,11 @@ const app = initializeApp(FIREBASE_CONFIG);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ─── STARTUP ─────────────────────────────────────────────────────
+// --- STARTUP ---
 document.getElementById('auth-screen').style.display = 'flex';
 setupAuth();
 
-// ─── GLOBALS ─────────────────────────────────────────────────────
+// --- GLOBALS ---
 let currentUser = null;
 let currentUserData = null;
 let currentPage = 'dashboard';
@@ -907,7 +907,7 @@ const STATUS_LABELS = {
 const STATUS_ORDER = ['pending','validated','design','dev-be','dev-fe','testing','done'];
 const TYPE_LABELS = { feature:'Fitur Baru', menu:'Menu / Modul', function:'Fungsi / Logic', report:'Laporan' };
 
-// ─── AUTH ─────────────────────────────────────────────────────────
+// --- AUTH ---
 function setupAuth() {
   onAuthStateChanged(auth, async (user) => {
     if (user) {
@@ -976,7 +976,7 @@ window.doLogout = async function() {
   await signOut(auth);
 };
 
-// ─── APP SHELL ────────────────────────────────────────────────────
+// --- APP SHELL ---
 function showApp() {
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
@@ -1001,7 +1001,7 @@ function showApp() {
   navigate('dashboard');
 }
 
-// ─── REALTIME LISTENER ────────────────────────────────────────────
+// --- REALTIME LISTENER ---
 function listenRequests() {
   const role = currentUserData?.role;
   let q;
@@ -1055,7 +1055,7 @@ function updateBadges() {
   }
 }
 
-// ─── NAVIGATION ───────────────────────────────────────────────────
+// --- NAVIGATION ---
 let currentClientId = null;
 
 window.navigate = function(page, param) {
@@ -1120,7 +1120,7 @@ function renderPage(page) {
   else if (page === 'clients')    c.innerHTML = renderClientsPage();
 }
 
-// ─── DASHBOARD ────────────────────────────────────────────────────
+// --- DASHBOARD ---
 function renderDashboard() {
   const total = allRequests.length;
   const pending = allRequests.filter(r => r.status==='pending').length;
@@ -1183,7 +1183,7 @@ function renderRecentActivity(requests) {
   </div>`;
 }
 
-// ─── REQUEST LIST — Grouped by Client ─────────────────────────────
+// --- REQUEST LIST — Grouped by Client ---
 function renderRequestList(requests) {
   const groups = {};
   requests.forEach(r => {
@@ -1298,7 +1298,7 @@ function renderClientGroupCard(group) {
     </div>`;
 }
 
-// ── HALAMAN DETAIL KLIEN ────────────────────────────────────────────
+// --- HALAMAN DETAIL KLIEN ---
 function renderClientDetail(clientId) {
   const cl = allClients.find(c=>c.id===clientId);
   if (!cl) return renderEmpty('Klien tidak ditemukan','');
@@ -1537,7 +1537,7 @@ window.filterByClient = function(clientId) {
   navigate('client-detail', clientId);
 };
 
-// ─── TIMELINE HELPERS ─────────────────────────────────────────────
+// --- TIMELINE HELPERS ---
 function calcCountdown(dateStr) {
   if (!dateStr) return null;
   const target = new Date(dateStr);
@@ -1718,7 +1718,7 @@ function renderRequestCard(r, role) {
   `;
 }
 
-// ─── VALIDATE BOARD ───────────────────────────────────────────────
+// --- VALIDATE BOARD ---
 function renderValidateBoard() {
   const pendingReqs = allRequests.filter(r => r.status === 'pending');
   return `
@@ -1812,7 +1812,7 @@ function renderValidateCard(r) {
   `;
 }
 
-// ─── DEV BOARD ────────────────────────────────────────────────────
+// --- DEV BOARD ---
 function renderDevBoard() {
   const COLS = [
     { status:'validated', label:'Approved',    bg:'linear-gradient(135deg,#0891B2,#0EA5E9)', icon:'✓',  next:'design'  },
@@ -1912,7 +1912,7 @@ function renderDevBoard() {
 }
 
 
-// ─── SUBMIT REQUEST ───────────────────────────────────────────────
+// --- SUBMIT REQUEST ---
 async function createRequest(title, type, priority, clientId, client, desc, notes, specs) {
   if (!title || !type || !client || !desc) { showToast('Lengkapi semua field wajib','error'); return false; }
   await addDoc(collection(db,'requests'), {
@@ -1932,7 +1932,7 @@ async function createRequest(title, type, priority, clientId, client, desc, note
 
 
 
-// ─── DETAIL / UPDATE ─────────────────────────────────────────────
+// --- DETAIL / UPDATE ---
 window.openDetail = async function(id) {
   openModal('modal-detail');
   document.getElementById('detail-title').textContent = 'Memuat...';
@@ -2139,7 +2139,7 @@ window.addComment = async function(id) {
   await openDetail(id);
 };
 
-// ─── REQUEST FORM (ADD / EDIT) ────────────────────────────────────
+// --- REQUEST FORM (ADD / EDIT) ---
 window.openRequestForm = async function(id) {
   id = id || '';
   openModal('modal-request-form');
@@ -2247,7 +2247,7 @@ window.showFullDesc = function(id, title, desc) {
 };
 
 
-// ─── ITEM ROWS (multi-item per dokumen) ─────────────────────────
+// --- ITEM ROWS (multi-item per dokumen) ---
 const TYPE_OPTS = `
   <option value="">-- Pilih Tipe --</option>
   <option value="feature">Fitur Baru</option>
@@ -2395,7 +2395,7 @@ function collectItems() {
   return items;
 }
 
-// ─── SPEC ROWS ────────────────────────────────────────────────────
+// --- SPEC ROWS ---
 window.addSpecRow = function(containerId, key='', val='') {
   const container = document.getElementById(containerId);
   const emptyId = containerId + '-empty';
@@ -2539,7 +2539,7 @@ window.deleteRequest = async function(id, title) {
   showToast('Request dihapus','info');
 };
 
-// ─── PRINT REQUEST ────────────────────────────────────────────────
+// --- PRINT REQUEST ---
 window.printRequest = async function(id) {
   const snap = await getDoc(doc(db,'requests',id));
   if (!snap.exists()) { showToast('Data tidak ditemukan','error'); return; }
@@ -2874,7 +2874,7 @@ window.deleteClient = async function(id, name) {
   showToast('Klien dihapus','info');
 };
 
-// ─── MODAL HELPERS ────────────────────────────────────────────────
+// --- MODAL HELPERS ---
 window.openModal = function(id) {
   document.getElementById(id).classList.add('show');
 };
@@ -2883,7 +2883,7 @@ document.querySelectorAll('.modal-overlay').forEach(el => {
   el.addEventListener('click', e => { if(e.target === el) el.classList.remove('show'); });
 });
 
-// ─── TOAST ────────────────────────────────────────────────────────
+// --- TOAST ---
 window.showToast = function(msg, type='info') {
   const t = document.getElementById('toast');
   document.getElementById('toast-msg').textContent = msg;
@@ -2905,7 +2905,7 @@ window.toggleTheme = function() {
   }
 })();
 
-// ─── EMPTY ────────────────────────────────────────────────────────
+// --- EMPTY ---
 function renderEmpty(title, sub) {
   return `<div class="empty-state"><div class="empty-icon">📭</div><p>${title}</p><small>${sub}</small></div>`;
 }
