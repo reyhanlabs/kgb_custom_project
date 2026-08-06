@@ -1143,17 +1143,17 @@ function renderDashboard() {
   const recent = allRequests.slice(0, 5);
   return `
     <div class="stats-row">
-      <div class="stat-card s-total"><div class="stat-icon">📊</div><div class="stat-num">${total}</div><div class="stat-label">Total Request</div></div>
-      <div class="stat-card s-pending"><div class="stat-icon">⏳</div><div class="stat-num">${pending}</div><div class="stat-label">Menunggu Approval</div></div>
-      <div class="stat-card s-validated"><div class="stat-icon">⚡</div><div class="stat-num">${validated}</div><div class="stat-label">Sedang Dikerjakan</div></div>
-      <div class="stat-card s-done"><div class="stat-icon">✅</div><div class="stat-num">${done}</div><div class="stat-label">Selesai</div></div>
+      <div class="stat-card s-total"><div class="stat-icon">\uD83D\uDCCA</div><div class="stat-num">${total}</div><div class="stat-label">Total Request</div></div>
+      <div class="stat-card s-pending"><div class="stat-icon">\u23F3</div><div class="stat-num">${pending}</div><div class="stat-label">Menunggu Approval</div></div>
+      <div class="stat-card s-validated"><div class="stat-icon">\u26A1</div><div class="stat-num">${validated}</div><div class="stat-label">Sedang Dikerjakan</div></div>
+      <div class="stat-card s-done"><div class="stat-icon">\u2705</div><div class="stat-num">${done}</div><div class="stat-label">Selesai</div></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
       ${renderMiniChart(allRequests)}
       ${renderRecentActivity(allRequests)}
     </div>
     <div style="margin-bottom:10px;font-size:13px;font-weight:600;color:var(--text-muted);">Request Terbaru</div>
-    <div class="requests-grid">${recent.length ? recent.map(r=>renderRequestCard(r,currentUserData?.role)).join('') : renderEmpty('Belum ada request','Klik tombol ＋ Request Baru di kanan atas')}</div>
+    <div class="requests-grid">${recent.length ? recent.map(r=>renderRequestCard(r,currentUserData?.role)).join('') : renderEmpty('Belum ada request','Klik tombol \uFF0B Request Baru di kanan atas')}</div>
   `;
 }
 
@@ -1210,14 +1210,14 @@ function renderRequestList(requests) {
 
   return `
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px;flex-wrap:wrap;">
-      <input class="filter-search" id="search-input" placeholder="🔍 Cari klien atau request..." oninput="filterRequests()" style="max-width:260px;">
+      <input class="filter-search" id="search-input" placeholder="\uD83D\uDD0D Cari klien atau request..." oninput="filterRequests()" style="max-width:260px;">
       <select class="filter-select" id="filter-status" onchange="filterRequests()">
         <option value="">Semua Status</option>
         ${Object.entries(STATUS_LABELS).map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}
       </select>
       <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
-        <span id="filter-active-tag" style="display:none;padding:3px 10px;background:var(--indigo-dim2);color:var(--indigo);border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;" onclick="clearFilters()">✕ Reset</span>
-        <span style="font-size:12px;color:var(--text-dim);" id="filter-count">${requests.length} request · ${sorted.length} klien</span>
+        <span id="filter-active-tag" style="display:none;padding:3px 10px;background:var(--indigo-dim2);color:var(--indigo);border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;" onclick="clearFilters()">\u2715 Reset</span>
+        <span style="font-size:12px;color:var(--text-dim);" id="filter-count">${requests.length} request \u00B7 ${sorted.length} klien</span>
       </div>
     </div>
     <div id="requests-grid" style="display:flex;flex-direction:column;gap:14px;">
@@ -1270,7 +1270,7 @@ function renderClientGroupCard(group) {
             ${group.items.map(r => {
               const cd = calcCountdown(r.dateDeadline);
               const cdColor = cd===null?'var(--text-dim)':cd<0?'var(--red)':cd<=3?'var(--amber)':'var(--green)';
-              const cdText  = cd===null?'—':cd<0?`⚠ ${Math.abs(cd)}h`:cd===0?'🔴 Hari ini':`${cd}h lagi`;
+              const cdText  = cd===null?'\u2014':cd<0?`⚠ ${Math.abs(cd)}h`:cd===0?'\uD83D\uDD34 Hari ini':`${cd}h lagi`;
               const safeTitle = (r.title||'').replace(/'/g,"\'");
               return `
               <tr style="border-bottom:1px solid var(--border);" onmouseover="this.style.background='var(--inset)'" onmouseout="this.style.background=''">
@@ -1306,7 +1306,7 @@ function renderClientGroupCard(group) {
           style="width:100%;margin-top:10px;padding:8px;border:1.5px dashed var(--border-md);border-radius:8px;background:transparent;color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;"
           onmouseover="this.style.background='var(--indigo-dim)';this.style.color='var(--indigo)';this.style.borderColor='var(--indigo)'"
           onmouseout="this.style.background='transparent';this.style.color='var(--text-muted)';this.style.borderColor='var(--border-md)'">
-          ＋ Tambah Request untuk ${group.name}
+          \uFF0B Tambah Request untuk ${group.name}
         </button>
       </div>
     </div>`;
@@ -1327,7 +1327,7 @@ function renderClientDetail(clientId) {
   return `
     <button onclick="navigate('requests')"
       style="background:none;border:none;color:var(--indigo);font-size:13px;font-weight:700;cursor:pointer;padding:0;margin-bottom:16px;display:flex;align-items:center;gap:6px;">
-      ← Kembali ke Custom Request
+      \u2190 Kembali ke Custom Request
     </button>
     <!-- PROFIL KLIEN -->
     <div style="background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:20px 24px;margin-bottom:20px;box-shadow:var(--sh-card);">
@@ -1352,7 +1352,7 @@ function renderClientDetail(clientId) {
           <button onclick="openClientForm('${clientId}')"
             style="padding:8px 14px;background:var(--inset);border:1.5px solid var(--border-md);border-radius:8px;color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;"
             onmouseover="this.style.color='var(--indigo)';this.style.borderColor='var(--indigo)'"
-            onmouseout="this.style.color='var(--text-muted)';this.style.borderColor='var(--border-md)'">✏ Edit Klien</button>
+            onmouseout="this.style.color='var(--text-muted)';this.style.borderColor='var(--border-md)'">\u270F Edit Klien</button>
         </div>
       </div>
     </div>
@@ -1368,7 +1368,7 @@ function renderClientDetail(clientId) {
         style="padding:14px;border:2px dashed var(--border-md);border-radius:14px;background:transparent;color:var(--text-muted);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;transition:all .15s;"
         onmouseover="this.style.background='var(--indigo-dim)';this.style.color='var(--indigo)';this.style.borderColor='var(--indigo)'"
         onmouseout="this.style.background='transparent';this.style.color='var(--text-muted)';this.style.borderColor='var(--border-md)'">
-        ＋ Tambah Request Baru untuk ${cl.name}
+        \uFF0B Tambah Request Baru untuk ${cl.name}
       </button>
     </div>`;
 }
@@ -1388,8 +1388,8 @@ function renderClientDetailRow(r) {
         <!-- JUDUL + STATUS + ACTIONS -->
         <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;">
           <div style="flex:1;min-width:0;">
-            <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:4px;">${r.title||'—'}</div>
-            <div style="font-size:11px;color:var(--text-dim);font-family:monospace;">#${r.id.slice(-8).toUpperCase()} · Diajukan ${r.createdAt?.toDate?r.createdAt.toDate().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}):'—'} oleh ${r.submittedByName||'—'}</div>
+            <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:4px;">${r.title||'\u2014'}</div>
+            <div style="font-size:11px;color:var(--text-dim);font-family:monospace;">#${r.id.slice(-8).toUpperCase()} \u00B7 Diajukan ${r.createdAt?.toDate?r.createdAt.toDate().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}):'\u2014'} oleh ${r.submittedByName||'\u2014'}</div>
           </div>
           <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
             <span class="badge badge-status-${r.status}">${STATUS_LABELS[r.status]||r.status}</span>
@@ -1402,7 +1402,7 @@ function renderClientDetailRow(r) {
           <div>
             <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
               <span style="font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;">Progress Pengerjaan</span>
-              <span style="font-size:11px;font-weight:800;color:${fillColor};">${r.status==='rejected'?'Ditolak':r.status==='done'?'✓ Selesai':pct+'%'}</span>
+              <span style="font-size:11px;font-weight:800;color:${fillColor};">${r.status==='rejected'?'Ditolak':r.status==='done'?'\u2713 Selesai':pct+'%'}</span>
             </div>
             <div style="height:8px;background:var(--border);border-radius:99px;overflow:hidden;">
               <div style="height:100%;width:${pct}%;background:${fillColor};border-radius:99px;transition:width .5s;"></div>
@@ -1420,7 +1420,7 @@ function renderClientDetailRow(r) {
             ${r.dateDeadline?`
               <div style="font-size:10px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;">Deadline</div>
               <div style="font-size:13px;font-weight:800;color:${cdColor};">${formatDate(r.dateDeadline)}</div>
-              <div style="font-size:11px;font-weight:700;color:${cdColor};">${cd<0?`⚠ ${Math.abs(cd)}h lewat`:cd===0?'🔴 Hari ini':`⏱ ${cd}h lagi`}</div>
+              <div style="font-size:11px;font-weight:700;color:${cdColor};">${cd<0?`\u26A0 ${Math.abs(cd)}h lewat`:cd===0?'🔴 Hari ini':`\u23F1 ${cd}h lagi`}</div>
             `:r.duration?`<div style="font-size:11px;color:var(--text-muted);">${r.duration}</div>`:''}
           </div>
         </div>
@@ -1445,28 +1445,28 @@ function renderClientDetailRow(r) {
             style="padding:8px 14px;border-radius:8px;border:1.5px solid var(--border-md);background:var(--inset);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;"
             onmouseover="this.style.color='var(--indigo)';this.style.borderColor='var(--indigo)';this.style.background='var(--indigo-dim)'"
             onmouseout="this.style.color='var(--text-muted)';this.style.borderColor='var(--border-md)';this.style.background='var(--inset)'">
-            💬 Komentar & Approval
+            \uD83D\uDCAC Komentar & Approval
           </button>
           <button onclick="openRequestForm('${r.id}')"
             style="padding:8px 14px;border-radius:8px;border:1.5px solid var(--indigo-dim2);background:var(--indigo-dim);color:var(--indigo);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;"
             onmouseover="this.style.background='var(--indigo-dim2)'" onmouseout="this.style.background='var(--indigo-dim)'">
-            ✏ Edit
+            \u270F Edit
           </button>
           <button onclick="printRequest('${r.id}')"
             style="padding:8px 14px;border-radius:8px;border:1.5px solid rgba(5,150,105,0.3);background:var(--green-dim);color:var(--green);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;"
             onmouseover="this.style.background='rgba(5,150,105,0.2)'" onmouseout="this.style.background='var(--green-dim)'">
-            🖨 Cetak
+            \uD83D\uDDA8 Cetak
           </button>
           <div style="margin-left:auto;display:flex;gap:6px;align-items:center;">
             <select onchange="if(this.value){updateStatus('${r.id}',this.value);this.value=''}"
               style="padding:7px 12px;border-radius:8px;border:1.5px solid var(--border-md);background:var(--inset);color:var(--text-muted);font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;outline:none;"
               onfocus="this.style.borderColor='var(--indigo)'" onblur="this.style.borderColor='var(--border-md)'">
-              <option value="">⚡ Update Status</option>
+              <option value="">\u26A1 Update Status</option>
               ${Object.entries(STATUS_LABELS).filter(([s])=>s!==r.status&&s!=='rejected').map(([s,l])=>`<option value="${s}">${l}</option>`).join('')}
             </select>
             <button onclick="deleteRequest('${r.id}','${safeTitle}')"
               style="padding:8px 10px;border-radius:8px;border:1.5px solid rgba(220,38,38,0.25);background:var(--red-dim);color:var(--red);font-size:12px;cursor:pointer;transition:all .15s;"
-              onmouseover="this.style.background='rgba(220,38,38,0.2)'" onmouseout="this.style.background='var(--red-dim)'">🗑</button>
+              onmouseover="this.style.background='rgba(220,38,38,0.2)'" onmouseout="this.style.background='var(--red-dim)'">\uD83D\uDDD1</button>
           </div>
         </div>
       </div>
@@ -1514,7 +1514,7 @@ window.filterRequests = function() {
   const grid = document.getElementById('requests-grid');
   if (grid) grid.innerHTML = sorted.length ? sorted.map(g=>renderClientGroupCard(g)).join('') : renderEmpty('Tidak ada hasil','Coba ubah filter');
   const countEl = document.getElementById('filter-count');
-  if (countEl) countEl.textContent = `${filtered.length} request · ${sorted.length} klien`;
+  if (countEl) countEl.textContent = `${filtered.length} request \u00B7 ${sorted.length} klien`;
   const tag = document.getElementById('filter-active-tag');
   if (tag) tag.style.display = (status||search)?'inline-block':'none';
 };
@@ -1556,16 +1556,16 @@ function renderTimelineCard(r) {
     const color = isOverdue ? 'var(--red)' : isUrgent ? 'var(--amber)' : 'var(--green)';
     const bg    = isOverdue ? 'var(--red-dim)' : isUrgent ? 'var(--amber-dim)' : 'var(--green-dim)';
     const label = isOverdue
-      ? `⚠ ${Math.abs(countdown)} hari telah lewat`
+      ? `\u26A0 ${Math.abs(countdown)} hari telah lewat`
       : countdown === 0
         ? '🔴 Deadline hari ini!'
-        : `⏱ ${countdown} hari lagi`;
+        : `\u23F1 ${countdown} hari lagi`;
     countdownHtml = `<div style="margin-top:8px;padding:5px 10px;background:${bg};border-radius:6px;font-size:11px;font-weight:700;color:${color};text-align:center;">${label}</div>`;
   }
 
   return `
     <div style="background:var(--inset);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-top:8px;">
-      <div style="font-size:10px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">📅 Timeline</div>
+      <div style="font-size:10px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">\uD83D\uDCC5 Timeline</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
         ${r.dateRequest ? `
           <div>
@@ -1609,11 +1609,11 @@ function renderRequestCard(r, role) {
   const safeTitle = (r.title||'').replace(/'/g,"\\'");
   return `
     <div class="req-card status-${r.status}" style="overflow:visible;">
-      <!-- PROGRESS BAR — jelas, terpisah dari stripe atas -->
+      <!-- PROGRESS BAR \u2014 jelas, terpisah dari stripe atas -->
       <div style="padding:8px 16px 0;background:var(--card);">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
           <div style="font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;">Progress</div>
-          <div style="font-size:11px;font-weight:800;color:${fillColor};">${r.status==='rejected'?'Ditolak':r.status==='done'?'Selesai ✓':progressPct+'%'}</div>
+          <div style="font-size:11px;font-weight:800;color:${fillColor};">${r.status==='rejected'?'Ditolak':r.status==='done'?'Selesai \u2713':progressPct+'%'}</div>
         </div>
         <div style="height:8px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:8px;">
           <div style="height:100%;width:${progressPct}%;background:${fillColor};border-radius:99px;transition:width .5s;"></div>
@@ -1624,26 +1624,26 @@ function renderRequestCard(r, role) {
         <!-- JUDUL + ACTION BUTTONS -->
         <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;">
           <div style="flex:1;min-width:0;cursor:pointer;" onclick="openDetail('${r.id}')">
-            <div class="req-title">${r.title || '—'}</div>
-            <div class="req-id">#${r.id.slice(-8).toUpperCase()} ·
+            <div class="req-title">${r.title || '\u2014'}</div>
+            <div class="req-id">#${r.id.slice(-8).toUpperCase()} \u00B7
               ${r.clientId
                 ? `<span onclick="event.stopPropagation();filterByClient('${r.clientId}','${(r.client||'').replace(/'/g,"\\'")}');" style="cursor:pointer;color:var(--indigo);font-weight:700;text-decoration:underline;text-underline-offset:2px;" title="Lihat semua request ${r.client}">${r.client||'—'}</span>`
-                : (r.client||'—')}
+                : (r.client||'\u2014')}
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
             <button onclick="openRequestForm('${r.id}')" title="Edit"
               style="width:28px;height:28px;border-radius:7px;border:1.5px solid var(--border-md);background:var(--inset);color:var(--indigo);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;"
               onmouseover="this.style.background='var(--indigo-dim2)';this.style.borderColor='var(--indigo)'"
-              onmouseout="this.style.background='var(--inset)';this.style.borderColor='var(--border-md)'">✏</button>
+              onmouseout="this.style.background='var(--inset)';this.style.borderColor='var(--border-md)'">\u270F</button>
             <button onclick="printRequest('${r.id}')" title="Cetak"
               style="width:28px;height:28px;border-radius:7px;border:1.5px solid rgba(5,150,105,0.3);background:var(--green-dim);color:var(--green);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;"
               onmouseover="this.style.background='rgba(5,150,105,0.2)'"
-              onmouseout="this.style.background='var(--green-dim)'">🖨</button>
+              onmouseout="this.style.background='var(--green-dim)'">\uD83D\uDDA8</button>
             <button onclick="deleteRequest('${r.id}','${safeTitle}')" title="Hapus"
               style="width:28px;height:28px;border-radius:7px;border:1.5px solid rgba(220,38,38,0.25);background:var(--red-dim);color:var(--red);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;"
               onmouseover="this.style.background='rgba(220,38,38,0.2)'"
-              onmouseout="this.style.background='var(--red-dim)'">🗑</button>
+              onmouseout="this.style.background='var(--red-dim)'">\uD83D\uDDD1</button>
           </div>
         </div>
 
@@ -1663,7 +1663,7 @@ function renderRequestCard(r, role) {
           </div>
           <div style="background:var(--inset);border:1px solid var(--border);border-radius:8px;padding:7px 10px;">
             <div style="font-size:10px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Diajukan</div>
-            <div style="font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.submittedByName||'—'}</div>
+            <div style="font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.submittedByName||'\u2014'}</div>
           </div>
         </div>
 
@@ -1674,7 +1674,7 @@ function renderRequestCard(r, role) {
           ${(r.items||[]).map((item,i) => `
             <div style="display:flex;align-items:center;gap:8px;padding:4px 0;${i>0?'border-top:1px solid var(--border);margin-top:4px;':''}">
               <span style="font-size:11px;font-weight:800;color:var(--indigo);min-width:16px;flex-shrink:0;">${i+1}.</span>
-              <span style="font-size:12px;font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.name||'—'}</span>
+              <span style="font-size:12px;font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.name||'\u2014'}</span>
               ${item.type?`<span class="badge badge-type-${item.type}" style="font-size:10px;flex-shrink:0;">${TYPE_LABELS[item.type]||item.type}</span>`:''}
             </div>
           `).join('')}
@@ -1683,7 +1683,7 @@ function renderRequestCard(r, role) {
         <!-- DESKRIPSI -->
         <div style="background:var(--inset);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:10px;">
           <div style="font-size:10px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;">Deskripsi</div>
-          <div style="font-size:12px;color:var(--text-muted);margin:0;line-height:1.6;">${r.description || (r.items&&r.items[0]?r.items.map(it=>it.name).join(', '):'—')}</div>
+          <div style="font-size:12px;color:var(--text-muted);margin:0;line-height:1.6;">${r.description || (r.items&&r.items[0]?r.items.map(it=>it.name).join(', '):'\u2014')}</div>
           ${(r.description||'').length > 120 ? `
           <button onclick="showDescById('${r.id}')"
             style="margin-top:6px;padding:0;background:none;border:none;font-size:11px;font-weight:700;color:var(--indigo);cursor:pointer;font-family:inherit;">
@@ -1692,7 +1692,7 @@ function renderRequestCard(r, role) {
         </div>
 
         <!-- TANGGAL + TIMELINE -->
-        <div class="req-meta-info" style="margin:0 0 8px;"><span>📅 ${date}</span></div>
+        <div class="req-meta-info" style="margin:0 0 8px;"><span>\uD83D\uDCC5 ${date}</span></div>
         ${renderTimelineCard(r)}
 
         <!-- BOTTOM ACTION ROW -->
@@ -1701,7 +1701,7 @@ function renderRequestCard(r, role) {
             style="width:100%;padding:8px 12px;border-radius:8px;border:1.5px solid var(--border-md);background:var(--inset);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;"
             onmouseover="this.style.background='var(--indigo-dim)';this.style.color='var(--indigo)';this.style.borderColor='var(--indigo)'"
             onmouseout="this.style.background='var(--inset)';this.style.color='var(--text-muted)';this.style.borderColor='var(--border-md)'">
-            💬 Detail & Komentar
+            \uD83D\uDCAC Detail & Komentar
           </button>
         </div>
       </div>
@@ -1715,7 +1715,7 @@ function renderValidateBoard() {
   return `
     <div style="margin-bottom:28px;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-        <div style="font-size:14px;font-weight:800;color:var(--text);">⏳ Menunggu Approval</div>
+        <div style="font-size:14px;font-weight:800;color:var(--text);">\u23F3 Menunggu Approval</div>
         <span style="background:var(--amber-dim);color:var(--amber);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:800;">${pendingReqs.length}</span>
       </div>
       ${pendingReqs.length ? `
@@ -1742,7 +1742,7 @@ function renderValidateCard(r) {
     <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;
       background:${countdown<0?'var(--red-dim)':countdown<=3?'var(--amber-dim)':'var(--green-dim)'};
       color:${countdown<0?'var(--red)':countdown<=3?'var(--amber)':'var(--green)'};">
-      ${countdown<0?'⚠ '+Math.abs(countdown)+' hari lewat':countdown===0?'🔴 Hari ini':'⏱ '+countdown+' hari lagi'}
+      ${countdown<0?'\u26A0 '+Math.abs(countdown)+' hari lewat':countdown===0?'\uD83D\uDD34 Hari ini':'\u23F1 '+countdown+' hari lagi'}
     </span>` : '';
   return `
     <div style="background:var(--card);border:2px solid var(--amber-dim);border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(217,119,6,0.10);">
@@ -1752,11 +1752,11 @@ function renderValidateCard(r) {
         <!-- header -->
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;">
           <div>
-            <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:3px;">${r.title||'—'}</div>
-            <div style="font-size:12px;color:var(--text-muted);">#${r.id.slice(-8).toUpperCase()} · <strong>${r.client||'—'}</strong> · ${typeLabel}</div>
+            <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:3px;">${r.title||'\u2014'}</div>
+            <div style="font-size:12px;color:var(--text-muted);">#${r.id.slice(-8).toUpperCase()} \u00B7 <strong>${r.client||'\u2014'}</strong> \u00B7 ${typeLabel}</div>
           </div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;">
-            <span class="badge badge-status-pending" style="white-space:nowrap;">⏳ Menunggu Approval</span>
+            <span class="badge badge-status-pending" style="white-space:nowrap;">\u23F3 Menunggu Approval</span>
             <span class="priority-badge priority-${r.priority}">${(r.priority||'').toUpperCase()}</span>
           </div>
         </div>
@@ -1764,13 +1764,13 @@ function renderValidateCard(r) {
         <!-- deskripsi -->
         <div style="background:var(--inset);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:12px;">
           <div style="font-size:10px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Deskripsi Kebutuhan</div>
-          <div style="font-size:13px;color:var(--text);line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">${r.description||'—'}</div>
+          <div style="font-size:13px;color:var(--text);line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">${r.description||'\u2014'}</div>
         </div>
 
         <!-- meta + countdown -->
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
-          <span style="font-size:12px;color:var(--text-muted);">👤 ${r.submittedByName||'—'}</span>
-          <span style="font-size:12px;color:var(--text-muted);">📅 ${date}</span>
+          <span style="font-size:12px;color:var(--text-muted);">\uD83D\uDC64 ${r.submittedByName||'\u2014'}</span>
+          <span style="font-size:12px;color:var(--text-muted);">\uD83D\uDCC5 ${date}</span>
           ${r.dateDeadline ? `<span style="font-size:12px;color:var(--text-muted);">🎯 Deadline: <strong>${formatDate(r.dateDeadline)}</strong></span>` : ''}
           ${countdownHtml}
         </div>
@@ -1780,13 +1780,13 @@ function renderValidateCard(r) {
           <button onclick="quickApprove('${r.id}')"
             style="flex:1;min-width:140px;padding:10px 16px;background:linear-gradient(135deg,#059669,#10B981);color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;transition:opacity .15s;box-shadow:0 3px 10px rgba(5,150,105,0.3);"
             onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
-            ✓ Approve & Teruskan ke Tim Dev
+            \u2713 Approve & Teruskan ke Tim Dev
           </button>
           <button onclick="openDetail('${r.id}')"
             style="padding:10px 14px;background:var(--inset);border:1.5px solid var(--border-md);border-radius:9px;font-size:13px;font-weight:700;color:var(--text-muted);cursor:pointer;font-family:inherit;transition:all .15s;"
             onmouseover="this.style.color='var(--indigo)';this.style.borderColor='var(--indigo)'"
             onmouseout="this.style.color='var(--text-muted)';this.style.borderColor='var(--border-md)'">
-            👁 Lihat Detail
+            \uD83D\uDC41 Lihat Detail
           </button>
           <div style="display:flex;gap:6px;align-items:center;flex:1;min-width:200px;">
             <input id="reject-reason-${r.id}" style="flex:1;padding:9px 12px;background:var(--inset);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-size:12px;font-family:inherit;outline:none;"
@@ -1794,7 +1794,7 @@ function renderValidateCard(r) {
             <button onclick="quickReject('${r.id}')"
               style="padding:9px 14px;background:var(--red-dim);border:1.5px solid rgba(220,38,38,0.25);border-radius:9px;color:var(--red);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .15s;"
               onmouseover="this.style.background='rgba(220,38,38,0.2)'" onmouseout="this.style.background='var(--red-dim)'">
-              ✕ Tolak
+              \u2715 Tolak
             </button>
           </div>
         </div>
@@ -1850,20 +1850,20 @@ function renderDevBoard() {
                   <span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;
                     background:${deadline<0?'var(--red-dim)':deadline<=3?'var(--amber-dim)':'var(--green-dim)'};
                     color:${deadline<0?'var(--red)':deadline<=3?'var(--amber)':'var(--green)'};">
-                    ${deadline<0?'⚠ '+Math.abs(deadline)+'h lewat':deadline===0?'🔴 Hari ini':'⏱ '+deadline+'h lagi'}
+                    ${deadline<0?'\u26A0 '+Math.abs(deadline)+'h lewat':deadline===0?'\uD83D\uDD34 Hari ini':'\u23F1 '+deadline+'h lagi'}
                   </span>` : '';
                 return `
                 <div style="background:var(--inset);border:1.5px solid var(--border);border-radius:10px;margin-bottom:8px;overflow:visible;position:relative;transition:box-shadow .15s;"
                   onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.10)'"
                   onmouseout="this.style.boxShadow=''">
-                  <!-- card content — klik buka detail -->
+                  <!-- card content \u2014 klik buka detail -->
                   <div onclick="openDetail('${r.id}')" style="padding:10px 12px;cursor:pointer;position:relative;">
                     <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:${PRIORITY_COLORS[r.priority]||'#94A3B8'};"></div>
                     <div style="padding-left:8px;">
                       <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.4;">${r.title}</div>
                       <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-                        <span style="font-size:10px;color:var(--text-dim);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.client||'—'}</span>
-                        <span style="font-size:10px;">${TYPE_ICONS[r.type]||'•'}</span>
+                        <span style="font-size:10px;color:var(--text-dim);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.client||'\u2014'}</span>
+                        <span style="font-size:10px;">${TYPE_ICONS[r.type]||'\u2022'}</span>
                         <span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;
                           background:${r.priority==='high'?'#FEE2E2':r.priority==='medium'?'#FEF9C3':'#DCFCE7'};
                           color:${PRIORITY_COLORS[r.priority]||'#475569'};">${(r.priority||'').toUpperCase()}</span>
@@ -1891,7 +1891,7 @@ function renderDevBoard() {
                 </div>`;
               }).join('') : `
                 <div style="text-align:center;padding:28px 10px;">
-                  <div style="font-size:24px;margin-bottom:6px;opacity:.3;">📭</div>
+                  <div style="font-size:24px;margin-bottom:6px;opacity:.3;">\uD83D\uDCED</div>
                   <div style="font-size:11px;color:var(--text-dim);">Tidak ada item</div>
                 </div>`}
             </div>
@@ -1933,7 +1933,7 @@ window.openDetail = async function(id) {
   if (!snap.exists()) { document.getElementById('detail-body').innerHTML = '<div class="loading">Request tidak ditemukan.</div>'; return; }
   const r = { id: snap.id, ...snap.data() };
   document.getElementById('detail-title').textContent = r.title;
-  document.getElementById('detail-id').textContent = `#${r.id.slice(-8).toUpperCase()} · ${r.client}`;
+  document.getElementById('detail-id').textContent = `#${r.id.slice(-8).toUpperCase()} \u00B7 ${r.client}`;
   document.getElementById('detail-body').innerHTML = renderDetailBody(r);
 };
 
@@ -1951,9 +1951,9 @@ function renderDetailBody(r) {
       <div class="detail-section">
         <h4>Tindakan Approval</h4>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="btn-approve" onclick="updateStatus('${r.id}','validated')">✓ Approve & Teruskan ke Tim Dev</button>
+          <button class="btn-approve" onclick="updateStatus('${r.id}','validated')">\u2713 Approve & Teruskan ke Tim Dev</button>
           <div style="flex:1;min-width:180px;"><input id="reject-reason" style="width:100%;padding:8px 10px;background:var(--inset);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;" placeholder="Alasan penolakan (opsional)"></div>
-          <button class="btn-danger" onclick="rejectRequest('${r.id}')">✕ Tolak</button>
+          <button class="btn-danger" onclick="rejectRequest('${r.id}')">\u2715 Tolak</button>
         </div>
       </div>
     `;
@@ -1979,7 +1979,7 @@ function renderDetailBody(r) {
       <div class="detail-row"><span class="detail-key">Tipe</span><span class="detail-val"><span class="badge badge-type-${r.type}">${TYPE_LABELS[r.type]||r.type}</span></span></div>
       <div class="detail-row"><span class="detail-key">Status</span><span class="detail-val"><span class="badge badge-status-${r.status}">${STATUS_LABELS[r.status]||r.status}</span></span></div>
       <div class="detail-row"><span class="detail-key">Prioritas</span><span class="detail-val"><span class="priority-badge priority-${r.priority}">${(r.priority||'').toUpperCase()}</span></span></div>
-      <div class="detail-row"><span class="detail-key">Diajukan oleh</span><span class="detail-val">${r.submittedByName||'—'}</span></div>
+      <div class="detail-row"><span class="detail-key">Diajukan oleh</span><span class="detail-val">${r.submittedByName||'\u2014'}</span></div>
       <div class="detail-row"><span class="detail-key">Tgl Dibuat</span><span class="detail-val">${date}</span></div>
       <div class="detail-row"><span class="detail-key">Terakhir update</span><span class="detail-val">${updDate}</span></div>
     </div>
@@ -2012,7 +2012,7 @@ function renderDetailBody(r) {
     </div>` : ''}
     <div class="detail-section">
       <h4>Deskripsi Kebutuhan</h4>
-      <div class="detail-desc">${r.description||'—'}</div>
+      <div class="detail-desc">${r.description||'\u2014'}</div>
       ${r.notes ? `<div style="margin-top:10px;padding:10px 12px;background:var(--amber-dim);border:1px solid rgba(245,158,11,0.2);border-radius:8px;font-size:12px;color:var(--text-muted);"><strong style="color:var(--amber)">Catatan:</strong> ${r.notes}</div>` : ''}
     </div>
     ${r.specs && r.specs.length > 0 ? `
@@ -2025,8 +2025,8 @@ function renderDetailBody(r) {
         </div>
         ${r.specs.map((s,i) => `
           <div style="display:grid;grid-template-columns:1fr 2fr;padding:9px 14px;border-top:1px solid var(--border);background:${i%2===0?'var(--inset)':'var(--card)'};">
-            <div style="font-size:13px;font-weight:700;color:var(--text);">${s.key||'—'}</div>
-            <div style="font-size:13px;color:var(--text-muted);">${s.value||'—'}</div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);">${s.key||'\u2014'}</div>
+            <div style="font-size:13px;color:var(--text-muted);">${s.value||'\u2014'}</div>
           </div>
         `).join('')}
       </div>
@@ -2039,10 +2039,10 @@ function renderDetailBody(r) {
           <div style="${idx>0?'border-top:1px solid var(--border);':''}">
             <div class='acc-hdr' onclick='accToggle(this)'>
               <span style="font-size:11px;font-weight:800;color:var(--indigo);min-width:20px;">${idx+1}.</span>
-              <span style="font-size:13px;font-weight:700;color:var(--text);flex:1;">${item.name||'—'}</span>
+              <span style="font-size:13px;font-weight:700;color:var(--text);flex:1;">${item.name||'\u2014'}</span>
               ${item.type?`<span class="badge badge-type-${item.type}" style="font-size:10px;">${TYPE_LABELS[item.type]||item.type}</span>`:''}
               ${item.specs&&item.specs.length>0?`<span style="font-size:10px;color:var(--text-dim);">${item.specs.length} spec</span>`:''}
-              <span class="acc-icon" style="font-size:12px;color:var(--text-dim);transition:transform .2s;display:inline-block;flex-shrink:0;">▸</span>
+              <span class="acc-icon" style="font-size:12px;color:var(--text-dim);transition:transform .2s;display:inline-block;flex-shrink:0;">\u25B8</span>
             </div>
             <div id="modal-item-${r.id}-${idx}" style="display:none;padding:12px 14px 14px 44px;background:var(--inset);border-top:1px solid var(--border);">
               ${item.desc?`<div style="font-size:13px;color:var(--text);line-height:1.7;margin-bottom:${item.specs?.length?'10px':'0'};">${item.desc}</div>`:''}
@@ -2103,7 +2103,7 @@ function renderDetailBody(r) {
 
 window.updateStatus = async function(id, status) {
   await updateDoc(doc(db,'requests',id), { status, updatedAt: serverTimestamp() });
-  showToast(`✓ Status diperbarui: ${STATUS_LABELS[status]}`, 'success');
+  showToast(`\u2713 Status diperbarui: ${STATUS_LABELS[status]}`, 'success');
   await openDetail(id);
 };
 
@@ -2291,7 +2291,7 @@ window.addItemRow = function(item = {}) {
       <div style="font-size:12px;font-weight:800;color:var(--indigo);">Item #${itemNum}</div>
       <button type="button" onclick="removeItemRow('item-row-${idx}')"
         style="padding:3px 10px;background:var(--red-dim);border:1.5px solid rgba(220,38,38,0.2);border-radius:6px;color:var(--red);font-size:11px;font-weight:700;cursor:pointer;">
-        ✕ Hapus
+        \u2715 Hapus
       </button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
@@ -2320,12 +2320,12 @@ window.addItemRow = function(item = {}) {
         <label style="font-size:12px;color:var(--text-muted);font-weight:600;">Spesifikasi / Parameter</label>
         <button type="button" onclick="addSpecRowInItem('item-row-${idx}')"
           style="font-size:11px;font-weight:700;color:var(--indigo);background:var(--indigo-dim);border:1.5px solid var(--indigo-dim2);border-radius:6px;padding:3px 10px;cursor:pointer;">
-          ＋ Tambah Spec
+          \uFF0B Tambah Spec
         </button>
       </div>
       <div class="item-specs-list" id="specs-${idx}"></div>
       <div class="item-specs-empty" id="specs-empty-${idx}" style="padding:8px 12px;border:1.5px dashed var(--border-md);border-radius:8px;font-size:12px;color:var(--text-dim);text-align:center;">
-        Belum ada spec — opsional
+        Belum ada spec \u2014 opsional
       </div>
     </div>
   `;
@@ -2361,7 +2361,7 @@ window.addSpecRowInItem = function(itemId, key='', val='') {
       style="padding:7px 10px;background:var(--card);border:1.5px solid var(--border);border-radius:7px;color:var(--text);font-size:12px;font-family:inherit;outline:none;"
       onfocus="this.style.borderColor='var(--indigo)'" onblur="this.style.borderColor='var(--border)'">
     <button type="button" onclick="this.closest('div').remove();checkItemSpecEmpty('${itemId}')"
-      style="width:30px;height:30px;background:var(--red-dim);border:1.5px solid rgba(220,38,38,0.2);border-radius:7px;color:var(--red);cursor:pointer;font-weight:700;">✕</button>
+      style="width:30px;height:30px;background:var(--red-dim);border:1.5px solid rgba(220,38,38,0.2);border-radius:7px;color:var(--red);cursor:pointer;font-weight:700;">\u2715</button>
   `;
   if (list) list.appendChild(row);
 };
@@ -2431,7 +2431,7 @@ window.addSpecRow = function(containerId, key='', val='') {
       style="padding:9px 12px;background:var(--inset);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;outline:none;"
       onfocus="this.style.borderColor='var(--indigo)'" onblur="this.style.borderColor='var(--border)'">
     <button type="button" onclick="this.closest('div[id^=spec-row]').remove();checkSpecEmpty('${containerId}')"
-      style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:var(--red-dim);border:1.5px solid rgba(220,38,38,0.2);border-radius:var(--radius);color:var(--red);cursor:pointer;font-size:14px;font-weight:700;">✕</button>
+      style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:var(--red-dim);border:1.5px solid rgba(220,38,38,0.2);border-radius:var(--radius);color:var(--red);cursor:pointer;font-size:14px;font-weight:700;">\u2715</button>
   `;
   if (container) container.appendChild(row);
 };
@@ -2512,7 +2512,7 @@ window.saveRequest = async function() {
   const dateLabel = dateRequest
     ? new Date(dateRequest).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})
     : new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'});
-  const autoTitle = `Custom Request ${client} — ${dateLabel}`;
+  const autoTitle = `Custom Request ${client} \u2014 ${dateLabel}`;
   const title     = autoTitle;
   const type      = items[0]?.type || 'other';
   const timeline  = { dateRequest, dateDeadline, dateStart, dateEnd, duration };
@@ -2570,7 +2570,7 @@ window.printRequest = async function(id) {
   const itemsPrintHtml = r.items && r.items.length > 0 ? r.items.map((item, idx) => `
     <div style="margin-bottom:14px;border:1px solid #E5E7EB;border-radius:6px;overflow:hidden;">
       <div style="background:#F8FAFF;padding:9px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #E5E7EB;">
-        <div style="font-size:13px;font-weight:800;color:#111;">${idx+1}. ${item.name||'—'}</div>
+        <div style="font-size:13px;font-weight:800;color:#111;">${idx+1}. ${item.name||'\u2014'}</div>
         <div style="font-size:11px;font-weight:700;color:#555;">${TYPE_LABELS[item.type]||item.type||''}</div>
       </div>
       <div style="padding:10px 14px;">
@@ -2590,7 +2590,7 @@ window.printRequest = async function(id) {
 
   const commentsHtml = r.comments && r.comments.length > 0 ? r.comments.map(c=>`
     <div style="margin-bottom:8px;padding:8px 12px;border:1px solid #E5E7EB;border-left:2px solid #374151;border-radius:3px;">
-      <div style="font-size:11px;font-weight:700;color:#111;">${c.author||'—'} <span style="color:#aaa;font-weight:400;">· ${c.time||''}</span></div>
+      <div style="font-size:11px;font-weight:700;color:#111;">${c.author||'\u2014'} <span style="color:#aaa;font-weight:400;">\u00B7 ${c.time||''}</span></div>
       <div style="font-size:12px;margin-top:3px;color:#374151;">${c.text||''}</div>
     </div>
   `).join('') : '<p style="color:#aaa;font-size:12px;font-style:italic;margin:0;">Tidak ada komentar</p>';
@@ -2614,7 +2614,7 @@ window.printRequest = async function(id) {
 
       <!-- JUDUL REQUEST -->
       <div style="margin-bottom:20px;">
-        <div style="font-size:16px;font-weight:800;color:#111;line-height:1.4;">${r.title||'—'}</div>
+        <div style="font-size:16px;font-weight:800;color:#111;line-height:1.4;">${r.title||'\u2014'}</div>
       </div>
 
       <!-- INFO GRID -->
@@ -2622,13 +2622,13 @@ window.printRequest = async function(id) {
         <tbody>
           <tr style="border-bottom:1px solid #E5E7EB;">
             <td style="padding:7px 0;font-size:11px;color:#777;width:150px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Klien</td>
-            <td style="padding:7px 0;font-size:13px;font-weight:700;color:#111;">${r.client||'—'}</td>
+            <td style="padding:7px 0;font-size:13px;font-weight:700;color:#111;">${r.client||'\u2014'}</td>
             <td style="padding:7px 0;font-size:11px;color:#777;width:150px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Status</td>
             <td style="padding:7px 0;font-size:13px;font-weight:700;color:#111;">${statusLabel}</td>
           </tr>
           <tr style="border-bottom:1px solid #E5E7EB;">
             <td style="padding:7px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Diajukan Oleh</td>
-            <td style="padding:7px 0;font-size:13px;color:#111;">${r.submittedByName||'—'}</td>
+            <td style="padding:7px 0;font-size:13px;color:#111;">${r.submittedByName||'\u2014'}</td>
             <td style="padding:7px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Tipe Request</td>
             <td style="padding:7px 0;font-size:13px;color:#111;">${typeLabel}</td>
           </tr>
@@ -2636,7 +2636,7 @@ window.printRequest = async function(id) {
             <td style="padding:7px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Tanggal Dibuat</td>
             <td style="padding:7px 0;font-size:13px;color:#111;">${date}</td>
             <td style="padding:7px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Prioritas</td>
-            <td style="padding:7px 0;font-size:13px;font-weight:700;color:#111;">${priorityMap[r.priority]||r.priority||'—'}</td>
+            <td style="padding:7px 0;font-size:13px;font-weight:700;color:#111;">${priorityMap[r.priority]||r.priority||'\u2014'}</td>
           </tr>
           <tr>
             <td style="padding:7px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Terakhir Update</td>
@@ -2668,7 +2668,7 @@ window.printRequest = async function(id) {
       <!-- DESKRIPSI KEBUTUHAN -->
       <div style="margin-bottom:20px;">
         <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#555;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #E5E7EB;">Deskripsi Kebutuhan</div>
-        <p style="font-size:13px;line-height:1.8;color:#111;white-space:pre-wrap;margin:0;">${r.description||'—'}</p>
+        <p style="font-size:13px;line-height:1.8;color:#111;white-space:pre-wrap;margin:0;">${r.description||'\u2014'}</p>
         ${r.notes ? `<div style="margin-top:12px;padding:10px 14px;border:1px solid #D1D5DB;border-left:3px solid #374151;border-radius:4px;font-size:12px;color:#374151;"><strong>Catatan:</strong> ${r.notes}</div>` : ''}
       </div>
 
@@ -2700,7 +2700,7 @@ window.printRequest = async function(id) {
 
       <!-- FOOTER -->
       <div style="display:flex;justify-content:space-between;margin-top:28px;padding-top:12px;border-top:1px solid #E5E7EB;font-size:10px;color:#aaa;">
-        <span>Konsultama Global Bisnis — Custom Request Management System</span>
+        <span>Konsultama Global Bisnis \u2014 Custom Request Management System</span>
         <span>Dicetak: ${new Date().toLocaleString('id-ID')}</span>
       </div>
     </div>
@@ -2718,7 +2718,7 @@ function renderClientsPage() {
   if (allClients.length === 0) {
     return `
       <div style="text-align:center;padding:80px 20px;">
-        <div style="font-size:64px;margin-bottom:16px;opacity:.35;">🏢</div>
+        <div style="font-size:64px;margin-bottom:16px;opacity:.35;">\uD83C\uDFE2</div>
         <div style="font-size:18px;font-weight:800;color:var(--text-muted);margin-bottom:8px;">Belum ada data klien</div>
         <div style="font-size:13px;color:var(--text-dim);margin-bottom:28px;">Belum ada klien terdaftar. Tambahkan klien pertama untuk mulai membuat request.</div>
         ${canEdit ? `<button class="btn-new" onclick="openClientForm('')" style="display:inline-flex;margin:0 auto;">＋ Tambah Klien Pertama</button>` : '<div style="font-size:13px;color:var(--text-dim);">Hubungi Marketing atau CTO untuk menambahkan klien.</div>'}
@@ -2786,7 +2786,7 @@ function renderClientCard(cl, canEdit) {
           <div style="width:44px;height:44px;border-radius:12px;background:${color};display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0;">${initials}</div>
           <div style="flex:1;min-width:0;">
             <div style="font-size:14px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${cl.name}</div>
-            <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${cl.industry||'—'}${cl.size?' · '+cl.size:''}</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${cl.industry||'\u2014'}${cl.size?' \u00B7 '+cl.size:''}</div>
           </div>
         </div>
 
@@ -2813,7 +2813,7 @@ function renderClientCard(cl, canEdit) {
             style="flex:1;padding:7px 12px;background:var(--indigo-dim);border:1.5px solid var(--indigo-dim2);border-radius:8px;color:var(--indigo);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;"
             onmouseover="this.style.background='var(--indigo-dim2)'"
             onmouseout="this.style.background='var(--indigo-dim)'">
-            📋 Lihat ${reqCount} Request
+            \uD83D\uDCCB Lihat ${reqCount} Request
           </button>
           ${canEdit ? `
           <div style="display:flex;gap:6px;">
@@ -2925,7 +2925,7 @@ window.toggleTheme = function() {
 
 // --- EMPTY ---
 function renderEmpty(title, sub) {
-  return `<div class="empty-state"><div class="empty-icon">📭</div><p>${title}</p><small>${sub}</small></div>`;
+  return `<div class="empty-state"><div class="empty-icon">\uD83D\uDCED</div><p>${title}</p><small>${sub}</small></div>`;
 }
 
 </script>
