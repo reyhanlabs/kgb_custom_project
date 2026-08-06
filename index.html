@@ -298,7 +298,7 @@
   .urole { font-size:11px; color:rgba(255,255,255,0.55); }
 
   /* ══ MAIN ══ */
-  .main { margin-left:var(--sidebar); flex:1; display:flex; flex-direction:column; }
+  .main { margin-left:var(--sidebar); flex:1; display:flex; flex-direction:column; min-width:0; }
   .topbar {
     padding:14px 28px; border-bottom:1px solid var(--border); display:flex; align-items:center;
     justify-content:space-between; position:sticky; top:0; z-index:5;
@@ -308,7 +308,45 @@
   .page-title { font-size:19px; font-weight:800; color:#fff; }
   .page-sub { font-size:12px; color:rgba(255,255,255,0.60); margin-top:2px; }
   .topbar-actions { display:flex; align-items:center; gap:10px; }
-  .content { padding:24px 28px; flex:1; }
+  .topbar-left { display:flex; align-items:center; gap:12px; min-width:0; }
+  .content { padding:24px 28px; flex:1; min-width:0; }
+
+  /* ══ MOBILE: hamburger + off-canvas sidebar ══ */
+  .hamburger-btn {
+    display:none; width:36px; height:36px; border-radius:9px; border:none;
+    background:rgba(255,255,255,0.18); color:#fff; font-size:17px; cursor:pointer;
+    align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .hamburger-btn:hover { background:rgba(255,255,255,0.28); }
+  .sidebar-backdrop {
+    display:none; position:fixed; inset:0; background:rgba(6,13,24,0.55); z-index:15;
+  }
+  .sidebar-backdrop.show { display:block; }
+  .sidebar-close-btn { display:none; }
+
+  @media (max-width: 880px) {
+    .hamburger-btn { display:flex; }
+    .sidebar {
+      transform:translateX(-100%); transition:transform .25s ease; z-index:20;
+      box-shadow:4px 0 24px rgba(0,0,0,0.25);
+    }
+    .sidebar.open { transform:translateX(0); }
+    .sidebar-close-btn {
+      display:flex; align-items:center; justify-content:center; width:28px; height:28px;
+      border-radius:8px; border:none; background:rgba(255,255,255,0.15); color:#fff;
+      font-size:14px; cursor:pointer; flex-shrink:0;
+    }
+    .main { margin-left:0; }
+    .topbar { padding:12px 14px; }
+    .page-title { font-size:16px; }
+    .page-sub { font-size:11px; }
+    .content { padding:14px; }
+    .btn-new { padding:8px 12px !important; font-size:12px !important; }
+  }
+  @media (max-width: 480px) {
+    .page-sub { display:none; }
+    .topbar { padding:10px 12px; }
+  }
 
   /* ══ STAT CARDS — each has its own bold color ══ */
   .stats-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:26px; }
@@ -513,6 +551,52 @@
   }
   .card-action-btn:hover { filter:brightness(1.08); transform:translateY(-1px); }
 
+  /* ══ MOBILE RESPONSIVE ══ */
+  @media (max-width: 680px) {
+    /* Modal jadi hampir full-width & padding lebih kecil */
+    .modal-overlay { padding:0; align-items:stretch; }
+    .modal { max-width:100% !important; width:100%; min-height:100vh; border-radius:0; margin:0; }
+    .modal-body { padding:16px !important; }
+    .modal-footer { padding:12px 16px; flex-wrap:wrap; }
+    .modal-header-inner { padding:16px !important; }
+
+    /* Detail info jadi 1 kolom di layar sempit */
+    .detail-row { grid-template-columns:1fr; gap:2px; }
+    .detail-key { font-size:11px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.04em; }
+
+    /* Field-row form jadi 1 kolom */
+    .field-row { grid-template-columns:1fr !important; }
+
+    /* Stat cards: 2 kolom */
+    .stats-row { grid-template-columns:repeat(2,1fr) !important; gap:10px; }
+    .stat-card { padding:14px 16px !important; }
+
+    /* Header kartu grup klien: wrap rapi */
+    .client-group-header { flex-wrap:wrap; gap:10px !important; }
+    .client-group-badges { width:100%; justify-content:flex-start !important; margin-left:0 !important; }
+
+    /* Tabel request per klien → jadi kartu bertumpuk */
+    .req-table thead { display:none; }
+    .req-table, .req-table tbody { display:block; width:100%; }
+    .req-table tr.req-row {
+      display:flex !important; flex-wrap:wrap; align-items:center; gap:6px 10px;
+      border:1px solid var(--border) !important; border-radius:12px !important;
+      margin-bottom:8px; padding:10px !important; background:var(--card);
+    }
+    .req-table tr.req-detail-row { display:block; margin-top:-8px; margin-bottom:8px; }
+    .req-table tr.req-detail-row td { display:block !important; padding:0 !important; }
+    .req-table td { display:block; padding:0 !important; border:none !important; }
+    .req-td-title { flex:1 1 100%; order:1; }
+    .req-td-status { order:2; }
+    .req-td-items { order:3; }
+    .req-td-deadline { order:4; }
+    .req-td-actions { order:5; margin-left:auto; }
+    .req-td-actions > div { justify-content:flex-end; }
+  }
+  @media (max-width: 420px) {
+    .stats-row { grid-template-columns:1fr !important; }
+  }
+
   /* ══ PRINT STYLES ══ */
   @media print {
     body > *:not(#print-area) { display:none !important; }
@@ -570,14 +654,16 @@
 <!-- MAIN APP -->
 <div id="app">
   <div class="layout">
-    <aside class="sidebar">
+    <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeSidebar()"></div>
+    <aside class="sidebar" id="sidebar">
       <div class="sidebar-logo">
         <div class="logo-row">
           <div class="logo-dot">KGB</div>
-          <div>
+          <div style="flex:1;">
             <div class="logo-name">Konsultama Global Bisnis</div>
             <div class="logo-sub">Custom Request</div>
           </div>
+          <button class="sidebar-close-btn" onclick="closeSidebar()" title="Tutup menu">✕</button>
         </div>
       </div>
       <div class="nav-section">
@@ -620,9 +706,12 @@
 
     <main class="main">
       <div class="topbar">
-        <div>
-          <div class="page-title" id="page-title">Dashboard</div>
-          <div class="page-sub" id="page-sub">Selamat datang di Custom Request System</div>
+        <div class="topbar-left">
+          <button class="hamburger-btn" onclick="openSidebar()" title="Menu">☰</button>
+          <div>
+            <div class="page-title" id="page-title">Dashboard</div>
+            <div class="page-sub" id="page-sub">Selamat datang di Custom Request System</div>
+          </div>
         </div>
         <div class="topbar-actions">
           <button class="btn-theme" onclick="toggleTheme()" title="Ganti tema" id="btn-theme">☀</button>
@@ -893,6 +982,21 @@ let allRequests = [];
 let allClients = [];
 let unsubRequests = null;
 let unsubClients = null;
+let expandedGroups = new Set(); // menyimpan id grup klien yang sedang terbuka (accordion)
+let expandedRequests = new Set(); // menyimpan id request yang detailnya sedang terbuka (dropdown inline)
+function safeGroupId(s){ return String(s||'').replace(/[^a-zA-Z0-9_-]/g,'_'); }
+function clientColorFor(name) {
+  const palette = ['#027fb3','#8B5CF6','#10B981','#F59E0B','#EF4444','#EC4899','#0891B2','#6366F1','#059669','#D97706','#DC2626','#DB2777','#7C3AED','#0EA5E9','#65A30D','#EA580C','#9333EA','#0D9488'];
+  let hash = 0;
+  const s = String(name||'');
+  for (let i = 0; i < s.length; i++) { hash = (hash * 31 + s.charCodeAt(i)) | 0; }
+  return palette[Math.abs(hash) % palette.length];
+}
+function hexToRgba(hex, alpha) {
+  const h = hex.replace('#','');
+  const r = parseInt(h.substring(0,2),16), g = parseInt(h.substring(2,4),16), b = parseInt(h.substring(4,6),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
 
 const STATUS_LABELS = {
   pending: 'Menunggu Approval',
@@ -1081,6 +1185,17 @@ window.navigate = function(page, param) {
     el.classList.toggle('active', el.dataset.page === (page === 'client-detail' ? 'requests' : page))
   );
   renderPage(page);
+  closeSidebar();
+};
+
+window.openSidebar = function() {
+  document.getElementById('sidebar')?.classList.add('open');
+  document.getElementById('sidebar-backdrop')?.classList.add('show');
+};
+
+window.closeSidebar = function() {
+  document.getElementById('sidebar')?.classList.remove('open');
+  document.getElementById('sidebar-backdrop')?.classList.remove('show');
 };
 
 const PAGE_TITLES = {
@@ -1210,12 +1325,14 @@ function renderRequestList(requests) {
 
   return `
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px;flex-wrap:wrap;">
-      <input class="filter-search" id="search-input" placeholder="\uD83D\uDD0D Cari klien atau request..." oninput="filterRequests()" style="max-width:260px;">
+      <input class="filter-search" id="search-input" placeholder="\uD83D\uDD0D Cari klien atau request..." oninput="filterRequests()" style="max-width:260px;flex:1;">
       <select class="filter-select" id="filter-status" onchange="filterRequests()">
         <option value="">Semua Status</option>
         ${Object.entries(STATUS_LABELS).map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}
       </select>
-      <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+      <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span onclick="expandAllClientGroups()" style="padding:3px 10px;background:var(--indigo-dim);color:var(--indigo);border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">Buka Semua</span>
+        <span onclick="collapseAllClientGroups()" style="padding:3px 10px;background:var(--inset);color:var(--text-muted);border:1px solid var(--border-md);border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">Tutup Semua</span>
         <span id="filter-active-tag" style="display:none;padding:3px 10px;background:var(--indigo-dim2);color:var(--indigo);border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;" onclick="clearFilters()">\u2715 Reset</span>
         <span style="font-size:12px;color:var(--text-dim);" id="filter-count">${requests.length} request \u00B7 ${sorted.length} klien</span>
       </div>
@@ -1227,8 +1344,7 @@ function renderRequestList(requests) {
 
 function renderClientGroupCard(group) {
   const cl = allClients.find(c=>c.id===group.clientId);
-  const colors = ['#027fb3','#8B5CF6','#10B981','#F59E0B','#EF4444','#EC4899'];
-  const color  = colors[(group.name.charCodeAt(0)||0) % colors.length];
+  const color  = clientColorFor(group.name);
   const initials = group.name.split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?';
 
   const done    = group.items.filter(r=>r.status==='done').length;
@@ -1236,27 +1352,37 @@ function renderClientGroupCard(group) {
   const onprog  = group.items.filter(r=>['validated','design','dev-be','dev-fe','testing'].includes(r.status)).length;
   const rejected= group.items.filter(r=>r.status==='rejected').length;
 
+  const gid   = safeGroupId(group.clientId || group.name);
+  const isOpen = expandedGroups.has(gid);
+
   return `
-    <div style="background:var(--card);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--sh-card);">
-      <!-- HEADER KLIEN -->
-      <div style="display:flex;align-items:center;gap:14px;padding:14px 20px;background:var(--inset);border-bottom:1px solid var(--border);">
+    <div style="background:var(--card);border:1.5px solid var(--border);border-left:5px solid ${color};border-radius:16px;overflow:hidden;box-shadow:var(--sh-card);">
+      <!-- HEADER KLIEN (klik untuk buka/tutup) -->
+      <div class="client-group-header" onclick="toggleClientGroup('${gid}')" style="display:flex;align-items:flex-start;gap:14px;padding:14px 20px;background:linear-gradient(90deg, ${hexToRgba(color,0.14)}, var(--inset) 55%);border-bottom:1px solid var(--border);cursor:pointer;user-select:none;">
+        <span id="chev-${gid}" style="flex-shrink:0;font-size:11px;color:var(--text-dim);transition:transform .2s;transform:rotate(${isOpen?'90deg':'0deg'});display:inline-block;margin-top:4px;">▶</span>
         <div style="width:40px;height:40px;border-radius:10px;background:${color};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;">${initials}</div>
         <div style="flex:1;min-width:0;">
           <div style="font-size:15px;font-weight:800;color:var(--text);">${group.name}</div>
-          <div style="font-size:11px;color:var(--text-muted);margin-top:1px;">${cl?`${cl.industry||''}${cl.size?' · '+cl.size:''}${cl.pic?' · PIC: '+cl.pic:''}`:''}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:1px;">${cl?.industry||''}${cl?.size?' · '+cl.size:''}</div>
+          ${cl && (cl.pic||cl.phone||cl.email) ? `
+          <div style="display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:5px;">
+            ${cl.pic?`<span style="font-size:11px;color:var(--text-muted);display:inline-flex;align-items:center;gap:4px;">👤 <strong style="color:var(--text);">${cl.pic}</strong>${cl.picRole?` <span style="color:var(--text-dim);">(${cl.picRole})</span>`:''}</span>`:''}
+            ${cl.phone?`<a href="tel:${cl.phone.replace(/[^0-9+]/g,'')}" onclick="event.stopPropagation()" style="font-size:11px;color:var(--indigo);text-decoration:none;display:inline-flex;align-items:center;gap:4px;">📞 ${cl.phone}</a>`:''}
+            ${cl.email?`<a href="mailto:${cl.email}" onclick="event.stopPropagation()" style="font-size:11px;color:var(--indigo);text-decoration:none;display:inline-flex;align-items:center;gap:4px;">✉ ${cl.email}</a>`:''}
+          </div>` : ''}
         </div>
-        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+        <div class="client-group-badges" style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
           ${pending>0?`<span style="padding:3px 9px;border-radius:20px;background:var(--amber-dim);color:var(--amber);font-size:11px;font-weight:800;">⏳ ${pending}</span>`:''}
           ${onprog>0?`<span style="padding:3px 9px;border-radius:20px;background:var(--indigo-dim);color:var(--indigo);font-size:11px;font-weight:800;">⚡ ${onprog}</span>`:''}
           ${done>0?`<span style="padding:3px 9px;border-radius:20px;background:var(--green-dim);color:var(--green);font-size:11px;font-weight:800;">✓ ${done}</span>`:''}
           ${rejected>0?`<span style="padding:3px 9px;border-radius:20px;background:var(--red-dim);color:var(--red);font-size:11px;font-weight:800;">✕ ${rejected}</span>`:''}
           <span style="font-size:12px;color:var(--text-dim);font-weight:700;">${group.items.length} dok</span>
-          ${group.clientId?`<button onclick="navToClient(${group.clientId})" style="padding:5px 12px;background:var(--indigo);color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">Buka Detail ›</button>`:''}
+          ${group.clientId?`<button onclick="event.stopPropagation();navToClient(${group.clientId})" style="padding:5px 12px;background:var(--indigo);color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">Buka Detail ›</button>`:''}
         </div>
       </div>
-      <!-- TABLE REQUEST -->
-      <div style="padding:0 20px 14px;">
-        <table style="width:100%;border-collapse:collapse;">
+      <!-- TABLE REQUEST (accordion body) -->
+      <div id="grp-body-${gid}" style="padding:0 20px 14px;${isOpen?'':'display:none;'}">
+        <table class="req-table" style="width:100%;border-collapse:collapse;">
           <thead>
             <tr style="border-bottom:1.5px solid var(--border);">
               <th style="text-align:left;padding:10px 8px 8px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;">Judul Request</th>
@@ -1272,22 +1398,28 @@ function renderClientGroupCard(group) {
               const cdColor = cd===null?'var(--text-dim)':cd<0?'var(--red)':cd<=3?'var(--amber)':'var(--green)';
               const cdText  = cd===null?'\u2014':cd<0?`⚠ ${Math.abs(cd)}h`:cd===0?'\uD83D\uDD34 Hari ini':`${cd}h lagi`;
               const safeTitle = (r.title||'').replace(/'/g,"\'");
+              const rowOpen = expandedRequests.has(r.id);
               return `
-              <tr style="border-bottom:1px solid var(--border);" onmouseover="this.style.background='var(--inset)'" onmouseout="this.style.background=''">
-                <td style="padding:10px 8px;cursor:pointer;" onclick="navToClient(${r.clientId||''})">
-                  <div style="font-size:13px;font-weight:700;color:var(--text);">${r.title||'—'}</div>
-                  <div style="font-size:10px;color:var(--text-dim);font-family:monospace;margin-top:2px;">#${r.id.slice(-8).toUpperCase()}</div>
+              <tr id="req-row-${r.id}" class="req-row" style="border-bottom:1px solid var(--border);cursor:pointer;" onclick="toggleRequestRow('${r.id}')" onmouseover="this.style.background='var(--inset)'" onmouseout="this.style.background=''">
+                <td class="req-td-title" style="padding:10px 8px;">
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <span id="req-chev-${r.id}" style="font-size:9px;color:var(--text-dim);transition:transform .2s;display:inline-block;transform:rotate(${rowOpen?'90deg':'0deg'});flex-shrink:0;">▶</span>
+                    <div>
+                      <div style="font-size:13px;font-weight:700;color:var(--text);">${r.title||'—'}</div>
+                      <div style="font-size:10px;color:var(--text-dim);font-family:monospace;margin-top:2px;">#${r.id.slice(-8).toUpperCase()}</div>
+                    </div>
+                  </div>
                 </td>
-                <td style="padding:10px 8px;">
-                  <span style="font-size:13px;font-weight:800;color:var(--indigo);">${(r.items||[]).length}</span>
+                <td class="req-td-items" style="padding:10px 8px;">
+                  <span style="font-size:13px;font-weight:800;color:var(--indigo);">${(r.items||[]).length} item</span>
                 </td>
-                <td style="padding:10px 8px;">
+                <td class="req-td-status" style="padding:10px 8px;">
                   <span class="badge badge-status-${r.status}" style="font-size:11px;">${STATUS_LABELS[r.status]||r.status}</span>
                 </td>
-                <td style="padding:10px 8px;">
+                <td class="req-td-deadline" style="padding:10px 8px;">
                   <span style="font-size:11px;font-weight:700;color:${cdColor};">${cdText}</span>
                 </td>
-                <td style="padding:10px 8px;">
+                <td class="req-td-actions" style="padding:10px 8px;">
                   <div style="display:flex;gap:4px;">
                     <button onclick="event.stopPropagation();openRequestForm('${r.id}')" title="Edit"
                       style="width:26px;height:26px;border-radius:6px;border:1.5px solid var(--border-md);background:var(--inset);color:var(--indigo);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;"
@@ -1295,6 +1427,13 @@ function renderClientGroupCard(group) {
                     <button onclick="event.stopPropagation();deleteRequest('${r.id}','${safeTitle}')" title="Hapus"
                       style="width:26px;height:26px;border-radius:6px;border:1.5px solid rgba(220,38,38,0.2);background:var(--red-dim);color:var(--red);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;"
                       onmouseover="this.style.background='rgba(220,38,38,0.2)'" onmouseout="this.style.background='var(--red-dim)'">🗑</button>
+                  </div>
+                </td>
+              </tr>
+              <tr id="req-detail-${r.id}" class="req-detail-row" style="${rowOpen?'':'display:none;'}">
+                <td colspan="5" style="padding:0;border-bottom:1px solid var(--border);background:var(--inset);">
+                  <div style="padding:14px 16px;">
+                    ${renderDetailBody(r)}
                   </div>
                 </td>
               </tr>`;
@@ -1526,6 +1665,46 @@ window.clearFilters = function() {
 
 window.filterByClient = function(clientId) {
   navigate('client-detail', clientId);
+};
+
+window.toggleClientGroup = function(gid) {
+  const body = document.getElementById('grp-body-' + gid);
+  const chev = document.getElementById('chev-' + gid);
+  if (!body) return;
+  const willOpen = body.style.display === 'none';
+  body.style.display = willOpen ? '' : 'none';
+  if (chev) chev.style.transform = willOpen ? 'rotate(90deg)' : 'rotate(0deg)';
+  if (willOpen) expandedGroups.add(gid); else expandedGroups.delete(gid);
+};
+
+window.toggleRequestRow = function(id) {
+  const detailRow = document.getElementById('req-detail-' + id);
+  const chev = document.getElementById('req-chev-' + id);
+  if (!detailRow) return;
+  const willOpen = detailRow.style.display === 'none';
+  detailRow.style.display = willOpen ? '' : 'none';
+  if (chev) chev.style.transform = willOpen ? 'rotate(90deg)' : 'rotate(0deg)';
+  if (willOpen) expandedRequests.add(id); else expandedRequests.delete(id);
+};
+
+window.expandAllClientGroups = function() {
+  document.querySelectorAll('[id^="grp-body-"]').forEach(el => {
+    el.style.display = '';
+    const gid = el.id.replace('grp-body-','');
+    expandedGroups.add(gid);
+    const chev = document.getElementById('chev-'+gid);
+    if (chev) chev.style.transform = 'rotate(90deg)';
+  });
+};
+
+window.collapseAllClientGroups = function() {
+  document.querySelectorAll('[id^="grp-body-"]').forEach(el => {
+    el.style.display = 'none';
+    const gid = el.id.replace('grp-body-','');
+    expandedGroups.delete(gid);
+    const chev = document.getElementById('chev-'+gid);
+    if (chev) chev.style.transform = 'rotate(0deg)';
+  });
 };
 
 // --- TIMELINE HELPERS ---
@@ -2508,12 +2687,20 @@ window.saveRequest = async function() {
     return;
   }
 
-  // Auto-generate judul: "Custom Request PT. X — DD Mon YYYY"
-  const dateLabel = dateRequest
-    ? new Date(dateRequest).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})
-    : new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'});
-  const autoTitle = `Custom Request ${client} \u2014 ${dateLabel}`;
-  const title     = autoTitle;
+  // Judul: ambil dari nama/judul item request (bukan lagi "Custom Request {klien} — tanggal")
+  const itemNames = items.map(it => (it.name||'').trim()).filter(Boolean);
+  let title;
+  if (itemNames.length === 0) {
+    // fallback jika item tidak punya nama sama sekali
+    const dateLabel = dateRequest
+      ? new Date(dateRequest).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})
+      : new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'});
+    title = `Custom Request ${client} \u2014 ${dateLabel}`;
+  } else if (itemNames.length === 1) {
+    title = itemNames[0];
+  } else {
+    title = `${itemNames[0]} (+${itemNames.length - 1} item lainnya)`;
+  }
   const type      = items[0]?.type || 'other';
   const timeline  = { dateRequest, dateDeadline, dateStart, dateEnd, duration };
   const editId    = document.getElementById('req-edit-id').value;
