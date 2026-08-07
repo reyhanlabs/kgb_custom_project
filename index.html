@@ -1008,6 +1008,16 @@ const app = initializeApp(FIREBASE_CONFIG);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// --- CLOUDINARY (free image hosting, no card required) ---
+// Ganti dua nilai di bawah dengan punya Ka setelah daftar gratis di cloudinary.com
+const CLOUDINARY_CLOUD_NAME = 'amrieproject';
+const CLOUDINARY_UPLOAD_PRESET = 'amrieproject';
+
+// --- ATTACHMENT LIMITS (keep free-tier friendly) ---
+const ATTACH_MAX_FILES = 5;
+const ATTACH_MAX_SIZE_MB = 5;
+const ATTACH_ACCEPTED = ['image/jpeg','image/png','image/webp'];
+
 // --- STARTUP ---
 document.getElementById('auth-screen').style.display = 'flex';
 setupAuth();
@@ -1718,6 +1728,7 @@ function renderClientGroupCard(group) {
                 <td colspan="4" style="padding:0 8px 12px 28px;">
                   <div style="border-left:2px solid ${sc};padding-left:14px;margin-top:4px;">
                     ${r.desc?`<div style="font-size:13px;color:var(--text);line-height:1.65;white-space:pre-wrap;margin-bottom:${specHtml?'10px':'0'};">${r.desc}</div>`:''}
+                    ${(r.attachments&&r.attachments.length)?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:${specHtml?'10px':'0'};">${r.attachments.map(a=>`<img src="${a.url}" onclick="event.stopPropagation();window.open('${a.url}','_blank')" style="width:52px;height:52px;object-fit:cover;border-radius:7px;border:1.5px solid var(--border);cursor:pointer;">`).join('')}</div>`:''}
                     ${specHtml?`<div style="display:flex;flex-wrap:wrap;gap:5px;">${specHtml}</div>`:''}
                     ${r.dateDeadline||r.duration?`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
                       ${r.dateDeadline?`<span style="font-size:11px;background:var(--amber-dim);color:var(--amber);border-radius:6px;padding:3px 9px;font-weight:700;">\uD83D\uDCC5 ${r.dateDeadline}</span>`:''}
@@ -2505,9 +2516,17 @@ function renderDetailBody(r) {
     </div>` : ''}
     <div class="detail-section">
       <h4>Requirements Description</h4>
-      <div class="detail-desc">${r.description||'\u2014'}</div>
+      <div class="detail-desc">${r.desc||r.description||'\u2014'}</div>
       ${r.notes ? `<div style="margin-top:10px;padding:10px 12px;background:var(--amber-dim);border:1px solid rgba(245,158,11,0.2);border-radius:8px;font-size:12px;color:var(--text-muted);"><strong style="color:var(--amber)">Notes:</strong> ${r.notes}</div>` : ''}
     </div>
+    ${(r.attachments && r.attachments.length) ? `
+    <div class="detail-section">
+      <h4>Attachments (${r.attachments.length})</h4>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        ${r.attachments.map(a => `<img src="${a.url}" onclick="window.open('${a.url}','_blank')"
+          style="width:84px;height:84px;object-fit:cover;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;">`).join('')}
+      </div>
+    </div>` : ''}
     ${r.specs && r.specs.length > 0 ? `
     <div class="detail-section">
       <h4>Custom Specifications</h4>
@@ -2630,6 +2649,7 @@ window.openRequestForm = async function(id) {
   document.getElementById('req-edit-id').value = id;
   const itemsList = document.getElementById('req-items-list');
   if (itemsList) itemsList.innerHTML = '';
+  for (const k in itemAttachments) delete itemAttachments[k];
   updateItemCount();
   const notesWrap = document.getElementById('req-notes-wrap');
   const notesIcon = document.getElementById('notes-toggle-icon');
@@ -2657,7 +2677,8 @@ window.openRequestForm = async function(id) {
     }
     addItemRow({ name: r.name||'', type: r.type||'', desc: r.desc||'',
       specs: r.specs||[], dateRequest: r.dateRequest||'',
-      dateDeadline: r.dateDeadline||'', duration: r.duration||'' });
+      dateDeadline: r.dateDeadline||'', duration: r.duration||'',
+      attachments: r.attachments||[] });
     // Disable deadline if not yet approved
     if (r.status === 'pending') {
       const deadlineInputs = document.querySelectorAll('.item-date-deadline');
@@ -2784,6 +2805,18 @@ window.addItemRow = function(item = {}) {
           style="padding:7px 10px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:12px;font-family:inherit;outline:none;width:100%;">
       </div>
     </div>
+    <div style="margin-bottom:10px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <label style="font-size:12px;color:var(--text-muted);font-weight:600;">Attachments (screenshots)</label>
+        <label style="font-size:11px;font-weight:700;color:var(--indigo);background:var(--indigo-dim);border:1.5px solid var(--indigo-dim2);border-radius:6px;padding:3px 10px;cursor:pointer;">
+          \uFF0B Add Image
+          <input type="file" class="item-attach-input" accept="image/jpeg,image/png,image/webp" multiple
+            style="display:none;" onchange="handleAttachSelect(this, 'item-row-${id}')">
+        </label>
+      </div>
+      <div class="item-attach-list" id="attach-${id}" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+      <div style="font-size:10px;color:var(--text-dim);margin-top:4px;">Max ${ATTACH_MAX_FILES} gambar, ${ATTACH_MAX_SIZE_MB}MB/file (jpg, png, webp)</div>
+    </div>
     <div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
         <label style="font-size:12px;color:var(--text-muted);font-weight:600;">Specifications / Parameters</label>
@@ -2807,8 +2840,91 @@ window.addItemRow = function(item = {}) {
     if (specEmpty) specEmpty.style.display = 'none';
     item.specs.forEach(s => addSpecRowInItem(`item-row-${id}`, s.key, s.value));
   }
+  itemAttachments[`item-row-${id}`] = { existing: (item.attachments||[]).slice(), newFiles: [], removed: [] };
+  renderAttachThumbs(`item-row-${id}`);
   updateItemCount();
 };
+
+// --- ATTACHMENTS (per item row, uploaded to Firebase Storage on save) ---
+const itemAttachments = {}; // rowId -> { existing:[{url,path,name}], newFiles:[File], removed:[{url,path}] }
+
+window.handleAttachSelect = function(input, rowId) {
+  const store = itemAttachments[rowId] || (itemAttachments[rowId] = { existing:[], newFiles:[], removed:[] });
+  const currentCount = store.existing.length + store.newFiles.length;
+  const files = Array.from(input.files || []);
+  input.value = '';
+  for (const f of files) {
+    if (store.existing.length + store.newFiles.length >= ATTACH_MAX_FILES) {
+      showToast(`Maksimal ${ATTACH_MAX_FILES} gambar per request`, 'error'); break;
+    }
+    if (!ATTACH_ACCEPTED.includes(f.type)) { showToast(`${f.name}: format tidak didukung`, 'error'); continue; }
+    if (f.size > ATTACH_MAX_SIZE_MB * 1024 * 1024) { showToast(`${f.name}: melebihi ${ATTACH_MAX_SIZE_MB}MB`, 'error'); continue; }
+    store.newFiles.push(f);
+  }
+  renderAttachThumbs(rowId);
+};
+
+function renderAttachThumbs(rowId) {
+  const wrap = document.getElementById('attach-' + rowId.replace('item-row-', ''));
+  if (!wrap) return;
+  const store = itemAttachments[rowId] || { existing:[], newFiles:[] };
+  const thumbs = [];
+  store.existing.forEach((att, i) => thumbs.push(`
+    <div style="position:relative;width:56px;height:56px;">
+      <img src="${att.url}" onclick="window.open('${att.url}','_blank')"
+        style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1.5px solid var(--border);cursor:pointer;">
+      <button type="button" onclick="removeExistingAttach('${rowId}', ${i})"
+        style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:var(--red);color:#fff;border:none;font-size:10px;cursor:pointer;line-height:1;">\u2715</button>
+    </div>`));
+  store.newFiles.forEach((f, i) => {
+    const url = URL.createObjectURL(f);
+    thumbs.push(`
+    <div style="position:relative;width:56px;height:56px;">
+      <img src="${url}" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1.5px solid var(--indigo);cursor:pointer;" onclick="window.open('${url}','_blank')">
+      <span style="position:absolute;bottom:1px;left:1px;background:var(--indigo);color:#fff;font-size:8px;padding:1px 4px;border-radius:4px;">new</span>
+      <button type="button" onclick="removeNewAttach('${rowId}', ${i})"
+        style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:var(--red);color:#fff;border:none;font-size:10px;cursor:pointer;line-height:1;">\u2715</button>
+    </div>`);
+  });
+  wrap.innerHTML = thumbs.join('') || `<span style="font-size:11px;color:var(--text-dim);font-style:italic;">Belum ada gambar</span>`;
+}
+
+window.removeExistingAttach = function(rowId, idx) {
+  const store = itemAttachments[rowId];
+  if (!store) return;
+  const [removedItem] = store.existing.splice(idx, 1);
+  if (removedItem) store.removed.push(removedItem);
+  renderAttachThumbs(rowId);
+};
+
+window.removeNewAttach = function(rowId, idx) {
+  const store = itemAttachments[rowId];
+  if (!store) return;
+  store.newFiles.splice(idx, 1);
+  renderAttachThumbs(rowId);
+};
+
+async function uploadItemAttachments(rowId) {
+  const store = itemAttachments[rowId];
+  // catatan: hapus gambar lama hanya menghapusnya dari daftar attachment di Firestore.
+  // File fisiknya tetap ada di Cloudinary (unsigned upload tidak bisa hapus dari client tanpa API secret) - dampaknya minor karena kuota gratis cukup besar.
+  const kept = store ? store.existing.slice() : [];
+  if (store && store.newFiles.length) {
+    for (const f of store.newFiles) {
+      const formData = new FormData();
+      formData.append('file', f);
+      formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+      formData.append('folder', 'custom-requests');
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+        method: 'POST', body: formData
+      });
+      if (!res.ok) { showToast(`Gagal upload ${f.name}`, 'error'); continue; }
+      const data = await res.json();
+      kept.push({ url: data.secure_url, name: f.name, publicId: data.public_id });
+    }
+  }
+  return kept;
+}
 
 window.addSpecRowInItem = function(itemId, key='', val='') {
   const div = document.getElementById(itemId);
@@ -2877,7 +2993,7 @@ function collectItems() {
       const v = specRow.querySelector('.spec-val')?.value.trim();
       if (k) specs.push({ key:k, value:v||'' });
     });
-    if (name || desc) items.push({ name, type, desc, dateRequest, dateDeadline, duration, specs });
+    if (name || desc) items.push({ name, type, desc, dateRequest, dateDeadline, duration, specs, rowId: row.id });
   });
   return items;
 }
@@ -2962,25 +3078,32 @@ window.saveRequest = async function() {
   const priority = document.getElementById('req-priority')?.value || 'medium';
   const notes    = document.getElementById('req-notes')?.value.trim() || '';
   const baseDate = new Date().toISOString().split('T')[0];
+  showToast('Menyimpan...', 'info');
   if (editId) {
     const item = items[0];
+    const attachments = await uploadItemAttachments(item.rowId);
     await updateDoc(doc(db, 'requests', editId), {
       name: item.name, type: item.type||'', desc: item.desc||'',
       specs: item.specs||[], dateRequest: item.dateRequest||baseDate,
       dateDeadline: item.dateDeadline||'', duration: item.duration||'',
-      priority, clientId, client, notes, updatedAt: serverTimestamp()
+      priority, clientId, client, notes, attachments, updatedAt: serverTimestamp()
     });
+    delete itemAttachments[item.rowId];
     showToast('\u2713 Request updated successfully', 'success');
   } else {
-    await Promise.all(items.map(item => addDoc(collection(db, 'requests'), {
-      name: item.name, type: item.type||'', desc: item.desc||'',
-      specs: item.specs||[], dateRequest: item.dateRequest||baseDate,
-      dateDeadline: item.dateDeadline||'', duration: item.duration||'',
-      priority, clientId, client, notes,
-      status: 'pending', submittedBy: currentUser.uid,
-      submittedByName: currentUserData?.name || currentUser.email,
-      createdAt: serverTimestamp(), updatedAt: serverTimestamp(), comments: []
-    })));
+    await Promise.all(items.map(async item => {
+      const attachments = await uploadItemAttachments(item.rowId);
+      await addDoc(collection(db, 'requests'), {
+        name: item.name, type: item.type||'', desc: item.desc||'',
+        specs: item.specs||[], dateRequest: item.dateRequest||baseDate,
+        dateDeadline: item.dateDeadline||'', duration: item.duration||'',
+        priority, clientId, client, notes, attachments,
+        status: 'pending', submittedBy: currentUser.uid,
+        submittedByName: currentUserData?.name || currentUser.email,
+        createdAt: serverTimestamp(), updatedAt: serverTimestamp(), comments: []
+      });
+      delete itemAttachments[item.rowId];
+    }));
     showToast('\u2713 ' + items.length + ' requests sent successfully!', 'success');
   }
   closeModal('modal-request-form');
