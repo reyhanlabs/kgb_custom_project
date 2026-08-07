@@ -720,6 +720,110 @@
   </div>
 </div>
 
+<!-- MODAL: BUG FORM -->
+<div class="modal-overlay" id="modal-bug-form">
+  <div class="modal" style="max-width:620px;">
+    <div class="modal-header">
+      <div class="modal-header-inner">
+        <div class="modal-title" id="bug-form-title">Log New Bug</div>
+        <div class="modal-title-sub">Track a bug or issue for a client</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('modal-bug-form')">&#x2715;</button>
+    </div>
+    <div class="modal-body" style="max-height:80vh;overflow-y:auto;">
+      <input type="hidden" id="bug-edit-id">
+      <input type="hidden" id="bug-client-id">
+      <input type="hidden" id="bug-client-name">
+
+      <!-- Client badge -->
+      <div id="bug-client-badge" style="display:none;margin-bottom:14px;padding:10px 14px;background:var(--indigo-dim);border:1.5px solid var(--indigo-dim2);border-radius:10px;align-items:center;gap:10px;">
+        <span style="font-size:18px;">&#x1F3E2;</span>
+        <div>
+          <div style="font-size:11px;color:var(--indigo);font-weight:700;text-transform:uppercase;letter-spacing:.05em;">Client</div>
+          <div style="font-size:14px;font-weight:800;color:var(--text);" id="bug-client-badge-name">—</div>
+        </div>
+      </div>
+      <!-- Client selector -->
+      <div id="bug-client-selector" style="display:none;margin-bottom:14px;">
+        <div class="field" style="margin:0;">
+          <label>Client <span style="color:var(--red)">*</span></label>
+          <select id="bug-client-dd" style="font-size:14px;">
+            <option value="">-- Select Client --</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Description <span style="color:var(--red)">*</span></label>
+        <textarea id="bug-desc" rows="3" placeholder="Describe the bug or issue..." style="width:100%;padding:9px 12px;background:var(--inset);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;outline:none;resize:vertical;"></textarea>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div class="field" style="margin:0;">
+          <label>Ticket No.</label>
+          <input type="text" id="bug-ticket" placeholder="e.g. 27966" style="padding:9px 12px;background:var(--inset);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;outline:none;width:100%;">
+        </div>
+        <div class="field" style="margin:0;">
+          <label>&#x1F517; Redmine Link</label>
+          <input type="url" id="bug-redmine" placeholder="https://redmine.konsultama.co.id/issues/..." style="padding:9px 12px;background:var(--inset);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;outline:none;width:100%;">
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div class="field" style="margin:0;">
+          <label>Priority <span style="color:var(--red)">*</span></label>
+          <select id="bug-priority" style="width:100%;padding:9px 12px;background:var(--inset);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;outline:none;">
+            <option value="urgent">Urgent</option>
+            <option value="high">High</option>
+            <option value="normal" selected>Normal</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+        <div class="field" style="margin:0;">
+          <label>Status <span style="color:var(--red)">*</span></label>
+          <select id="bug-status" style="width:100%;padding:9px 12px;background:var(--inset);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;outline:none;">
+            <option value="open">Open</option>
+            <option value="inprogress">In Progress</option>
+            <option value="testing">Testing</option>
+            <option value="released">Released</option>
+            <option value="closed">Closed</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div class="field" style="margin:0;">
+          <label style="font-size:11px;">Report Date</label>
+          <input type="date" id="bug-date-report" style="padding:7px 10px;background:var(--inset);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:12px;font-family:inherit;outline:none;width:100%;">
+        </div>
+        <div class="field" style="margin:0;">
+          <label style="font-size:11px;">Finish Date</label>
+          <input type="date" id="bug-date-finish" style="padding:7px 10px;background:var(--inset);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:12px;font-family:inherit;outline:none;width:100%;">
+        </div>
+        <div class="field" style="margin:0;">
+          <label style="font-size:11px;">Release Date</label>
+          <input type="date" id="bug-date-release" style="padding:7px 10px;background:var(--inset);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:12px;font-family:inherit;outline:none;width:100%;">
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div class="field" style="margin:0;">
+          <label>Version No.</label>
+          <input type="text" id="bug-version" placeholder="e.g. V2.25.02.051200" style="padding:9px 12px;background:var(--inset);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;outline:none;width:100%;">
+        </div>
+        <div class="field" style="margin:0;">
+          <label>Notes</label>
+          <input type="text" id="bug-notes" placeholder="Additional notes..." style="padding:9px 12px;background:var(--inset);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;outline:none;width:100%;">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-bug-form')">Cancel</button>
+      <button class="btn-submit" onclick="saveBug()">&#x1F4BE; Save Bug</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: REGISTER -->
 <div class="modal-overlay" id="modal-register">
   <div class="modal" style="max-width:420px;">
@@ -803,6 +907,10 @@
         <div id="nav-gantt" class="nav-item" data-page="gantt" onclick="navigate('gantt')" style="display:none">
           <div class="nav-icon-pill"><span>&#x1F4C5;</span></div>
           <span class="nav-text">Gantt Chart</span>
+        </div>
+        <div id="nav-bugtracker" class="nav-item" data-page="bugtracker" onclick="navigate('bugtracker')" style="display:none">
+          <div class="nav-icon-pill"><span>&#x1F41B;</span></div>
+          <span class="nav-text">Bug Tracker</span>
         </div>
       </div>
       <div class="sidebar-user">
@@ -1195,16 +1303,18 @@ function showApp() {
   // sync theme button
   const isDark = document.documentElement.classList.contains('dark');
   const tb = document.getElementById('btn-theme');
-  if (tb) tb.textContent = isDark ? '☀' : '🌙';
+  if (tb) tb.textContent = isDark ? '\u2600' : '\uD83C\uDF19';
 
   // Show all menus for all roles
   document.getElementById('nav-clients').style.display = 'flex';
   document.getElementById('nav-dev').style.display = 'flex';
   document.getElementById('nav-validate').style.display = 'flex';
   document.getElementById('nav-gantt').style.display = 'flex';
+  document.getElementById('nav-bugtracker').style.display = 'flex';
   // start listening
   listenRequests();
   listenClients();
+  listenBugs();
   navigate('dashboard');
 }
 
@@ -1313,6 +1423,7 @@ const PAGE_TITLES = {
   validate:      ['Needs Approval',  'Review and approve custom requests from clients'],
   devboard:      ['Dev Board',       'Track and update requests progress'],
   gantt:         ['Gantt Chart',  'Visual timeline of all custom requests'],
+  bugtracker:    ['Bug Tracker',   'Track and manage bugs per client'],
   clients:       ['Clients',      'Master data for all clients'],
   'client-detail': ['',              ''],
 };
@@ -1335,7 +1446,7 @@ function renderPage(page) {
     return;
   }
 
-  const [title, sub] = PAGE_TITLES[page] || ['—','—'];
+  const [title, sub] = PAGE_TITLES[page] || ['\u2014','\u2014'];
   document.getElementById('page-title').textContent = title;
   document.getElementById('page-sub').textContent   = sub;
 
@@ -1349,6 +1460,10 @@ function renderPage(page) {
       btnNew.style.display = 'flex';
       btnNew.innerHTML = '+ New Request';
       btnNew.onclick = () => openRequestForm('');
+    } else if (page === 'bugtracker') {
+      btnNew.style.display = 'flex';
+      btnNew.innerHTML = '+ New Bug';
+      btnNew.onclick = () => openBugForm('');
     }
   }
 
@@ -1358,6 +1473,7 @@ function renderPage(page) {
   else if (page === 'devboard')   c.innerHTML = renderDevBoard();
   else if (page === 'clients')    c.innerHTML = renderClientsPage();
   else if (page === 'gantt')       c.innerHTML = renderGanttChart();
+  else if (page === 'bugtracker')  c.innerHTML = renderBugTracker();
 }
 
 
@@ -1457,8 +1573,8 @@ function renderGanttChart() {
   sorted.forEach((r, idx) => {
     const bg   = idx % 2 === 0 ? 'transparent' : 'rgba(2,127,179,0.03)';
     const col  = STATUS_COLOR[r.status] || '#94A3B8';
-    const name = r.name || r.title || '—';
-    const client = r.client || '—';
+    const name = r.name || r.title || '\u2014';
+    const client = r.client || '\u2014';
 
     const startRaw = r.dateRequest || r.createdAt?.toDate?.()?.toISOString()?.split('T')[0];
     const endRaw   = r.dateDeadline;
@@ -1589,6 +1705,221 @@ function renderGanttChart() {
 
 window.syncGanttScroll = function(el) {
   // Sync horizontal scroll (header already sticky, nothing extra needed)
+};
+
+
+// --- BUG TRACKER ---
+const BUG_STATUS = {
+  open:       { label:'Open',        color:'#EF4444', bg:'#FEE2E2' },
+  inprogress: { label:'In Progress', color:'#F59E0B', bg:'#FEF3C7' },
+  testing:    { label:'Testing',     color:'#0891B2', bg:'#E0F2FE' },
+  released:   { label:'Released',    color:'#7C3AED', bg:'#EDE9FE' },
+  closed:     { label:'Closed',      color:'#10B981', bg:'#D1FAE5' },
+};
+const BUG_PRIORITY = {
+  urgent: { label:'Urgent', color:'#fff', bg:'#EF4444' },
+  high:   { label:'High',   color:'#fff', bg:'#F59E0B' },
+  normal: { label:'Normal', color:'#fff', bg:'#0891B2' },
+  low:    { label:'Low',    color:'#374151', bg:'#E5E7EB' },
+};
+
+let allBugs = [];
+
+function listenBugs() {
+  const q = query(collection(db,'bugs'), orderBy('createdAt','desc'));
+  onSnapshot(q, snap => {
+    allBugs = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+    if (currentPage === 'bugtracker') navigate('bugtracker');
+  });
+}
+
+function renderBugTracker() {
+  const groups = {};
+  allBugs.forEach(b => {
+    const key = b.clientId || ('__' + b.client);
+    if (!groups[key]) groups[key] = { clientId:b.clientId||'', name:b.client||'Unknown', bugs:[] };
+    groups[key].bugs.push(b);
+  });
+  const sorted = Object.values(groups).sort((a,b) => a.name.localeCompare(b.name));
+
+  if (!sorted.length) return `
+    <div style="text-align:center;padding:80px 20px;">
+      <div style="font-size:48px;opacity:.25;margin-bottom:16px;">\uD83D\uDC1B</div>
+      <div style="font-size:16px;font-weight:700;color:var(--text-muted);">No bugs tracked yet</div>
+      <div style="font-size:13px;color:var(--text-dim);margin-top:6px;">Click <strong>+ Log Bug</strong> on a client to get started</div>
+    </div>`;
+
+  const colorPalette = ['#027fb3','#8B5CF6','#10B981','#F59E0B','#EF4444','#EC4899','#0891B2','#7C3AED','#059669','#D97706','#DC2626','#DB2777'];
+  const fmtDate = d => d ? new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '\u2014';
+
+  const groupHtml = sorted.map(g => {
+    const hash  = g.name.split('').reduce((a,ch)=>a+ch.charCodeAt(0),0);
+    const color = colorPalette[hash % colorPalette.length];
+    const init  = g.name.split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?';
+    const open   = g.bugs.filter(b=>b.status==='open').length;
+    const inprog = g.bugs.filter(b=>b.status==='inprogress').length;
+    const closed = g.bugs.filter(b=>b.status==='closed').length;
+
+    const rows = g.bugs.map((b,i) => {
+      const st = BUG_STATUS[b.status]    || { label:b.status||'?',    color:'#94A3B8', bg:'#F1F5F9' };
+      const pr = BUG_PRIORITY[b.priority]|| { label:b.priority||'?',  color:'#fff',    bg:'#94A3B8' };
+      return `<tr style="border-bottom:1px solid var(--border);" onmouseover="this.style.background='var(--inset)'" onmouseout="this.style.background=''">
+        <td style="padding:9px 12px;font-size:12px;color:var(--text-dim);text-align:center;width:30px;">${i+1}</td>
+        <td style="padding:9px 12px;">
+          <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.4;">${b.desc||'\u2014'}</div>
+          ${b.redmineUrl
+            ? `<a href="${b.redmineUrl}" target="_blank" style="font-size:10px;font-weight:700;color:var(--indigo);text-decoration:none;background:var(--indigo-dim);padding:1px 7px;border-radius:5px;margin-top:3px;display:inline-block;">\uD83D\uDD17 #${b.ticketNo||'Redmine'}</a>`
+            : b.ticketNo ? `<span style="font-size:10px;color:var(--text-dim);font-family:monospace;">#${b.ticketNo}</span>` : ''}
+        </td>
+        <td style="padding:9px 12px;white-space:nowrap;">
+          <span style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;background:${pr.bg};color:${pr.color};">${pr.label}</span>
+        </td>
+        <td style="padding:9px 12px;font-size:11px;color:var(--text-muted);white-space:nowrap;">${fmtDate(b.dateReport)}</td>
+        <td style="padding:9px 12px;font-size:11px;color:var(--text-muted);white-space:nowrap;">${fmtDate(b.dateFinish)}</td>
+        <td style="padding:9px 12px;white-space:nowrap;">
+          <span style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;background:${st.bg};color:${st.color};">${st.label}</span>
+        </td>
+        <td style="padding:9px 12px;font-size:11px;color:var(--text-muted);white-space:nowrap;">${fmtDate(b.dateRelease)}</td>
+        <td style="padding:9px 12px;font-size:11px;color:var(--text-muted);">${b.versionNo||'\u2014'}</td>
+        <td style="padding:9px 12px;">
+          <div style="display:flex;gap:4px;">
+            <button onclick="event.stopPropagation();openBugForm('${b.id}')" title="Edit"
+              style="width:26px;height:26px;border-radius:6px;border:1.5px solid var(--border-md);background:var(--inset);color:var(--indigo);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;">\u270F</button>
+            <button onclick="event.stopPropagation();deleteBug('${b.id}')" title="Delete"
+              style="width:26px;height:26px;border-radius:6px;border:1.5px solid rgba(220,38,38,0.2);background:var(--red-dim);color:var(--red);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;">\uD83D\uDDD1</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+
+    return `
+    <div style="background:var(--card);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--sh-card);margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--inset);border-bottom:1.5px solid var(--border);">
+        <div style="width:36px;height:36px;border-radius:10px;background:${color};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;flex-shrink:0;">${init}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:14px;font-weight:800;color:var(--text);">${g.name}</div>
+          <div style="font-size:11px;color:var(--text-dim);margin-top:1px;">${g.bugs.length} issue${g.bugs.length!==1?'s':''} &nbsp;&middot;&nbsp; ${open} open &nbsp;&middot;&nbsp; ${inprog} in progress &nbsp;&middot;&nbsp; ${closed} closed</div>
+        </div>
+        <button onclick="openBugForm('',{clientId:'${g.clientId}',client:'${g.name}'})"
+          style="padding:6px 14px;background:var(--indigo);color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">
+          \uFF0B Log Bug</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;min-width:820px;">
+          <thead>
+            <tr style="border-bottom:1.5px solid var(--border);">
+              <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:center;width:30px;">#</th>
+              <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:left;">Description</th>
+              <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:left;width:80px;">Priority</th>
+              <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:left;width:100px;">Report Date</th>
+              <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:left;width:100px;">Finish Date</th>
+              <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:left;width:90px;">Status</th>
+              <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:left;width:100px;">Release Date</th>
+              <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:left;width:80px;">Version</th>
+              <th style="width:64px;"></th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>`;
+  }).join('');
+
+  return `
+    <div style="margin-bottom:16px;font-size:13px;color:var(--text-muted);">${allBugs.length} bugs across ${sorted.length} client${sorted.length!==1?'s':''}</div>
+    ${groupHtml}`;
+}
+
+window.openBugForm = async function(id, prefill={}) {
+  openModal('modal-bug-form');
+  document.getElementById('bug-edit-id').value = id||'';
+  const today = new Date().toISOString().split('T')[0];
+  if (id) {
+    document.getElementById('bug-form-title').textContent = 'Edit Bug';
+    const snap = await getDoc(doc(db,'bugs',id));
+    if (!snap.exists()) { showToast('Bug not found','error'); return; }
+    const b = snap.data();
+    document.getElementById('bug-client-id').value    = b.clientId||'';
+    document.getElementById('bug-client-name').value  = b.client||'';
+    document.getElementById('bug-desc').value         = b.desc||'';
+    document.getElementById('bug-ticket').value       = b.ticketNo||'';
+    document.getElementById('bug-redmine').value      = b.redmineUrl||'';
+    document.getElementById('bug-priority').value     = b.priority||'normal';
+    document.getElementById('bug-status').value       = b.status||'open';
+    document.getElementById('bug-date-report').value  = b.dateReport||today;
+    document.getElementById('bug-date-finish').value  = b.dateFinish||'';
+    document.getElementById('bug-date-release').value = b.dateRelease||'';
+    document.getElementById('bug-version').value      = b.versionNo||'';
+    document.getElementById('bug-notes').value        = b.notes||'';
+    document.getElementById('bug-client-badge-name').textContent = b.client||'\u2014';
+    document.getElementById('bug-client-badge').style.display = 'flex';
+    document.getElementById('bug-client-selector').style.display = 'none';
+  } else {
+    document.getElementById('bug-form-title').textContent = 'Log New Bug';
+    ['bug-desc','bug-ticket','bug-redmine','bug-version','bug-notes'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
+    document.getElementById('bug-priority').value     = 'urgent';
+    document.getElementById('bug-status').value       = 'open';
+    document.getElementById('bug-date-report').value  = today;
+    document.getElementById('bug-date-finish').value  = '';
+    document.getElementById('bug-date-release').value = '';
+    if (prefill.clientId) {
+      document.getElementById('bug-client-id').value   = prefill.clientId;
+      document.getElementById('bug-client-name').value = prefill.client||'';
+      document.getElementById('bug-client-badge-name').textContent = prefill.client||'\u2014';
+      document.getElementById('bug-client-badge').style.display = 'flex';
+      document.getElementById('bug-client-selector').style.display = 'none';
+    } else {
+      document.getElementById('bug-client-id').value = '';
+      document.getElementById('bug-client-badge').style.display = 'none';
+      document.getElementById('bug-client-selector').style.display = 'block';
+      const dd = document.getElementById('bug-client-dd');
+      if (dd) dd.innerHTML = '<option value="">-- Select Client --</option>' +
+        allClients.map(cl => '<option value="'+cl.id+'|'+cl.name+'">'+cl.name+'</option>').join('');
+    }
+  }
+};
+
+window.saveBug = async function() {
+  const editId = document.getElementById('bug-edit-id').value;
+  let clientId = document.getElementById('bug-client-id').value;
+  let client   = document.getElementById('bug-client-name').value;
+  const dd     = document.getElementById('bug-client-dd');
+  if (!clientId && dd?.value) {
+    const parts = dd.value.split('|');
+    clientId = parts[0]; client = parts.slice(1).join('|');
+  }
+  if (!clientId) { showToast('Please select a client','error'); return; }
+  const desc = document.getElementById('bug-desc').value.trim();
+  if (!desc)  { showToast('Description is required','error'); return; }
+  const payload = {
+    clientId, client, desc,
+    ticketNo:    document.getElementById('bug-ticket').value.trim(),
+    redmineUrl:  document.getElementById('bug-redmine').value.trim(),
+    priority:    document.getElementById('bug-priority').value,
+    status:      document.getElementById('bug-status').value,
+    dateReport:  document.getElementById('bug-date-report').value,
+    dateFinish:  document.getElementById('bug-date-finish').value,
+    dateRelease: document.getElementById('bug-date-release').value,
+    versionNo:   document.getElementById('bug-version').value.trim(),
+    notes:       document.getElementById('bug-notes').value.trim(),
+    updatedAt:   serverTimestamp(),
+  };
+  if (editId) {
+    await updateDoc(doc(db,'bugs',editId), payload);
+    showToast('\u2713 Bug updated successfully','success');
+  } else {
+    await addDoc(collection(db,'bugs'), { ...payload, createdAt: serverTimestamp() });
+    showToast('\u2713 Bug logged successfully','success');
+  }
+  closeModal('modal-bug-form');
+};
+
+window.deleteBug = async function(id) {
+  if (!confirm('Delete this bug report? This cannot be undone.')) return;
+  await deleteDoc(doc(db,'bugs',id));
+  showToast('Bug deleted','info');
 };
 
 
@@ -1746,7 +2077,7 @@ function renderRequestList(reqs) {
     groups[key].items.push(r);
   });
   const sorted = Object.values(groups).sort((a,b)=>a.name.localeCompare(b.name,'id'));
-  if (!sorted.length) return renderEmpty('No requests yet','Click ＋ New Request to get started');
+  if (!sorted.length) return renderEmpty('No requests yet','Click \uFF0B New Request to get started');
 
   return `
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px;flex-wrap:wrap;">
@@ -1797,14 +2128,14 @@ function renderClientGroupCard(group) {
           </div>` : ''}
         </div>
         <div class="client-group-badges" style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
-          ${pending>0?`<span style="padding:3px 9px;border-radius:20px;background:var(--amber-dim);color:var(--amber);font-size:11px;font-weight:800;">⏳ ${pending}</span>`:''}
-          ${onprog>0?`<span style="padding:3px 9px;border-radius:20px;background:var(--indigo-dim);color:var(--indigo);font-size:11px;font-weight:800;">⚡ ${onprog}</span>`:''}
-          ${done>0?`<span style="padding:3px 9px;border-radius:20px;background:var(--green-dim);color:var(--green);font-size:11px;font-weight:800;">✓ ${done}</span>`:''}
-          ${rejected>0?`<span style="padding:3px 9px;border-radius:20px;background:var(--red-dim);color:var(--red);font-size:11px;font-weight:800;">✕ ${rejected}</span>`:''}
+          ${pending>0?`<span style="padding:3px 9px;border-radius:20px;background:var(--amber-dim);color:var(--amber);font-size:11px;font-weight:800;">\u23F3 ${pending}</span>`:''}
+          ${onprog>0?`<span style="padding:3px 9px;border-radius:20px;background:var(--indigo-dim);color:var(--indigo);font-size:11px;font-weight:800;">\u26A1 ${onprog}</span>`:''}
+          ${done>0?`<span style="padding:3px 9px;border-radius:20px;background:var(--green-dim);color:var(--green);font-size:11px;font-weight:800;">\u2713 ${done}</span>`:''}
+          ${rejected>0?`<span style="padding:3px 9px;border-radius:20px;background:var(--red-dim);color:var(--red);font-size:11px;font-weight:800;">\u2715 ${rejected}</span>`:''}
           <span style="font-size:12px;color:var(--text-dim);font-weight:700;">${group.items.length} request</span>
           ${group.clientId?`
             <button onclick="event.stopPropagation();printClient('${group.clientId}')" style="padding:5px 12px;background:var(--green-dim);color:var(--green);border:1.5px solid rgba(16,185,129,0.3);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">\uD83D\uDDA8 Print</button>
-            <button onclick="event.stopPropagation();navToClient('${group.clientId}')" style="padding:5px 12px;background:var(--indigo);color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">View Detail ›</button>
+            <button onclick="event.stopPropagation();navToClient('${group.clientId}')" style="padding:5px 12px;background:var(--indigo);color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">View Detail \u203A</button>
           `:''}
         </div>
       </div>
@@ -1915,12 +2246,12 @@ function renderClientDetail(clientId) {
         <div style="flex:1;min-width:0;">
           <div style="font-size:20px;font-weight:800;color:var(--text);margin-bottom:4px;">${cl.name}</div>
           <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--text-muted);">
-            ${cl.industry?`<span>🏭 ${cl.industry}</span>`:''}
-            ${cl.size?`<span>👥 ${cl.size}</span>`:''}
-            ${cl.pic?`<span>👤 ${cl.pic}${cl.picRole?' · '+cl.picRole:''}</span>`:''}
-            ${cl.phone?`<span>📞 ${cl.phone}</span>`:''}
-            ${cl.email?`<span>✉ ${cl.email}</span>`:''}
-            ${cl.products?`<span>📦 ${cl.products}</span>`:''}
+            ${cl.industry?`<span>\uD83C\uDFED ${cl.industry}</span>`:''}
+            ${cl.size?`<span>\uD83D\uDC65 ${cl.size}</span>`:''}
+            ${cl.pic?`<span>\uD83D\uDC64 ${cl.pic}${cl.picRole?' \u00B7 '+cl.picRole:''}</span>`:''}
+            ${cl.phone?`<span>\uD83D\uDCDE ${cl.phone}</span>`:''}
+            ${cl.email?`<span>\u2709 ${cl.email}</span>`:''}
+            ${cl.products?`<span>\uD83D\uDCE6 ${cl.products}</span>`:''}
           </div>
         </div>
         <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
@@ -1940,7 +2271,7 @@ function renderClientDetail(clientId) {
     <div style="display:flex;flex-direction:column;gap:12px;" id="client-detail-list">
       ${reqs.length ? reqs.map(r=>renderClientDetailRow(r)).join('') : `
         <div style="background:var(--card);border:2px dashed var(--border-md);border-radius:14px;padding:48px;text-align:center;">
-          <div style="font-size:40px;margin-bottom:12px;opacity:.3;">📋</div>
+          <div style="font-size:40px;margin-bottom:12px;opacity:.3;">\uD83D\uDCCB</div>
           <div style="font-size:15px;font-weight:700;color:var(--text-muted);">No requests yet</div>
         </div>`}
       <button onclick="openRequestFormForClient('${clientId}')"
@@ -1958,7 +2289,7 @@ function renderClientDetailRow(r) {
   const fillColor = r.status==='done'?'#10B981':r.status==='rejected'?'#EF4444':'#027fb3';
   const cd = (r.status === 'pending' || r.status === 'rejected') ? null : calcCountdown(r.dateDeadline);
   const cdColor = cd===null?'var(--text-dim)':cd<0?'var(--red)':cd<=3?'var(--amber)':'var(--green)';
-  const safeTitle = (r.name||r.title||'—'||'').replace(/'/g,"\'");
+  const safeTitle = (r.name||r.title||'\u2014'||'').replace(/'/g,"\'");
 
   return `
     <div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--sh-card);">
@@ -1999,7 +2330,7 @@ function renderClientDetailRow(r) {
             ${r.dateDeadline?`
               <div style="font-size:10px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;">Deadline</div>
               <div style="font-size:13px;font-weight:800;color:${cdColor};">${formatDate(r.dateDeadline)}</div>
-              <div style="font-size:11px;font-weight:700;color:${cdColor};">${cd<0?`\u26A0 ${Math.abs(cd)}h overdue`:cd===0?'🔴 Today':`\u23F1 ${cd}h left`}</div>
+              <div style="font-size:11px;font-weight:700;color:${cdColor};">${cd<0?`\u26A0 ${Math.abs(cd)}h overdue`:cd===0?'\uD83D\uDD34 Today':`\u23F1 ${cd}h left`}</div>
             `:r.duration?`<div style="font-size:11px;color:var(--text-muted);">${r.duration}</div>`:''}
           </div>
         </div>
@@ -2008,7 +2339,7 @@ function renderClientDetailRow(r) {
         ${(r.items||[]).length>0?`
         <div style="border:1.5px solid var(--border);border-radius:10px;overflow:visible;margin-bottom:14px;">
           <div style="background:var(--indigo-dim);padding:9px 14px 9px;border-radius:10px 10px 0 0;font-size:11px;font-weight:800;color:var(--indigo);">
-            📦 ${(r.items||[]).length} Custom Items
+            \uD83D\uDCE6 ${(r.items||[]).length} Custom Items
           </div>
           ${(r.items||[]).map(renderAccItem).join('')}       </div>`:
         (r.desc||r.description)?`
@@ -2094,8 +2425,8 @@ window.showDescById = function(rid) {
   const r = allRequests.find(x => x.id === rid);
   if (!r) return;
   const desc = r.desc || r.description ||
-    (r.items||[]).map((it,i) => (i+1)+'. '+it.name+(it.desc?' — '+it.desc:'')).join('\n') || '—';
-  document.getElementById('modal-desc-title').textContent = r.name || r.name||r.title||'—' || '—';
+    (r.items||[]).map((it,i) => (i+1)+'. '+it.name+(it.desc?' \u2014 '+it.desc:'')).join('\n') || '\u2014';
+  document.getElementById('modal-desc-title').textContent = r.name || r.name||r.title||'\u2014' || '\u2014';
   document.getElementById('modal-desc-body').textContent  = desc;
   openModal('modal-desc');
 };
@@ -2105,13 +2436,13 @@ window.filterRequests = function() {
   const status = document.getElementById('filter-status')?.value||'';
   let filtered = allRequests.filter(r => {
     if (status && r.status!==status) return false;
-    if (search && !(r.name||r.title||'—'?.toLowerCase().includes(search)||r.client?.toLowerCase().includes(search)||r.id?.toLowerCase().includes(search))) return false;
+    if (search && !(r.name||r.title||'\u2014'?.toLowerCase().includes(search)||r.client?.toLowerCase().includes(search)||r.id?.toLowerCase().includes(search))) return false;
     return true;
   });
   const groups = {};
   filtered.forEach(r=>{
     const key = r.clientId||('__'+r.client);
-    if (!groups[key]) groups[key]={clientId:r.clientId||'',name:r.client||'—',items:[]};
+    if (!groups[key]) groups[key]={clientId:r.clientId||'',name:r.client||'\u2014',items:[]};
     groups[key].items.push(r);
   });
   const sorted = Object.values(groups).sort((a,b)=>a.name.localeCompare(b.name,'id'));
@@ -2183,7 +2514,7 @@ function calcCountdown(dateStr) {
 }
 
 function formatDate(dateStr) {
-  if (!dateStr) return '—';
+  if (!dateStr) return '\u2014';
   const d = new Date(dateStr);
   return d.toLocaleDateString('id-ID', { day:'2-digit', month:'short', year:'numeric' });
 }
@@ -2202,7 +2533,7 @@ function renderTimelineCard(r) {
     const label = isOverdue
       ? `\u26A0 ${Math.abs(countdown)} hari telah overdue`
       : countdown === 0
-        ? '🔴 Deadline hari ini!'
+        ? '\uD83D\uDD34 Deadline hari ini!'
         : `\u23F1 ${countdown} hari lagi`;
     countdownHtml = `<div style="margin-top:8px;padding:5px 10px;background:${bg};border-radius:6px;font-size:11px;font-weight:700;color:${color};text-align:center;">${label}</div>`;
   }
@@ -2249,8 +2580,8 @@ function renderRequestCard(r, role) {
   const pipelineIdx = STATUS_ORDER.indexOf(r.status);
   const progressPct = r.status === 'rejected' ? 0 : Math.round((pipelineIdx / (STATUS_ORDER.length-1)) * 100);
   const fillColor   = r.status === 'done' ? '#10B981' : r.status === 'rejected' ? '#EF4444' : '#027fb3';
-  const date = r.createdAt?.toDate ? r.createdAt.toDate().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '—';
-  const safeTitle = (r.name||r.title||'—'||'').replace(/'/g,"\\'");
+  const date = r.createdAt?.toDate ? r.createdAt.toDate().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '\u2014';
+  const safeTitle = (r.name||r.title||'\u2014'||'').replace(/'/g,"\\'");
   return `
     <div class="req-card status-${r.status}" style="overflow:visible;">
       <!-- PROGRESS BAR - separate from top stripe -->
@@ -2271,7 +2602,7 @@ function renderRequestCard(r, role) {
             <div class="req-title">${r.name || r.name||r.title||'\u2014' || '\u2014'}</div>
             <div class="req-id">#${r.id.slice(-8).toUpperCase()} \u00B7
               ${r.clientId
-                ? `<span onclick="event.stopPropagation();filterByClient('${r.clientId}','${(r.client||'').replace(/'/g,"\\'")}');" style="cursor:pointer;color:var(--indigo);font-weight:700;text-decoration:underline;text-underline-offset:2px;" title="Lihat semua requests ${r.client}">${r.client||'—'}</span>`
+                ? `<span onclick="event.stopPropagation();filterByClient('${r.clientId}','${(r.client||'').replace(/'/g,"\\'")}');" style="cursor:pointer;color:var(--indigo);font-weight:700;text-decoration:underline;text-underline-offset:2px;" title="Lihat semua requests ${r.client}">${r.client||'\u2014'}</span>`
                 : (r.client||'\u2014')}
             </div>
           </div>
@@ -2331,7 +2662,7 @@ function renderRequestCard(r, role) {
           ${(r.desc||r.description||'').length > 120 ? `
           <button onclick="showDescById('${r.id}')"
             style="margin-top:6px;padding:0;background:none;border:none;font-size:11px;font-weight:700;color:var(--indigo);cursor:pointer;font-family:inherit;">
-            Selengkapnya →
+            Selengkapnya \u2192
           </button>` : ''}
         </div>
 
@@ -2368,7 +2699,7 @@ function renderValidateBoard() {
         </div>
       ` : `
         <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:48px;text-align:center;">
-          <div style="font-size:48px;margin-bottom:14px;opacity:.7;">✅</div>
+          <div style="font-size:48px;margin-bottom:14px;opacity:.7;">\u2705</div>
           <div style="font-size:15px;font-weight:800;color:var(--text-muted);margin-bottom:4px;">No requests awaiting approval</div>
           <div style="font-size:13px;color:var(--text-dim);">All requests have been approved or rejected</div>
         </div>
@@ -2379,8 +2710,8 @@ function renderValidateBoard() {
 
 function renderValidateCard(r) {
   const typeLabel = TYPE_LABELS[r.type] || r.type;
-  const date = r.createdAt?.toDate ? r.createdAt.toDate().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '—';
-  const safeTitle = (r.name||r.title||'—'||'').replace(/'/g,"\\'");
+  const date = r.createdAt?.toDate ? r.createdAt.toDate().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '\u2014';
+  const safeTitle = (r.name||r.title||'\u2014'||'').replace(/'/g,"\\'");
   const countdown = calcCountdown(r.dateDeadline);
   const countdownHtml = countdown !== null ? `
     <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;
@@ -2420,7 +2751,7 @@ function renderValidateCard(r) {
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
           <span style="font-size:12px;color:var(--text-muted);">\uD83D\uDC64 ${r.submittedByName||'\u2014'}</span>
           <span style="font-size:12px;color:var(--text-muted);">\uD83D\uDCC5 ${date}</span>
-          ${r.dateDeadline ? `<span style="font-size:12px;color:var(--text-muted);">🎯 Deadline: <strong>${formatDate(r.dateDeadline)}</strong></span>` : ''}
+          ${r.dateDeadline ? `<span style="font-size:12px;color:var(--text-muted);">\uD83C\uDFAF Deadline: <strong>${formatDate(r.dateDeadline)}</strong></span>` : ''}
           ${countdownHtml}
         </div>
 
@@ -2611,13 +2942,13 @@ window.devBoardDrop = async function(e) {
 
 function renderDetailBody(r) {
   const role = currentUserData?.role;
-  const date = r.createdAt?.toDate ? r.createdAt.toDate().toLocaleString('en-GB') : '—';
-  const updDate = r.updatedAt?.toDate ? r.updatedAt.toDate().toLocaleString('id-ID') : '—';
+  const date = r.createdAt?.toDate ? r.createdAt.toDate().toLocaleString('en-GB') : '\u2014';
+  const updDate = r.updatedAt?.toDate ? r.updatedAt.toDate().toLocaleString('id-ID') : '\u2014';
   const pipelineIdx = STATUS_ORDER.indexOf(r.status);
   const pct = r.status === 'rejected' ? 0 : Math.max(0, Math.round((pipelineIdx/(STATUS_ORDER.length-1))*100));
 
   let actionsHtml = '';
-  // Approval — visible to all when status is pending
+  // Approval \u2014 visible to all when status is pending
   if (r.status === 'pending') {
     actionsHtml = `
       <div class="detail-section">
@@ -2630,7 +2961,7 @@ function renderDetailBody(r) {
       </div>
     `;
   }
-  // Update status — visible to all once validated
+  // Update status \u2014 visible to all once validated
   if (['validated','design','dev-be','dev-fe','testing'].includes(r.status)) {
     actionsHtml += `
       <div class="detail-section">
@@ -2668,7 +2999,7 @@ function renderDetailBody(r) {
     </div>` : ''}
     ${(r.dateDeadline || r.dateStart || r.dateEnd || r.dateRequest || r.duration) ? `
     <div class="detail-section">
-      <h4>📅 Timeline & Estimates</h4>
+      <h4>\uD83D\uDCC5 Timeline & Estimates</h4>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
         ${r.dateRequest ? `<div style="background:var(--inset);border:1px solid var(--border);border-radius:8px;padding:10px 12px;">
           <div style="font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Request Date</div>
@@ -2677,7 +3008,7 @@ function renderDetailBody(r) {
         ${r.dateDeadline ? `<div style="background:${calcCountdown(r.dateDeadline)<0?'var(--red-dim)':calcCountdown(r.dateDeadline)<=3?'var(--amber-dim)':'var(--inset)'};border:1px solid ${calcCountdown(r.dateDeadline)<0?'rgba(220,38,38,0.25)':calcCountdown(r.dateDeadline)<=3?'rgba(217,119,6,0.25)':'var(--border)'};border-radius:8px;padding:10px 12px;">
           <div style="font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Target Deadline</div>
           <div style="font-size:13px;font-weight:800;color:${calcCountdown(r.dateDeadline)<0?'var(--red)':calcCountdown(r.dateDeadline)<=3?'var(--amber)':'var(--text)'};">${formatDate(r.dateDeadline)}</div>
-          ${calcCountdown(r.dateDeadline)!==null ? `<div style="font-size:11px;font-weight:700;margin-top:3px;color:${calcCountdown(r.dateDeadline)<0?'var(--red)':calcCountdown(r.dateDeadline)<=3?'var(--amber)':'var(--green)'};">${calcCountdown(r.dateDeadline)<0?'⚠ '+Math.abs(calcCountdown(r.dateDeadline))+' hari terlewat':calcCountdown(r.dateDeadline)===0?'🔴 Today!':'⏱ '+calcCountdown(r.dateDeadline)+' hari lagi'}</div>` : ''}
+          ${calcCountdown(r.dateDeadline)!==null ? `<div style="font-size:11px;font-weight:700;margin-top:3px;color:${calcCountdown(r.dateDeadline)<0?'var(--red)':calcCountdown(r.dateDeadline)<=3?'var(--amber)':'var(--green)'};">${calcCountdown(r.dateDeadline)<0?'\u26A0 '+Math.abs(calcCountdown(r.dateDeadline))+' hari terlewat':calcCountdown(r.dateDeadline)===0?'\uD83D\uDD34 Today!':'\u23F1 '+calcCountdown(r.dateDeadline)+' hari lagi'}</div>` : ''}
         </div>` : ''}
         ${r.dateStart ? `<div style="background:var(--inset);border:1px solid var(--border);border-radius:8px;padding:10px 12px;">
           <div style="font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Estimated Start</div>
@@ -2724,7 +3055,7 @@ function renderDetailBody(r) {
     </div>` : ''}
     ${r.items && r.items.length > 0 ? `
     <div class="detail-section">
-      <h4>📦 Custom Items (${r.items.length})</h4>
+      <h4>\uD83D\uDCE6 Custom Items (${r.items.length})</h4>
       <div style="border:1.5px solid var(--border);border-radius:10px;overflow:hidden;">
         ${r.items.map((item, idx) => `
           <div style="${idx>0?'border-top:1px solid var(--border);':''}">
@@ -2776,8 +3107,8 @@ function renderDetailBody(r) {
             <div class="comment-avatar">${(c.author||'?').charAt(0).toUpperCase()}</div>
             <div class="comment-bubble">
               <div class="comment-meta">
-                <span class="comment-author">${c.author||'—'}</span>
-                <span class="comment-time">${c.time||'—'}</span>
+                <span class="comment-author">${c.author||'\u2014'}</span>
+                <span class="comment-time">${c.time||'\u2014'}</span>
               </div>
               <div class="comment-text">${c.text||''}</div>
             </div>
@@ -3243,7 +3574,7 @@ window.toggleNotes = function(btn) {
   const icon = document.getElementById('notes-toggle-icon');
   const open = wrap.style.display === 'none';
   wrap.style.display = open ? 'block' : 'none';
-  icon.textContent = open ? '▾' : '▸';
+  icon.textContent = open ? '\u25BE' : '\u25B8';
 };
 
 window.onReqClientChange = function() {
@@ -3274,7 +3605,6 @@ window.saveRequest = async function() {
       specs: item.specs||[], dateRequest: item.dateRequest||baseDate,
       dateDeadline: item.dateDeadline||'', duration: item.duration||'',
       redmineUrl: item.redmineUrl||'',
-      priority, clientId, client, notes,
       priority, clientId, client, notes, attachments, updatedAt: serverTimestamp()
     });
     delete itemAttachments[item.rowId];
@@ -3300,7 +3630,7 @@ window.saveRequest = async function() {
 
 window.quickApprove = async function(id) {
   await updateDoc(doc(db,'requests',id), { status:'validated', updatedAt:serverTimestamp() });
-  showToast('✓ Request approved! Check the Dev Board','success');
+  showToast('\u2713 Request approved! Check the Dev Board','success');
 };
 
 window.quickReject = async function(id) {
@@ -3321,10 +3651,10 @@ window.printRequest = async function(id) {
   const snap = await getDoc(doc(db,'requests',id));
   if (!snap.exists()) { showToast('Data not found','error'); return; }
   const r = { id:snap.id, ...snap.data() };
-  const fmtDate = d => d ? new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
-  const fmtDT   = ts => ts?.toDate ? ts.toDate().toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
-  const statusLabel  = STATUS_LABELS[r.status]  || r.status  || '—';
-  const typeLabel    = TYPE_LABELS[r.type]       || r.type    || '—';
+  const fmtDate = d => d ? new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '\u2014';
+  const fmtDT   = ts => ts?.toDate ? ts.toDate().toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '\u2014';
+  const statusLabel  = STATUS_LABELS[r.status]  || r.status  || '\u2014';
+  const typeLabel    = TYPE_LABELS[r.type]       || r.type    || '\u2014';
   const priorityMap  = {high:'High',medium:'Medium',low:'Low'};
   const cd           = calcCountdown(r.dateDeadline);
   const cdTxt        = cd===null?'':cd<0?' ('+Math.abs(cd)+'h overdue)':cd===0?' (Today)':' ('+cd+'h left)';
@@ -3358,17 +3688,17 @@ window.printRequest = async function(id) {
 
       // REQUEST NAME + STATUS BADGE
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">' +
-        '<div style="font-size:17px;font-weight:800;color:#111;line-height:1.4;flex:1;">'+(r.name||r.title||'—')+'</div>' +
+        '<div style="font-size:17px;font-weight:800;color:#111;line-height:1.4;flex:1;">'+(r.name||r.title||'\u2014')+'</div>' +
         '<span style="font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;background:'+sc+'18;color:'+sc+';border:1.5px solid '+sc+'40;margin-left:12px;white-space:nowrap;">'+statusLabel+'</span>' +
       '</div>' +
 
       // INFO GRID
       '<div style="background:#f0f7ff;border-radius:10px;padding:16px 20px;margin-bottom:20px;">' +
         '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;">' +
-          '<div><span style="color:#027fb3;font-weight:700;text-transform:uppercase;font-size:10px;letter-spacing:.06em;">Client</span><div style="font-size:13px;font-weight:700;color:#111;margin-top:2px;">'+(r.client||'—')+'</div></div>' +
-          '<div><span style="color:#027fb3;font-weight:700;text-transform:uppercase;font-size:10px;letter-spacing:.06em;">Submitted By</span><div style="font-size:13px;color:#111;margin-top:2px;">'+(r.submittedByName||'—')+'</div></div>' +
+          '<div><span style="color:#027fb3;font-weight:700;text-transform:uppercase;font-size:10px;letter-spacing:.06em;">Client</span><div style="font-size:13px;font-weight:700;color:#111;margin-top:2px;">'+(r.client||'\u2014')+'</div></div>' +
+          '<div><span style="color:#027fb3;font-weight:700;text-transform:uppercase;font-size:10px;letter-spacing:.06em;">Submitted By</span><div style="font-size:13px;color:#111;margin-top:2px;">'+(r.submittedByName||'\u2014')+'</div></div>' +
           '<div><span style="color:#027fb3;font-weight:700;text-transform:uppercase;font-size:10px;letter-spacing:.06em;">Type</span><div style="font-size:13px;color:#111;margin-top:2px;">'+typeLabel+'</div></div>' +
-          '<div><span style="color:#027fb3;font-weight:700;text-transform:uppercase;font-size:10px;letter-spacing:.06em;">Priority</span><div style="font-size:13px;font-weight:700;color:#111;margin-top:2px;">'+(priorityMap[r.priority]||r.priority||'—')+'</div></div>' +
+          '<div><span style="color:#027fb3;font-weight:700;text-transform:uppercase;font-size:10px;letter-spacing:.06em;">Priority</span><div style="font-size:13px;font-weight:700;color:#111;margin-top:2px;">'+(priorityMap[r.priority]||r.priority||'\u2014')+'</div></div>' +
           '<div><span style="color:#027fb3;font-weight:700;text-transform:uppercase;font-size:10px;letter-spacing:.06em;">Request Date</span><div style="font-size:13px;color:#111;margin-top:2px;">'+fmtDate(r.dateRequest)+'</div></div>' +
           '<div><span style="color:#027fb3;font-weight:700;text-transform:uppercase;font-size:10px;letter-spacing:.06em;">Deadline</span><div style="font-size:13px;font-weight:700;margin-top:2px;color:'+dlColor+';">'+fmtDate(r.dateDeadline)+cdTxt+'</div></div>' +
           (r.duration?'<div><span style="color:#027fb3;font-weight:700;text-transform:uppercase;font-size:10px;letter-spacing:.06em;">Est. Duration</span><div style="font-size:13px;color:#111;margin-top:2px;">'+r.duration+'</div></div>':'') +
@@ -3420,7 +3750,7 @@ window.printClient = async function(clientId) {
   if (!cl) { showToast('Client not found','error'); return; }
   const reqs = allRequests.filter(r => r.clientId === clientId)
     .sort((a,b) => (a.dateRequest||'').localeCompare(b.dateRequest||''));
-  const fmtDate = d => d ? new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+  const fmtDate = d => d ? new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '\u2014';
   const STATUS_C = {pending:'#F59E0B',validated:'#0891B2',rejected:'#EF4444',design:'#7C3AED','dev-be':'#027fb3','dev-fe':'#0369A1',testing:'#D97706',done:'#10B981'};
   const summary = {
     total: reqs.length,
@@ -3435,12 +3765,12 @@ window.printClient = async function(clientId) {
         const sc  = STATUS_C[r.status] || '#94A3B8';
         const cd  = calcCountdown(r.dateDeadline);
         const dlC = cd !== null && cd < 0 ? '#DC2626' : cd !== null && cd <= 3 ? '#D97706' : '#111';
-        const dlT = fmtDate(r.dateDeadline) + (cd === null ? '' : cd < 0 ? ' ⚠' : cd === 0 ? ' ●' : '');
+        const dlT = fmtDate(r.dateDeadline) + (cd === null ? '' : cd < 0 ? ' \u26A0' : cd === 0 ? ' \u25CF' : '');
         const TYPE_SHORT = {feature:'Feature',menu:'Menu',function:'Function',report:'Report'};
         return '<tr style="border-bottom:1px solid #e8edf5;">' +
           '<td style="padding:9px 12px;font-size:12px;color:#777;width:28px;text-align:center;">' + (i+1) + '</td>' +
           '<td style="padding:9px 12px;">' +
-            '<div style="font-size:13px;font-weight:700;color:#111;">' + (r.name||r.title||'—') + '</div>' +
+            '<div style="font-size:13px;font-weight:700;color:#111;">' + (r.name||r.title||'\u2014') + '</div>' +
             (r.type ? '<div style="font-size:10px;color:#888;margin-top:1px;">' + (TYPE_SHORT[r.type]||r.type) + '</div>' : '') +
           '</td>' +
           '<td style="padding:9px 12px;white-space:nowrap;">' +
@@ -3448,7 +3778,7 @@ window.printClient = async function(clientId) {
           '</td>' +
           '<td style="padding:9px 12px;font-size:12px;color:#555;white-space:nowrap;">' + fmtDate(r.dateRequest) + '</td>' +
           '<td style="padding:9px 12px;font-size:12px;font-weight:600;white-space:nowrap;color:' + dlC + ';">' + dlT + '</td>' +
-          '<td style="padding:9px 12px;font-size:12px;color:#555;">' + (r.duration||'—') + '</td>' +
+          '<td style="padding:9px 12px;font-size:12px;color:#555;">' + (r.duration||'\u2014') + '</td>' +
         '</tr>';
       }).join('')
     : '<tr><td colspan="6" style="padding:24px;text-align:center;color:#aaa;font-size:12px;font-style:italic;">No custom requests for this client</td></tr>';
@@ -3477,7 +3807,7 @@ window.printClient = async function(clientId) {
         '<div style="font-size:20px;font-weight:800;color:#111;margin-bottom:4px;">' + cl.name + '</div>' +
         '<div style="display:flex;flex-wrap:wrap;gap:16px;font-size:12px;color:#666;">' +
           (cl.industry ? '<span>' + cl.industry + '</span>' : '') +
-          (cl.pic      ? '<span>PIC: ' + cl.pic + (cl.picRole ? ' · ' + cl.picRole : '') + '</span>' : '') +
+          (cl.pic      ? '<span>PIC: ' + cl.pic + (cl.picRole ? ' \u00B7 ' + cl.picRole : '') + '</span>' : '') +
           (cl.phone    ? '<span>' + cl.phone + '</span>' : '') +
           (cl.email    ? '<span>' + cl.email + '</span>' : '') +
         '</div>' +
@@ -3516,7 +3846,7 @@ window.printClient = async function(clientId) {
     '</div>';
 
   const w = window.open('', '_blank', 'width=1000,height=750');
-  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + cl.name + ' — Custom Request Summary</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"><style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Inter,Arial,sans-serif;background:#fff;color:#111;-webkit-print-color-adjust:exact;print-color-adjust:exact;}@media print{@page{margin:0;}body{margin:1cm;}}</style></head><body>' + printHtml + '</body></html>');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + cl.name + ' \u2014 Custom Request Summary</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"><style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Inter,Arial,sans-serif;background:#fff;color:#111;-webkit-print-color-adjust:exact;print-color-adjust:exact;}@media print{@page{margin:0;}body{margin:1cm;}}</style></head><body>' + printHtml + '</body></html>');
   w.document.close();
   w.onload = function() { w.focus(); w.print(); };
 };
@@ -3532,7 +3862,7 @@ function renderClientsPage() {
         <div style="font-size:64px;margin-bottom:16px;opacity:.35;">\uD83C\uDFE2</div>
         <div style="font-size:18px;font-weight:800;color:var(--text-muted);margin-bottom:8px;">No data clients</div>
         <div style="font-size:13px;color:var(--text-dim);margin-bottom:28px;">No clients registered yet. Add your first client to start creating requests.</div>
-        ${canEdit ? `<button class="btn-new" onclick="openClientForm('')" style="display:inline-flex;margin:0 auto;">＋ Add Client Pertama</button>` : '<div style="font-size:13px;color:var(--text-dim);">Contact Marketing or CTO to add clients.</div>'}
+        ${canEdit ? `<button class="btn-new" onclick="openClientForm('')" style="display:inline-flex;margin:0 auto;">\uFF0B Add Client Pertama</button>` : '<div style="font-size:13px;color:var(--text-dim);">Contact Marketing or CTO to add clients.</div>'}
       </div>
     `;
   }
@@ -3541,7 +3871,7 @@ function renderClientsPage() {
       <input class="filter-search" style="max-width:280px;" id="client-search" placeholder="Search name, PIC, industry..." oninput="filterClients()">
       <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
         <span style="font-size:13px;color:var(--text-muted);">${allClients.length} clients</span>
-        ${canEdit ? `<button class="btn-new" onclick="openClientForm('')" style="display:inline-flex;">＋ Add Client</button>` : ''}
+        ${canEdit ? `<button class="btn-new" onclick="openClientForm('')" style="display:inline-flex;">\uFF0B Add Client</button>` : ''}
       </div>
     </div>
     <div id="clients-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;">
@@ -3582,10 +3912,10 @@ function renderClientCard(cl, canEdit) {
 
   const breakdownHtml = reqCount > 0 ? `
     <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;">
-      ${pending  > 0 ? `<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--amber-dim);color:var(--amber);">⏳ ${pending} pending</span>` : ''}
-      ${onprog   > 0 ? `<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--indigo-dim);color:var(--indigo);">⚡ ${onprog} in progress</span>` : ''}
-      ${done     > 0 ? `<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--green-dim);color:var(--green);">✓ ${done} done</span>` : ''}
-      ${rejected > 0 ? `<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--red-dim);color:var(--red);">✕ ${rejected} rejected</span>` : ''}
+      ${pending  > 0 ? `<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--amber-dim);color:var(--amber);">\u23F3 ${pending} pending</span>` : ''}
+      ${onprog   > 0 ? `<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--indigo-dim);color:var(--indigo);">\u26A1 ${onprog} in progress</span>` : ''}
+      ${done     > 0 ? `<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--green-dim);color:var(--green);">\u2713 ${done} done</span>` : ''}
+      ${rejected > 0 ? `<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--red-dim);color:var(--red);">\u2715 ${rejected} rejected</span>` : ''}
     </div>` : '';
 
   return `
@@ -3604,7 +3934,7 @@ function renderClientCard(cl, canEdit) {
 
         <!-- INFO -->
         <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px;">
-          ${cl.pic   ? `<div style="font-size:12px;color:var(--text-muted);display:flex;gap:6px;"><span style="color:var(--text-dim);min-width:56px;">PIC</span><span style="font-weight:600;color:var(--text);">${cl.pic}${cl.picRole?' · <span style="font-weight:400;">'+cl.picRole+'</span>':''}</span></div>` : ''}
+          ${cl.pic   ? `<div style="font-size:12px;color:var(--text-muted);display:flex;gap:6px;"><span style="color:var(--text-dim);min-width:56px;">PIC</span><span style="font-weight:600;color:var(--text);">${cl.pic}${cl.picRole?' \u00B7 <span style="font-weight:400;">'+cl.picRole+'</span>':''}</span></div>` : ''}
           ${cl.phone ? `<div style="font-size:12px;color:var(--text-muted);display:flex;gap:6px;"><span style="color:var(--text-dim);min-width:56px;">Telp</span><span>${cl.phone}</span></div>` : ''}
           ${cl.email ? `<div style="font-size:12px;color:var(--text-muted);display:flex;gap:6px;"><span style="color:var(--text-dim);min-width:56px;">Email</span><span style="color:#027fb3;">${cl.email}</span></div>` : ''}
           ${cl.products ? `<div style="font-size:12px;color:var(--text-muted);display:flex;gap:6px;"><span style="color:var(--text-dim);min-width:56px;">Products</span><span>${cl.products}</span></div>` : ''}
@@ -3688,11 +4018,11 @@ window.saveClient = async function() {
   const editId = document.getElementById('client-edit-id').value;
   if (editId) {
     await updateDoc(doc(db,'clients',editId), data);
-    showToast('✓ Data clients updated successfully','success');
+    showToast('\u2713 Data clients updated successfully','success');
   } else {
     data.createdAt = serverTimestamp();
     await addDoc(collection(db,'clients'), data);
-    showToast('✓ Client berhasil diaddkan','success');
+    showToast('\u2713 Client berhasil diaddkan','success');
   }
   closeModal('modal-client-form');
 };
@@ -3723,7 +4053,7 @@ window.showToast = function(msg, type='info') {
 window.toggleTheme = function() {
   const isDark = document.documentElement.classList.toggle('dark');
   localStorage.setItem('ds_theme', isDark ? 'dark' : 'light');
-  document.getElementById('btn-theme').textContent = isDark ? '☀' : '🌙';
+  document.getElementById('btn-theme').textContent = isDark ? '\u2600' : '\uD83C\uDF19';
 };
 
 (function initTheme() {
