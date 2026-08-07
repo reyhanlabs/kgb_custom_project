@@ -351,6 +351,32 @@
     .topbar { padding:10px 12px; }
   }
 
+  /* ══ BOTTOM NAV — mobile only ══ */
+  #bottom-nav { display:none; }
+  @media (max-width: 880px) {
+    #bottom-nav {
+      display:flex; position:fixed; left:0; right:0; bottom:0; z-index:18;
+      background:var(--card); border-top:1px solid var(--border);
+      box-shadow:0 -4px 20px rgba(0,0,0,0.10);
+      padding:6px 4px calc(6px + env(safe-area-inset-bottom));
+    }
+    .main { padding-bottom:64px; }
+    .bnav-item {
+      flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+      gap:2px; padding:6px 2px; border-radius:10px; cursor:pointer; position:relative;
+      color:var(--text-dim); font-size:10px; font-weight:600; transition:all .15s;
+    }
+    .bnav-item:hover { color:var(--indigo); background:var(--indigo-dim); }
+    .bnav-item.active { color:var(--indigo); font-weight:800; }
+    .bnav-icon { font-size:19px; line-height:1; }
+    .bnav-badge {
+      position:absolute; top:2px; right:16%; background:var(--red); color:#fff;
+      border-radius:20px; font-size:9px; font-weight:800; min-width:15px; height:15px;
+      display:flex; align-items:center; justify-content:center; padding:0 4px;
+      box-shadow:0 0 0 2px var(--card);
+    }
+  }
+
   /* ══ STAT CARDS — each has its own bold color ══ */
   .stats-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:26px; }
   .stat-card {
@@ -1691,7 +1717,7 @@ function renderClientGroupCard(group) {
               <tr id="${rowId}" style="display:none;background:var(--inset);">
                 <td colspan="4" style="padding:0 8px 12px 28px;">
                   <div style="border-left:2px solid ${sc};padding-left:14px;margin-top:4px;">
-                    ${r.desc?`<div style="font-size:13px;color:var(--text);line-height:1.65;margin-bottom:${specHtml?'10px':'0'};">${r.desc}</div>`:''}
+                    ${r.desc?`<div style="font-size:13px;color:var(--text);line-height:1.65;white-space:pre-wrap;margin-bottom:${specHtml?'10px':'0'};">${r.desc}</div>`:''}
                     ${specHtml?`<div style="display:flex;flex-wrap:wrap;gap:5px;">${specHtml}</div>`:''}
                     ${r.dateDeadline||r.duration?`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
                       ${r.dateDeadline?`<span style="font-size:11px;background:var(--amber-dim);color:var(--amber);border-radius:6px;padding:3px 9px;font-weight:700;">\uD83D\uDCC5 ${r.dateDeadline}</span>`:''}
