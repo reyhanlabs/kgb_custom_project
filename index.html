@@ -1124,7 +1124,7 @@ function showApp() {
 
 // --- REALTIME LISTENER ---
 
-// Event delegation untuk accordion - tidak pakai inline onclick
+// Event delegation for accordion - no inline onclick
 document.addEventListener('click', function(e) {
   var hdr = e.target.closest('[data-acc]');
   if (!hdr) return;
@@ -1188,6 +1188,10 @@ function updateBadges() {
     badgePending.style.display = 'none';
     if (badgeValidate) badgeValidate.style.display = 'none';
   }
+  const bp = document.getElementById('bnav-badge-pending');
+  const bv = document.getElementById('bnav-badge-validate');
+  if (bp) { bp.style.display = pendingCount>0?'inline-block':'none'; bp.textContent=pendingCount; }
+  if (bv) { bv.style.display = pendingCount>0?'inline-block':'none'; bv.textContent=pendingCount; }
 }
 
 // --- NAVIGATION ---
@@ -1201,6 +1205,8 @@ window.navigate = function(page, param) {
   document.querySelectorAll('.nav-item').forEach(el =>
     el.classList.toggle('active', el.dataset.page === (page === 'client-detail' ? 'requests' : page))
   );
+  const _ap2 = page === 'client-detail' ? 'requests' : page;
+  if (typeof setActiveBnav === 'function') setActiveBnav(_ap2);
   renderPage(page);
   closeSidebar();
 };
@@ -1221,13 +1227,13 @@ const PAGE_TITLES = {
   validate:      ['Needs Approval',  'Review and approve custom requests from clients'],
   devboard:      ['Dev Board',       'Track and update requests progress'],
   gantt:         ['Gantt Chart',  'Visual timeline of all custom requests'],
-  clients:       ['Clients',      'Master data perusahaan clients'],
+  clients:       ['Clients',      'Master data for all clients'],
   'client-detail': ['',              ''],
 };
 
 function renderPage(page) {
   const role   = currentUserData?.role;
-  const btnNew = document.getElementById('btn-new-requests');
+  const btnNew = document.getElementById('btn-new-request');
   const c      = document.getElementById('page-content');
 
   if (page === 'client-detail') {
@@ -1236,7 +1242,7 @@ function renderPage(page) {
     document.getElementById('page-sub').textContent   = 'All custom requests from this client';
     if (btnNew) {
       btnNew.style.display = 'flex';
-      btnNew.innerHTML = '＋ Request Baru';
+      btnNew.innerHTML = '+ New Request';
       btnNew.onclick = () => openRequestFormForClient(currentClientId);
     }
     c.innerHTML = renderClientDetail(currentClientId);
@@ -1251,11 +1257,11 @@ function renderPage(page) {
     btnNew.style.display = 'none';
     if (page === 'clients') {
       btnNew.style.display = 'flex';
-      btnNew.innerHTML = '＋ Add Client';
+      btnNew.innerHTML = '+ Add Client';
       btnNew.onclick = () => openClientForm('');
     } else if (page === 'requests') {
       btnNew.style.display = 'flex';
-      btnNew.innerHTML = '＋ Request Baru';
+      btnNew.innerHTML = '+ New Request';
       btnNew.onclick = () => openRequestForm('');
     }
   }
@@ -1486,7 +1492,7 @@ function renderGanttChart() {
         </div>
         <div style="font-size:12px;color:var(--text-muted);">
           Range: <strong style="color:var(--text);">${minDate.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})}</strong>
-          &ndash; <strong style="color:var(--text);">${maxDate.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})}</strong>
+          \u2013 <strong style="color:var(--text);">${maxDate.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})}</strong>
         </div>
         <div style="font-size:12px;color:var(--text-muted);">
           Click a bar or row to edit the item
@@ -1608,7 +1614,7 @@ function renderClientGroupCard(group) {
 
   return `
     <div style="background:var(--card);border:1.5px solid var(--border);border-left:5px solid ${color};border-radius:16px;overflow:hidden;box-shadow:var(--sh-card);">
-      <!-- HEADER KLIEN (klik untuk buka/tutup) -->
+      <!-- CLIENT HEADER (click to open/close) -->
       <div class="client-group-header" onclick="toggleClientGroup('${gid}')" style="display:flex;align-items:flex-start;gap:14px;padding:14px 20px;background:linear-gradient(90deg, ${hexToRgba(color,0.14)}, var(--inset) 55%);border-bottom:1px solid var(--border);cursor:pointer;user-select:none;">
         <span id="chev-${gid}" style="flex-shrink:0;font-size:11px;color:var(--text-dim);transition:transform .2s;transform:rotate(${isOpen?'90deg':'0deg'});display:inline-block;margin-top:4px;">\u25B6</span>
         <div style="width:40px;height:40px;border-radius:10px;background:${color};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;">${initials}</div>
@@ -1698,7 +1704,7 @@ function renderClientGroupCard(group) {
             }).join('')}
           </tbody>
         </table>
-        <!-- TAMBAH BARU -->
+        <!-- ADD NEW -->
         <button onclick="openRequestFormForClient('${group.clientId}')"
           style="width:100%;margin-top:10px;padding:8px;border:1.5px dashed var(--border-md);border-radius:8px;background:transparent;color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;"
           onmouseover="this.style.background='var(--indigo-dim)';this.style.color='var(--indigo)';this.style.borderColor='var(--indigo)'"
@@ -1896,6 +1902,13 @@ window.toggleItemDetail = function(rowId) {
   if (chev) chev.style.transform = open ? 'rotate(90deg)' : 'rotate(0deg)';
 };
 
+
+window.setActiveBnav = function(page) {
+  document.querySelectorAll('.bnav-item').forEach(el => el.classList.remove('active'));
+  const el = document.getElementById('bnav-' + page);
+  if (el) el.classList.add('active');
+};
+
 window.navToClient = function(clientId) {
   if (clientId) navigate('client-detail', clientId);
 };
@@ -2063,7 +2076,7 @@ function renderRequestCard(r, role) {
   const safeTitle = (r.name||r.title||'—'||'').replace(/'/g,"\\'");
   return `
     <div class="req-card status-${r.status}" style="overflow:visible;">
-      <!-- PROGRESS BAR \u2014 jelas, terpisah dari stripe atas -->
+      <!-- PROGRESS BAR - separate from top stripe -->
       <div style="padding:8px 16px 0;background:var(--card);">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
           <div style="font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;">Progress</div>
@@ -2412,7 +2425,7 @@ function renderDetailBody(r) {
       </div>
     `;
   }
-  // Update status — tampil untuk semua saat sudah divalidasi
+  // Update status — visible to all once validated
   if (['validated','design','dev-be','dev-fe','testing'].includes(r.status)) {
     actionsHtml += `
       <div class="detail-section">
@@ -2949,7 +2962,7 @@ window.saveRequest = async function() {
 
 window.quickApprove = async function(id) {
   await updateDoc(doc(db,'requests',id), { status:'validated', updatedAt:serverTimestamp() });
-  showToast('✓ Request di-approve! Masuk ke Dev Board','success');
+  showToast('✓ Request approved! Check the Dev Board','success');
 };
 
 window.quickReject = async function(id) {
@@ -3337,5 +3350,26 @@ function renderEmpty(title, sub) {
 }
 
 </script>
+  <!-- BOTTOM NAV - mobile only -->
+  <nav id="bottom-nav">
+    <div class="bnav-item active" id="bnav-dashboard" onclick="navigate('dashboard')">
+      <span class="bnav-icon">&#x229E;</span><span>Dashboard</span>
+    </div>
+    <div class="bnav-item" id="bnav-requests" onclick="navigate('requests')">
+      <span class="bnav-icon">&#x1F4CB;</span><span>Requests</span>
+      <span class="bnav-badge" id="bnav-badge-pending" style="display:none">0</span>
+    </div>
+    <div class="bnav-item" id="bnav-validate" onclick="navigate('validate')">
+      <span class="bnav-icon">&#x2713;</span><span>Approval</span>
+      <span class="bnav-badge" id="bnav-badge-validate" style="display:none">0</span>
+    </div>
+    <div class="bnav-item" id="bnav-devboard" onclick="navigate('devboard')">
+      <span class="bnav-icon">&#x25C8;</span><span>Dev</span>
+    </div>
+    <div class="bnav-item" id="bnav-clients" onclick="navigate('clients')">
+      <span class="bnav-icon">&#x1F3E2;</span><span>Clients</span>
+    </div>
+  </nav>
+
 </body>
 </html>
