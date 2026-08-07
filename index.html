@@ -2018,6 +2018,7 @@ function renderClientDetailRow(r) {
         }
 
         <!-- ACTIONS -->
+        ${r.redmineUrl ? `<a href="${r.redmineUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;margin-bottom:8px;font-size:12px;font-weight:700;color:var(--indigo);text-decoration:none;background:var(--indigo-dim);padding:4px 12px;border-radius:8px;border:1.5px solid var(--indigo-dim2);">\uD83D\uDD17 Open in Redmine \u2197</a>` : ''}
         <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
           <button onclick="openDetail('${r.id}')"
             style="padding:8px 14px;border-radius:8px;border:1.5px solid var(--border-md);background:var(--inset);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;"
@@ -2609,7 +2610,7 @@ window.devBoardDrop = async function(e) {
 
 function renderDetailBody(r) {
   const role = currentUserData?.role;
-  const date = r.createdAt?.toDate ? r.createdAt.toDate().toLocaleString('id-ID') : '—';
+  const date = r.createdAt?.toDate ? r.createdAt.toDate().toLocaleString('en-GB') : '—';
   const updDate = r.updatedAt?.toDate ? r.updatedAt.toDate().toLocaleString('id-ID') : '—';
   const pipelineIdx = STATUS_ORDER.indexOf(r.status);
   const pct = r.status === 'rejected' ? 0 : Math.max(0, Math.round((pipelineIdx/(STATUS_ORDER.length-1))*100));
@@ -2653,6 +2654,17 @@ function renderDetailBody(r) {
       <div class="detail-row"><span class="detail-key">Date Dibuat</span><span class="detail-val">${date}</span></div>
       <div class="detail-row"><span class="detail-key">Last update</span><span class="detail-val">${updDate}</span></div>
     </div>
+    ${r.redmineUrl ? `
+    <div style="margin-bottom:16px;padding:12px 16px;background:var(--indigo-dim);border:1.5px solid var(--indigo-dim2);border-radius:10px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:18px;">\uD83D\uDD17</span>
+        <div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--indigo);margin-bottom:2px;">Redmine</div>
+          <a href="${r.redmineUrl}" target="_blank" style="font-size:12px;font-weight:700;color:var(--indigo);text-decoration:none;word-break:break-all;">${r.redmineUrl}</a>
+        </div>
+      </div>
+      <a href="${r.redmineUrl}" target="_blank" style="padding:6px 12px;background:var(--indigo);color:#fff;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap;">Open \u2197</a>
+    </div>` : ''}
     ${(r.dateDeadline || r.dateStart || r.dateEnd || r.dateRequest || r.duration) ? `
     <div class="detail-section">
       <h4>📅 Timeline & Estimates</h4>
