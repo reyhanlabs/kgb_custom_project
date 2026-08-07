@@ -1141,9 +1141,9 @@ function listenRequests() {
   const role = currentUserData?.role;
   let q;
   if (role === 'marketing') {
-    q = query(collection(db,'requestss'), where('submittedBy','==',currentUser.uid));
+    q = query(collection(db,'requests'), where('submittedBy','==',currentUser.uid));
   } else {
-    q = collection(db,'requestss');
+    q = collection(db,'requests');
   }
   unsubRequests = onSnapshot(q, snap => {
     allRequests = snap.docs.map(d => ({ id: d.id, ...d.data() }))
@@ -1199,7 +1199,7 @@ window.navigate = function(page, param) {
     currentClientId = param;
   }
   document.querySelectorAll('.nav-item').forEach(el =>
-    el.classList.toggle('active', el.dataset.page === (page === 'client-detail' ? 'requestss' : page))
+    el.classList.toggle('active', el.dataset.page === (page === 'client-detail' ? 'requests' : page))
   );
   renderPage(page);
   closeSidebar();
@@ -1217,8 +1217,8 @@ window.closeSidebar = function() {
 
 const PAGE_TITLES = {
   dashboard:     ['Dashboard',       'Activity summary and requests statistics'],
-  requestss:      ['Custom Request',  'Manage all custom requestss grouped by client'],
-  validate:      ['Needs Approval',  'Review and approve custom requestss from clients'],
+  requests:      ['Custom Request',  'Manage all custom requests grouped by client'],
+  validate:      ['Needs Approval',  'Review and approve custom requests from clients'],
   devboard:      ['Dev Board',       'Track and update requests progress'],
   gantt:         ['Gantt Chart',  'Visual timeline of all requests items'],
   clients:       ['Clients',      'Master data perusahaan clients'],
@@ -1253,7 +1253,7 @@ function renderPage(page) {
       btnNew.style.display = 'flex';
       btnNew.innerHTML = '＋ Add Client';
       btnNew.onclick = () => openClientForm('');
-    } else if (page === 'requestss') {
+    } else if (page === 'requests') {
       btnNew.style.display = 'flex';
       btnNew.innerHTML = '＋ Request Baru';
       btnNew.onclick = () => openRequestForm('');
@@ -1261,7 +1261,7 @@ function renderPage(page) {
   }
 
   if      (page === 'dashboard')  c.innerHTML = renderDashboard();
-  else if (page === 'requestss')   c.innerHTML = renderRequestList(allRequests);
+  else if (page === 'requests')   c.innerHTML = renderRequestList(allRequests);
   else if (page === 'validate')   c.innerHTML = renderValidateBoard();
   else if (page === 'devboard')   c.innerHTML = renderDevBoard();
   else if (page === 'clients')    c.innerHTML = renderClientsPage();
@@ -1374,7 +1374,7 @@ function renderGanttChart() {
     const endD     = endRaw   ? new Date(endRaw)   : null;
 
     let barHtml = '';
-    // Only show bars for approved (non-pending, non-rejected) requestss
+    // Only show bars for approved (non-pending, non-rejected) requests
     const showBar = r.status !== 'pending' && r.status !== 'rejected';
     if (startD && showBar) {
       const s = Math.max(0, Math.floor((startD - minDate) / 86400000));
@@ -1519,13 +1519,13 @@ function renderDashboard() {
       ${renderRecentActivity(allRequests)}
     </div>
     <div style="margin-bottom:10px;font-size:13px;font-weight:600;color:var(--text-muted);">Request Terbaru</div>
-    <div class="requestss-grid">${recent.length ? recent.map(r=>renderRequestCard(r,currentUserData?.role)).join('') : renderEmpty('No requestss yet','Click tombol \uFF0B Request Baru di kanan atas')}</div>
+    <div class="requests-grid">${recent.length ? recent.map(r=>renderRequestCard(r,currentUserData?.role)).join('') : renderEmpty('No requests yet','Click tombol \uFF0B Request Baru di kanan atas')}</div>
   `;
 }
 
-function renderMiniChart(requestss) {
+function renderMiniChart(reqs) {
   const types = ['feature','menu','function','report'];
-  const counts = types.map(t => requestss.filter(r => r.type===t).length);
+  const counts = types.map(t => reqs.filter(r => r.type===t).length);
   const max = Math.max(...counts, 1);
   const colors = { feature:'var(--indigo)', menu:'var(--violet)', function:'var(--cyan)', report:'var(--amber)' };
   const labels = { feature:'Fitur', menu:'Menu', function:'Fungsi', report:'Report' };
@@ -1545,9 +1545,9 @@ function renderMiniChart(requestss) {
   </div>`;
 }
 
-function renderRecentActivity(requestss) {
+function renderRecentActivity(reqs) {
   const statuses = ['pending','validated','design','dev-be','dev-fe','testing','done','rejected'];
-  const counts = statuses.map(s => requestss.filter(r => r.status===s).length);
+  const counts = statuses.map(s => reqs.filter(r => r.status===s).length);
   const cols = {pending:'var(--amber)',validated:'var(--cyan)',design:'var(--violet)','dev-be':'var(--indigo)','dev-fe':'var(--cyan)',testing:'var(--amber)',done:'var(--green)',rejected:'var(--red)'};
   return `<div class="stat-card" style="background:var(--card);color:var(--text);box-shadow:var(--sh-card);border:1px solid var(--border);">
     <div style="font-size:10px;font-weight:800;color:var(--indigo);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">Status Overview</div>
@@ -1564,19 +1564,19 @@ function renderRecentActivity(requestss) {
 }
 
 // --- REQUEST LIST — Grouped by Client ---
-function renderRequestList(requestss) {
+function renderRequestList(reqs) {
   const groups = {};
-  requestss.forEach(r => {
+  reqs.forEach(r => {
     const key = r.clientId || ('__manual__' + r.client);
     if (!groups[key]) groups[key] = { clientId:r.clientId||'', name:r.client||'(Tanpa Client)', items:[] };
     groups[key].items.push(r);
   });
   const sorted = Object.values(groups).sort((a,b)=>a.name.localeCompare(b.name,'id'));
-  if (!sorted.length) return renderEmpty('No requestss yet','Click ＋ New Request to get started');
+  if (!sorted.length) return renderEmpty('No requests yet','Click ＋ New Request to get started');
 
   return `
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px;flex-wrap:wrap;">
-      <input class="filter-search" id="search-input" placeholder="\uD83D\uDD0D Search clients or requestss..." oninput="filterRequests()" style="max-width:260px;flex:1;">
+      <input class="filter-search" id="search-input" placeholder="\uD83D\uDD0D Search clients or requests..." oninput="filterRequests()" style="max-width:260px;flex:1;">
       <select class="filter-select" id="filter-status" onchange="filterRequests()">
         <option value="">All Status</option>
         ${Object.entries(STATUS_LABELS).map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}
@@ -1585,10 +1585,10 @@ function renderRequestList(requestss) {
         <span onclick="expandAllClientGroups()" style="padding:3px 10px;background:var(--indigo-dim);color:var(--indigo);border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">Expand All</span>
         <span onclick="collapseAllClientGroups()" style="padding:3px 10px;background:var(--inset);color:var(--text-muted);border:1px solid var(--border-md);border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">Collapse All</span>
         <span id="filter-active-tag" style="display:none;padding:3px 10px;background:var(--indigo-dim2);color:var(--indigo);border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;" onclick="clearFilters()">\u2715 Reset</span>
-        <span style="font-size:12px;color:var(--text-dim);" id="filter-count">${requestss.length} requests \u00B7 ${sorted.length} clients</span>
+        <span style="font-size:12px;color:var(--text-dim);" id="filter-count">${reqs.length} requests \u00B7 ${sorted.length} clients</span>
       </div>
     </div>
-    <div id="requestss-grid" style="display:flex;flex-direction:column;gap:14px;">
+    <div id="requests-grid" style="display:flex;flex-direction:column;gap:14px;">
       ${sorted.map(g=>renderClientGroupCard(g)).join('')}
     </div>`;
 }
@@ -1722,7 +1722,7 @@ function renderClientDetail(clientId) {
   const initials = cl.name.split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?';
 
   return `
-    <button onclick="navigate('requestss')"
+    <button onclick="navigate('requests')"
       style="background:none;border:none;color:var(--indigo);font-size:13px;font-weight:700;cursor:pointer;padding:0;margin-bottom:16px;display:flex;align-items:center;gap:6px;">
       \u2190 Back ke Custom Request
     </button>
@@ -1759,7 +1759,7 @@ function renderClientDetail(clientId) {
       ${reqs.length ? reqs.map(r=>renderClientDetailRow(r)).join('') : `
         <div style="background:var(--card);border:2px dashed var(--border-md);border-radius:14px;padding:48px;text-align:center;">
           <div style="font-size:40px;margin-bottom:12px;opacity:.3;">📋</div>
-          <div style="font-size:15px;font-weight:700;color:var(--text-muted);">No requestss yet</div>
+          <div style="font-size:15px;font-weight:700;color:var(--text-muted);">No requests yet</div>
         </div>`}
       <button onclick="openRequestFormForClient('${clientId}')"
         style="padding:14px;border:2px dashed var(--border-md);border-radius:14px;background:transparent;color:var(--text-muted);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;transition:all .15s;"
@@ -1925,7 +1925,7 @@ window.filterRequests = function() {
     groups[key].items.push(r);
   });
   const sorted = Object.values(groups).sort((a,b)=>a.name.localeCompare(b.name,'id'));
-  const grid = document.getElementById('requestss-grid');
+  const grid = document.getElementById('requests-grid');
   if (grid) grid.innerHTML = sorted.length ? sorted.map(g=>renderClientGroupCard(g)).join('') : renderEmpty('No results','Try changing the filter');
   const countEl = document.getElementById('filter-count');
   if (countEl) countEl.textContent = `${filtered.length} requests \u00B7 ${sorted.length} clients`;
@@ -2277,7 +2277,7 @@ function renderDevBoard() {
 
   return `
     <div style="margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-      <div style="font-size:13px;color:var(--text-muted);">${total} active requestss</div>
+      <div style="font-size:13px;color:var(--text-muted);">${total} active requests</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         ${COLS.map(col => {
           const n = allRequests.filter(r => r.status === col.status).length;
@@ -2360,7 +2360,7 @@ function renderDevBoard() {
 // --- SUBMIT REQUEST ---
 async function createRequest(title, type, priority, clientId, client, desc, notes, specs) {
   if (!title || !type || !client || !desc) { showToast('Please fill in all required fields','error'); return false; }
-  await addDoc(collection(db,'requestss'), {
+  await addDoc(collection(db,'requests'), {
     title, type, priority, clientId: clientId||'', client,
     description: desc, notes: notes||'',
     specs: specs||[],
@@ -2383,7 +2383,7 @@ window.openDetail = async function(id) {
   document.getElementById('detail-title').textContent = 'Loading...';
   document.getElementById('detail-id').textContent = '';
   document.getElementById('detail-body').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
-  const snap = await getDoc(doc(db,'requestss',id));
+  const snap = await getDoc(doc(db,'requests',id));
   if (!snap.exists()) { document.getElementById('detail-body').innerHTML = '<div class="loading">Request not found.</div>'; return; }
   const r = { id: snap.id, ...snap.data() };
   document.getElementById('detail-title').textContent = r.name||r.title||'—';
@@ -2556,14 +2556,14 @@ function renderDetailBody(r) {
 }
 
 window.updateStatus = async function(id, status) {
-  await updateDoc(doc(db,'requestss',id), { status, updatedAt: serverTimestamp() });
+  await updateDoc(doc(db,'requests',id), { status, updatedAt: serverTimestamp() });
   showToast(`\u2713 Status diperbarui: ${STATUS_LABELS[status]}`, 'success');
   await openDetail(id);
 };
 
 window.rejectRequest = async function(id) {
   const reason = document.getElementById('reject-reason')?.value.trim() || '';
-  await updateDoc(doc(db,'requestss',id), { status:'rejected', rejectedReason:reason, updatedAt:serverTimestamp() });
+  await updateDoc(doc(db,'requests',id), { status:'rejected', rejectedReason:reason, updatedAt:serverTimestamp() });
   showToast('Request ditolak.', 'info');
   closeModal('modal-detail');
 };
@@ -2572,14 +2572,14 @@ window.addComment = async function(id) {
   const inp = document.getElementById(`comment-input-${id}`);
   const text = inp?.value.trim();
   if (!text) return;
-  const snap = await getDoc(doc(db,'requestss',id));
+  const snap = await getDoc(doc(db,'requests',id));
   const existing = snap.data()?.comments || [];
   const newComment = {
     author: currentUserData?.name || currentUser.email,
     text,
     time: new Date().toLocaleString('id-ID')
   };
-  await updateDoc(doc(db,'requestss',id), { comments: [...existing, newComment], updatedAt:serverTimestamp() });
+  await updateDoc(doc(db,'requests',id), { comments: [...existing, newComment], updatedAt:serverTimestamp() });
   inp.value = '';
   await openDetail(id);
 };
@@ -2606,7 +2606,7 @@ window.openRequestForm = async function(id) {
   if (id) {
     document.getElementById('req-form-title').textContent = 'Edit Request Item';
     document.getElementById('req-form-sub').textContent   = 'Update this item details';
-    const snap = await getDoc(doc(db, 'requestss', id));
+    const snap = await getDoc(doc(db, 'requests', id));
     if (!snap.exists()) { showToast('Request not found', 'error'); return; }
     const r = snap.data();
     document.getElementById('req-client-id').value = r.clientId || '';
@@ -2908,7 +2908,7 @@ window.saveRequest = async function() {
   const baseDate = new Date().toISOString().split('T')[0];
   if (editId) {
     const item = items[0];
-    await updateDoc(doc(db, 'requestss', editId), {
+    await updateDoc(doc(db, 'requests', editId), {
       name: item.name, type: item.type||'', desc: item.desc||'',
       specs: item.specs||[], dateRequest: item.dateRequest||baseDate,
       dateDeadline: item.dateDeadline||'', duration: item.duration||'',
@@ -2916,7 +2916,7 @@ window.saveRequest = async function() {
     });
     showToast('\u2713 Request updated successfully', 'success');
   } else {
-    await Promise.all(items.map(item => addDoc(collection(db, 'requestss'), {
+    await Promise.all(items.map(item => addDoc(collection(db, 'requests'), {
       name: item.name, type: item.type||'', desc: item.desc||'',
       specs: item.specs||[], dateRequest: item.dateRequest||baseDate,
       dateDeadline: item.dateDeadline||'', duration: item.duration||'',
@@ -2931,26 +2931,26 @@ window.saveRequest = async function() {
 };
 
 window.quickApprove = async function(id) {
-  await updateDoc(doc(db,'requestss',id), { status:'validated', updatedAt:serverTimestamp() });
+  await updateDoc(doc(db,'requests',id), { status:'validated', updatedAt:serverTimestamp() });
   showToast('✓ Request di-approve! Masuk ke Dev Board','success');
 };
 
 window.quickReject = async function(id) {
   const inp = document.getElementById('reject-reason-'+id);
   const reason = inp?.value.trim() || '';
-  await updateDoc(doc(db,'requestss',id), { status:'rejected', rejectedReason:reason, updatedAt:serverTimestamp() });
+  await updateDoc(doc(db,'requests',id), { status:'rejected', rejectedReason:reason, updatedAt:serverTimestamp() });
   showToast('Request ditolak','info');
 };
 
 window.deleteRequest = async function(id, title) {
   if (!confirm(`Delete requests berikut?\n\n"${title}"\n\nTindakan ini tidak dapat dibatalkan.`)) return;
-  await deleteDoc(doc(db,'requestss',id));
-  showToast('Request dihapus','info');
+  await deleteDoc(doc(db,'requests',id));
+  showToast('Request deleted','info');
 };
 
 // --- PRINT REQUEST ---
 window.printRequest = async function(id) {
-  const snap = await getDoc(doc(db,'requestss',id));
+  const snap = await getDoc(doc(db,'requests',id));
   if (!snap.exists()) { showToast('Data not found','error'); return; }
   const r = { id:snap.id, ...snap.data() };
   const date     = r.createdAt?.toDate  ? r.createdAt.toDate().toLocaleString('id-ID')  : '—';
