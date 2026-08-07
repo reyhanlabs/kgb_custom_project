@@ -902,14 +902,14 @@
 
       <!-- ITEM LIST -->
       <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:10px;">
-        Item Custom
+        Custom Requests
         <span id="tab-items-count" style="background:var(--indigo-dim);color:var(--indigo);border-radius:20px;padding:1px 8px;font-size:11px;font-weight:800;margin-left:6px;">0</span>
       </div>
       <div id="req-items-list"></div>
       <div id="req-items-empty" style="display:none;"></div>
       <button type="button" onclick="addItemRow()"
         style="width:100%;margin-top:8px;padding:11px;border:2px dashed var(--border-md);border-radius:10px;background:transparent;color:var(--text-muted);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;">
-        &#xFF0B; Add Item
+        &#xFF0B; Add Request
       </button>
 
       <!-- CATATAN OPSIONAL -->
@@ -1703,7 +1703,7 @@ function renderClientGroupCard(group) {
           style="width:100%;margin-top:10px;padding:8px;border:1.5px dashed var(--border-md);border-radius:8px;background:transparent;color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;"
           onmouseover="this.style.background='var(--indigo-dim)';this.style.color='var(--indigo)';this.style.borderColor='var(--indigo)'"
           onmouseout="this.style.background='transparent';this.style.color='var(--text-muted)';this.style.borderColor='var(--border-md)'">
-          \uFF0B Add Request
+          + Add Request
         </button>
       </div>
     </div>`;
@@ -1765,7 +1765,7 @@ function renderClientDetail(clientId) {
         style="padding:14px;border:2px dashed var(--border-md);border-radius:14px;background:transparent;color:var(--text-muted);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;transition:all .15s;"
         onmouseover="this.style.background='var(--indigo-dim)';this.style.color='var(--indigo)';this.style.borderColor='var(--indigo)'"
         onmouseout="this.style.background='transparent';this.style.color='var(--text-muted)';this.style.borderColor='var(--border-md)'">
-        \uFF0B Add Request
+        + Add Request
       </button>
     </div>`;
 }
