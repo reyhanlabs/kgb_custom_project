@@ -1872,10 +1872,10 @@ function renderClientDetailRow(r) {
             📦 ${(r.items||[]).length} Custom Items
           </div>
           ${(r.items||[]).map(renderAccItem).join('')}       </div>`:
-        r.description?`
+        (r.desc||r.description)?`
         <div style="background:var(--inset);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px;">
           <div style="font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Description</div>
-          <div style="font-size:13px;color:var(--text);line-height:1.65;">${r.description}</div>
+          <div style="font-size:13px;color:var(--text);line-height:1.65;">${r.desc||r.description}</div>
         </div>`:''
         }
 
@@ -1953,7 +1953,7 @@ window.navToClient = function(clientId) {
 window.showDescById = function(rid) {
   const r = allRequests.find(x => x.id === rid);
   if (!r) return;
-  const desc = r.description ||
+  const desc = r.desc || r.description ||
     (r.items||[]).map((it,i) => (i+1)+'. '+it.name+(it.desc?' — '+it.desc:'')).join('\n') || '—';
   document.getElementById('modal-desc-title').textContent = r.name || r.name||r.title||'—' || '—';
   document.getElementById('modal-desc-body').textContent  = desc;
@@ -2187,8 +2187,8 @@ function renderRequestCard(r, role) {
         <!-- DESKRIPSI -->
         <div style="background:var(--inset);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:10px;">
           <div style="font-size:10px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;">Description</div>
-          <div style="font-size:12px;color:var(--text-muted);margin:0;line-height:1.6;">${r.description || (r.items&&r.items[0]?r.items.map(it=>it.name).join(', '):'\u2014')}</div>
-          ${(r.description||'').length > 120 ? `
+          <div style="font-size:12px;color:var(--text-muted);margin:0;line-height:1.6;">${r.desc || r.description || (r.items&&r.items[0]?r.items.map(it=>it.name).join(', '):'\u2014')}</div>
+          ${(r.desc||r.description||'').length > 120 ? `
           <button onclick="showDescById('${r.id}')"
             style="margin-top:6px;padding:0;background:none;border:none;font-size:11px;font-weight:700;color:var(--indigo);cursor:pointer;font-family:inherit;">
             Selengkapnya →
@@ -2268,7 +2268,7 @@ function renderValidateCard(r) {
         <!-- deskripsi -->
         <div style="background:var(--inset);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:12px;">
           <div style="font-size:10px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Requirements Description</div>
-          <div style="font-size:13px;color:var(--text);line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">${r.description||'\u2014'}</div>
+          <div style="font-size:13px;color:var(--text);line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">${r.desc||r.description||'\u2014'}</div>
         </div>
 
         <!-- meta + countdown -->
@@ -3238,7 +3238,7 @@ window.printRequest = async function(id) {
       <!-- DESKRIPSI KEBUTUHAN -->
       <div style="margin-bottom:20px;">
         <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#555;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #E5E7EB;">Requirements Description</div>
-        <p style="font-size:13px;line-height:1.8;color:#111;white-space:pre-wrap;margin:0;">${r.description||'\u2014'}</p>
+        <p style="font-size:13px;line-height:1.8;color:#111;white-space:pre-wrap;margin:0;">${r.desc||r.description||'\u2014'}</p>
         ${r.notes ? `<div style="margin-top:12px;padding:10px 14px;border:1px solid #D1D5DB;border-left:3px solid #374151;border-radius:4px;font-size:12px;color:#374151;"><strong>Notes:</strong> ${r.notes}</div>` : ''}
       </div>
 
