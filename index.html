@@ -2269,6 +2269,11 @@ function renderValidateCard(r) {
         <div style="background:var(--inset);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:12px;">
           <div style="font-size:10px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Requirements Description</div>
           <div style="font-size:13px;color:var(--text);line-height:1.6;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">${r.desc||r.description||'\u2014'}</div>
+          ${(r.desc||r.description||'').length > 150 ? `
+          <button onclick="showDescById('${r.id}')"
+            style="margin-top:6px;padding:0;background:none;border:none;font-size:11px;font-weight:700;color:var(--indigo);cursor:pointer;font-family:inherit;">
+            Selengkapnya \u2192
+          </button>` : ''}
         </div>
 
         <!-- meta + countdown -->
