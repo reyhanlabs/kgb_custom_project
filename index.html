@@ -1544,68 +1544,150 @@ window.syncGanttScroll = function(el) {
 
 // --- DASHBOARD ---
 function renderDashboard() {
-  const total = allRequests.length;
-  const pending = allRequests.filter(r => r.status==='pending').length;
-  const validated = allRequests.filter(r => ['validated','design','dev-be','dev-fe','testing'].includes(r.status)).length;
-  const done = allRequests.filter(r => r.status==='done').length;
-  const recent = allRequests.slice(0, 5);
-  return `
-    <div class="stats-row">
-      <div class="stat-card s-total"><div class="stat-icon">\uD83D\uDCCA</div><div class="stat-num">${total}</div><div class="stat-label">Total Requestss</div></div>
-      <div class="stat-card s-pending"><div class="stat-icon">\u23F3</div><div class="stat-num">${pending}</div><div class="stat-label">Awaiting Approval</div></div>
-      <div class="stat-card s-validated"><div class="stat-icon">\u26A1</div><div class="stat-num">${validated}</div><div class="stat-label">Sedang Dikerjakan</div></div>
-      <div class="stat-card s-done"><div class="stat-icon">\u2705</div><div class="stat-num">${done}</div><div class="stat-label">Done</div></div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
-      ${renderMiniChart(allRequests)}
-      ${renderRecentActivity(allRequests)}
-    </div>
-    <div style="margin-bottom:10px;font-size:13px;font-weight:600;color:var(--text-muted);">Request Terbaru</div>
-    <div class="requests-grid">${recent.length ? recent.map(r=>renderRequestCard(r,currentUserData?.role)).join('') : renderEmpty('No requests yet','Click tombol \uFF0B Request Baru di kanan atas')}</div>
-  `;
+  const total    = allRequests.length;
+  const pending  = allRequests.filter(r => r.status === 'pending');
+  const approved = allRequests.filter(r => ['validated','design','dev-be','dev-fe','testing'].includes(r.status));
+  const done     = allRequests.filter(r => r.status === 'done').length;
+
+  const STATUS_COLOR = {
+    pending:'#F59E0B', validated:'#0891B2', rejected:'#EF4444',
+    design:'#7C3AED', 'dev-be':'#027fb3', 'dev-fe':'#0369A1',
+    testing:'#D97706', done:'#10B981'
+  };
+
+  const groupByClient = (reqs) => {
+    const groups = {};
+    reqs.forEach(r => {
+      const key = r.clientId || r.client || 'unknown';
+      if (!groups[key]) groups[key] = { client: r.client || '\u2014', items: [] };
+      groups[key].items.push(r);
+    });
+    return Object.values(groups).sort((a,b) => a.client.localeCompare(b.client));
+  };
+
+  const renderClientList = (reqs, emptyMsg) => {
+    const groups = groupByClient(reqs);
+    if (!groups.length) return '<div style="padding:16px;text-align:center;color:var(--text-dim);font-size:12px;font-style:italic;">' + emptyMsg + '</div>';
+    return groups.map(g =>
+      '<div style="padding:8px 14px;border-bottom:1px solid var(--border);">' +
+        '<div style="font-size:10px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">' + g.client + '</div>' +
+        g.items.map(r => {
+          const sc = STATUS_COLOR[r.status] || '#94A3B8';
+          return '<div style="display:flex;align-items:center;gap:6px;padding:3px 0;">' +
+            '<div style="width:3px;height:16px;background:' + sc + ';border-radius:2px;flex-shrink:0;"></div>' +
+            '<div style="flex:1;font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (r.name||r.title||'\u2014') + '</div>' +
+            '<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;background:' + sc + '22;color:' + sc + ';flex-shrink:0;">' + (STATUS_LABELS[r.status]||r.status) + '</span>' +
+          '</div>';
+        }).join('') +
+      '</div>'
+    ).join('');
+  };
+
+  return '<div style="display:flex;flex-direction:column;gap:16px;">' +
+
+    // STAT CARDS
+    '<div class="stats-row">' +
+      '<div class="stat-card s-total"><div class="stat-icon">\uD83D\uDCCA</div><div class="stat-num">' + total + '</div><div class="stat-label">Total Requests</div></div>' +
+      '<div class="stat-card s-pending"><div class="stat-icon">\u23F3</div><div class="stat-num">' + pending.length + '</div><div class="stat-label">Awaiting Approval</div></div>' +
+      '<div class="stat-card s-validated"><div class="stat-icon">\u26A1</div><div class="stat-num">' + approved.length + '</div><div class="stat-label">In Progress</div></div>' +
+      '<div class="stat-card s-done"><div class="stat-icon">\u2705</div><div class="stat-num">' + done + '</div><div class="stat-label">Done</div></div>' +
+    '</div>' +
+
+    // STATUS OVERVIEW + TYPE CHART
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">' +
+      renderRecentActivity(allRequests) +
+      renderMiniChart(allRequests) +
+    '</div>' +
+
+    // AWAITING + IN PROGRESS - side by side, colored cards
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">' +
+
+      // Awaiting Approval - amber border
+      '<div style="border-radius:14px;overflow:hidden;box-shadow:var(--sh-card);background:var(--card);border:1.5px solid var(--border);border-top:3px solid #F59E0B;">' +
+        '<div style="padding:12px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);">' +
+          '<span style="font-size:15px;">\u23F3</span>' +
+          '<div style="font-size:13px;font-weight:800;color:var(--text);">Awaiting Approval</div>' +
+          '<span style="margin-left:auto;background:var(--amber-dim);color:var(--amber);font-size:11px;font-weight:800;padding:2px 9px;border-radius:20px;">' + pending.length + '</span>' +
+        '</div>' +
+        '<div style="max-height:240px;overflow-y:auto;">' +
+          renderClientList(pending, 'No requests awaiting approval \u2713') +
+        '</div>' +
+      '</div>' +
+
+      // In Progress - indigo border
+      '<div style="border-radius:14px;overflow:hidden;box-shadow:var(--sh-card);background:var(--card);border:1.5px solid var(--border);border-top:3px solid #027fb3;">' +
+        '<div style="padding:12px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);">' +
+          '<span style="font-size:15px;">\u26A1</span>' +
+          '<div style="font-size:13px;font-weight:800;color:var(--text);">Approved & In Progress</div>' +
+          '<span style="margin-left:auto;background:var(--indigo-dim);color:var(--indigo);font-size:11px;font-weight:800;padding:2px 9px;border-radius:20px;">' + approved.length + '</span>' +
+        '</div>' +
+        '<div style="max-height:240px;overflow-y:auto;">' +
+          renderClientList(approved, 'No requests in progress') +
+        '</div>' +
+      '</div>' +
+
+    '</div>' +
+
+  '</div>';
 }
 
+
 function renderMiniChart(reqs) {
-  const types = ['feature','menu','function','report'];
+  const types  = ['feature','menu','function','report'];
   const counts = types.map(t => reqs.filter(r => r.type===t).length);
-  const max = Math.max(...counts, 1);
-  const colors = { feature:'var(--indigo)', menu:'var(--violet)', function:'var(--cyan)', report:'var(--amber)' };
-  const labels = { feature:'Fitur', menu:'Menu', function:'Fungsi', report:'Report' };
-  return `<div class="stat-card" style="background:var(--card);color:var(--text);box-shadow:var(--sh-card);border:1px solid var(--border);">
-    <div style="font-size:10px;font-weight:800;color:var(--indigo);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">Request per Type</div>
-    ${types.map((t,i) => `
-      <div style="margin-bottom:10px;">
-        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
-          <span style="color:var(--text-muted)">${labels[t]}</span>
-          <span style="font-weight:600">${counts[i]}</span>
-        </div>
-        <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden;">
-          <div style="height:100%;width:${Math.round(counts[i]/max*100)}%;background:${colors[t]};border-radius:3px;transition:width .5s;"></div>
-        </div>
-      </div>
-    `).join('')}
-  </div>`;
+  const max    = Math.max(...counts, 1);
+  const cols   = { feature:'#6366F1', menu:'#8B5CF6', function:'#0891B2', report:'#F59E0B' };
+  const labels = { feature:'Feature', menu:'Menu', function:'Function', report:'Report' };
+  const hasAny = counts.some(n => n > 0);
+  return '<div class="stat-card" style="background:var(--card);color:var(--text);box-shadow:var(--sh-card);border:1.5px solid var(--border);border-top:3px solid #8B5CF6;">' +
+    '<div style="font-size:10px;font-weight:800;color:#8B5CF6;text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">Request by Type</div>' +
+    (hasAny
+      ? '<div style="display:flex;flex-direction:column;gap:10px;">' +
+          types.map((t,i) =>
+            '<div style="display:flex;align-items:center;gap:8px;">' +
+              '<div style="font-size:11px;color:var(--text-muted);width:70px;flex-shrink:0;">' + labels[t] + '</div>' +
+              '<div style="flex:1;height:7px;background:var(--inset);border-radius:4px;overflow:hidden;">' +
+                '<div style="height:100%;width:' + Math.round(counts[i]/max*100) + '%;background:' + cols[t] + ';border-radius:4px;transition:width .4s;"></div>' +
+              '</div>' +
+              '<div style="font-size:11px;font-weight:800;color:' + cols[t] + ';width:22px;text-align:right;">' + counts[i] + '</div>' +
+            '</div>'
+          ).join('') +
+        '</div>'
+      : '<div style="color:var(--text-dim);font-size:12px;font-style:italic;text-align:center;padding:12px 0;">No data yet</div>'
+    ) +
+  '</div>';
 }
+
 
 function renderRecentActivity(reqs) {
   const statuses = ['pending','validated','design','dev-be','dev-fe','testing','done','rejected'];
   const counts = statuses.map(s => reqs.filter(r => r.status===s).length);
-  const cols = {pending:'var(--amber)',validated:'var(--cyan)',design:'var(--violet)','dev-be':'var(--indigo)','dev-fe':'var(--cyan)',testing:'var(--amber)',done:'var(--green)',rejected:'var(--red)'};
-  return `<div class="stat-card" style="background:var(--card);color:var(--text);box-shadow:var(--sh-card);border:1px solid var(--border);">
-    <div style="font-size:10px;font-weight:800;color:var(--indigo);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">Status Overview</div>
-    <div style="display:flex;flex-wrap:wrap;gap:8px;">
-      ${statuses.map((s,i) => counts[i] > 0 ? `
-        <div style="display:flex;align-items:center;gap:6px;">
-          <div style="width:8px;height:8px;border-radius:50%;background:${cols[s]};"></div>
-          <span style="font-size:12px;color:var(--text-muted)">${STATUS_LABELS[s]}</span>
-          <span style="font-size:12px;font-weight:600;color:${cols[s]}">${counts[i]}</span>
-        </div>
-      ` : '').join('')}
-    </div>
-  </div>`;
+  const cols = {
+    pending:'#F59E0B', validated:'#0891B2', design:'#7C3AED',
+    'dev-be':'#027fb3', 'dev-fe':'#0369A1', testing:'#D97706',
+    done:'#10B981', rejected:'#EF4444'
+  };
+  const hasAny = counts.some(n => n > 0);
+  return '<div class="stat-card" style="background:var(--card);color:var(--text);box-shadow:var(--sh-card);border:1.5px solid var(--border);border-top:3px solid #10B981;">' +
+    '<div style="font-size:10px;font-weight:800;color:#10B981;text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">Status Overview</div>' +
+    (hasAny
+      ? '<div style="display:flex;flex-direction:column;gap:8px;">' +
+          statuses.map((s,i) => counts[i] > 0 ? (
+            '<div style="display:flex;align-items:center;gap:8px;">' +
+              '<div style="font-size:11px;color:var(--text-muted);width:86px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (STATUS_LABELS[s]||s) + '</div>' +
+              '<div style="flex:1;height:7px;background:var(--inset);border-radius:4px;overflow:hidden;">' +
+                '<div style="height:100%;width:' + Math.round(counts[i]/reqs.length*100) + '%;background:' + cols[s] + ';border-radius:4px;transition:width .4s;"></div>' +
+              '</div>' +
+              '<div style="font-size:11px;font-weight:800;color:' + cols[s] + ';width:22px;text-align:right;">' + counts[i] + '</div>' +
+            '</div>'
+          ) : '').join('') +
+        '</div>'
+      : '<div style="color:var(--text-dim);font-size:12px;font-style:italic;text-align:center;padding:12px 0;">No data yet</div>'
+    ) +
+  '</div>';
 }
 
-// --- REQUEST LIST — Grouped by Client ---
+
 function renderRequestList(reqs) {
   const groups = {};
   reqs.forEach(r => {
@@ -3333,8 +3415,9 @@ function renderClientCard(cl, canEdit) {
   const clientReqs = allRequests.filter(r => r.clientId === cl.id);
   const reqCount   = clientReqs.length;
   const initials   = cl.name.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
-  const colors     = ['#027fb3','#8B5CF6','#10B981','#F59E0B','#EF4444','#EC4899'];
-  const color      = colors[cl.name.charCodeAt(0) % colors.length];
+  const colors     = ['#027fb3','#8B5CF6','#10B981','#F59E0B','#EF4444','#EC4899','#0891B2','#7C3AED','#059669','#D97706','#DC2626','#DB2777'];
+  const _hash      = cl.name.split('').reduce((a,ch)=>a+ch.charCodeAt(0),0);
+  const color      = colors[_hash % colors.length];
   const safeName   = cl.name.replace(/'/g,"\\'");
 
   // breakdown status
@@ -3345,10 +3428,10 @@ function renderClientCard(cl, canEdit) {
 
   const breakdownHtml = reqCount > 0 ? `
     <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;">
-      ${pending  > 0 ? `<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--amber-dim);color:var(--amber);">⏳ ${pending} menunggu</span>` : ''}
-      ${onprog   > 0 ? `<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--indigo-dim);color:var(--indigo);">⚡ ${onprog} proses</span>` : ''}
-      ${done     > 0 ? `<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--green-dim);color:var(--green);">✓ ${done} selesai</span>` : ''}
-      ${rejected > 0 ? `<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--red-dim);color:var(--red);">✕ ${rejected} ditolak</span>` : ''}
+      ${pending  > 0 ? `<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--amber-dim);color:var(--amber);">⏳ ${pending} pending</span>` : ''}
+      ${onprog   > 0 ? `<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--indigo-dim);color:var(--indigo);">⚡ ${onprog} in progress</span>` : ''}
+      ${done     > 0 ? `<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--green-dim);color:var(--green);">✓ ${done} done</span>` : ''}
+      ${rejected > 0 ? `<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--red-dim);color:var(--red);">✕ ${rejected} rejected</span>` : ''}
     </div>` : '';
 
   return `
