@@ -1898,7 +1898,7 @@ function renderClientDetail(clientId) {
   return `
     <button onclick="navigate('requests')"
       style="background:none;border:none;color:var(--indigo);font-size:13px;font-weight:700;cursor:pointer;padding:0;margin-bottom:16px;display:flex;align-items:center;gap:6px;">
-      \u2190 Back ke Custom Request
+      \u2190 Back to Custom Requests
     </button>
     <!-- PROFIL KLIEN -->
     <div style="background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:20px 24px;margin-bottom:20px;box-shadow:var(--sh-card);">
@@ -2420,7 +2420,7 @@ function renderValidateCard(r) {
           <button onclick="quickApprove('${r.id}')"
             style="flex:1;min-width:140px;padding:10px 16px;background:linear-gradient(135deg,#059669,#10B981);color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;transition:opacity .15s;box-shadow:0 3px 10px rgba(5,150,105,0.3);"
             onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
-            \u2713 Approve & Teruskan ke Tim Dev
+            \u2713 Approve & Forward to Dev Team
           </button>
           <button onclick="openDetail('${r.id}')"
             style="padding:10px 14px;background:var(--inset);border:1.5px solid var(--border-md);border-radius:9px;font-size:13px;font-weight:700;color:var(--text-muted);cursor:pointer;font-family:inherit;transition:all .15s;"
@@ -2591,7 +2591,7 @@ function renderDetailBody(r) {
       <div class="detail-section">
         <h4>Approval Actions</h4>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="btn-approve" onclick="updateStatus('${r.id}','validated')">\u2713 Approve & Teruskan ke Tim Dev</button>
+          <button class="btn-approve" onclick="updateStatus('${r.id}','validated')">\u2713 Approve & Forward to Dev Team</button>
           <div style="flex:1;min-width:180px;"><input id="reject-reason" style="width:100%;padding:8px 10px;background:var(--inset);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;" placeholder="Alasan penolakan (optional)"></div>
           <button class="btn-danger" onclick="rejectRequest('${r.id}')">\u2715 Reject</button>
         </div>
