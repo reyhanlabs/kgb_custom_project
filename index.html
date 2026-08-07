@@ -362,18 +362,20 @@
       background:var(--card); border-top:1px solid var(--border);
       box-shadow:0 -4px 20px rgba(0,0,0,0.10);
       padding:6px 4px calc(6px + env(safe-area-inset-bottom));
+      overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none;
     }
+    #bottom-nav::-webkit-scrollbar { display:none; }
     .main { padding-bottom:64px; }
     .bnav-item {
-      flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
-      gap:2px; padding:6px 2px; border-radius:10px; cursor:pointer; position:relative;
+      flex:0 0 auto; min-width:64px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+      gap:2px; padding:6px 10px; border-radius:10px; cursor:pointer; position:relative;
       color:var(--text-dim); font-size:10px; font-weight:600; transition:all .15s;
     }
     .bnav-item:hover { color:var(--indigo); background:var(--indigo-dim); }
     .bnav-item.active { color:var(--indigo); font-weight:800; }
     .bnav-icon { font-size:19px; line-height:1; }
     .bnav-badge {
-      position:absolute; top:2px; right:16%; background:var(--red); color:#fff;
+      position:absolute; top:2px; right:10px; background:var(--red); color:#fff;
       border-radius:20px; font-size:9px; font-weight:800; min-width:15px; height:15px;
       display:flex; align-items:center; justify-content:center; padding:0 4px;
       box-shadow:0 0 0 2px var(--card);
@@ -880,7 +882,7 @@
         </div>
       </div>
       <div class="nav-section">
-        <div class="nav-label">Menu utama</div>
+        <div class="nav-label">Main Menu</div>
         <div class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')">
           <div class="nav-icon-pill"><span>⊞</span></div>
           <span class="nav-text">Dashboard</span>
@@ -899,6 +901,10 @@
           <div class="nav-icon-pill"><span>◈</span></div>
           <span class="nav-text">Dev Board</span>
         </div>
+        <div id="nav-bugtracker" class="nav-item" data-page="bugtracker" onclick="navigate('bugtracker')" style="display:none">
+          <div class="nav-icon-pill"><span>&#x1F41B;</span></div>
+          <span class="nav-text">Bug Tracker</span>
+        </div>
         <div class="nav-label" id="nav-label-master">Master Data</div>
         <div id="nav-clients" class="nav-item" data-page="clients" onclick="navigate('clients')" style="display:none">
           <div class="nav-icon-pill"><span>&#x1F3E2;</span></div>
@@ -907,10 +913,6 @@
         <div id="nav-gantt" class="nav-item" data-page="gantt" onclick="navigate('gantt')" style="display:none">
           <div class="nav-icon-pill"><span>&#x1F4C5;</span></div>
           <span class="nav-text">Gantt Chart</span>
-        </div>
-        <div id="nav-bugtracker" class="nav-item" data-page="bugtracker" onclick="navigate('bugtracker')" style="display:none">
-          <div class="nav-icon-pill"><span>&#x1F41B;</span></div>
-          <span class="nav-text">Bug Tracker</span>
         </div>
       </div>
       <div class="sidebar-user">
@@ -4088,6 +4090,9 @@ function renderEmpty(title, sub) {
     </div>
     <div class="bnav-item" id="bnav-clients" onclick="navigate('clients')">
       <span class="bnav-icon">&#x1F3E2;</span><span>Clients</span>
+    </div>
+    <div class="bnav-item" id="bnav-bugtracker" onclick="navigate('bugtracker')">
+      <span class="bnav-icon">&#x1F41B;</span><span>Bugs</span>
     </div>
   </nav>
 
