@@ -2452,136 +2452,158 @@ function renderValidateCard(r) {
 // --- DEV BOARD ---
 function renderDevBoard() {
   const COLS = [
-    { status:'validated', label:'Approved',    bg:'linear-gradient(135deg,#0891B2,#0EA5E9)', icon:'✓',  next:'design'  },
-    { status:'design',    label:'UI/UX Design', bg:'linear-gradient(135deg,#7C3AED,#A855F7)', icon:'✏',  next:'dev-be'  },
-    { status:'dev-be',    label:'Backend Dev',  bg:'linear-gradient(135deg,#025f87,#027fb3)', icon:'⚙',  next:'dev-fe'  },
-    { status:'dev-fe',    label:'Frontend Dev', bg:'linear-gradient(135deg,#0369A1,#0EA5E9)', icon:'◈',  next:'testing' },
-    { status:'testing',   label:'Testing / QA', bg:'linear-gradient(135deg,#B45309,#D97706)', icon:'🔍', next:'done'    },
-    { status:'done',      label:'Done',      bg:'linear-gradient(135deg,#059669,#10B981)', icon:'✅', next:null      },
+    { status:'validated', label:'Approved',    bg:'linear-gradient(135deg,#0891B2,#0EA5E9)', icon:'\u2713',  next:'design'  },
+    { status:'design',    label:'UI/UX Design', bg:'linear-gradient(135deg,#7C3AED,#A855F7)', icon:'\u270F',  next:'dev-be'  },
+    { status:'dev-be',    label:'Backend Dev',  bg:'linear-gradient(135deg,#025f87,#027fb3)', icon:'\u2699',  next:'dev-fe'  },
+    { status:'dev-fe',    label:'Frontend Dev', bg:'linear-gradient(135deg,#0369A1,#0EA5E9)', icon:'\u25C8',  next:'testing' },
+    { status:'testing',   label:'Testing / QA', bg:'linear-gradient(135deg,#B45309,#D97706)', icon:'\uD83D\uDD0D', next:'done' },
+    { status:'done',      label:'Done',         bg:'linear-gradient(135deg,#059669,#10B981)', icon:'\u2705', next:null      },
   ];
-  const NEXT_LABEL = {
-    'design':'Start Design','dev-be':'Start Dev BE','dev-fe':'Start Dev FE',
-    'testing':'Start Testing','done':'Tandai Done'
-  };
-  const PRIORITY_COLORS = { high:'#DC2626', medium:'#D97706', low:'#059669' };
-  const TYPE_ICONS = { feature:'⚡', menu:'☰', function:'⚙', report:'📊' };
-  const total = allRequests.filter(r => r.status !== 'pending' && r.status !== 'rejected').length;
+  const total = allRequests.filter(r => ['validated','design','dev-be','dev-fe','testing','done'].includes(r.status)).length;
+
+  const colHtml = COLS.map(col => {
+    const reqs = allRequests.filter(r => r.status === col.status);
+    const cardsHtml = reqs.length ? reqs.map(r => {
+      const cd = calcCountdown(r.dateDeadline);
+      const cdColor = cd===null?'var(--text-dim)':cd<0?'var(--red)':cd<=3?'var(--amber)':'var(--green)';
+      const cdText  = cd===null?'\u2014':cd<0?`\u26a0 ${Math.abs(cd)}h`:cd===0?'\uD83D\uDD34 Today':`${cd}h left`;
+      const pct = r.status==='done'?100:Math.round((STATUS_ORDER.indexOf(r.status)/(STATUS_ORDER.length-1))*100);
+      return `
+        <div class="dnd-card"
+          draggable="true"
+          data-id="${r.id}"
+          data-status="${r.status}"
+          ondragstart="devBoardDragStart(event)"
+          ondragend="devBoardDragEnd(event)"
+          style="background:var(--inset);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:grab;position:relative;transition:opacity .15s,transform .15s;user-select:none;">
+          <!-- drag handle indicator -->
+          <div style="position:absolute;top:8px;right:8px;color:var(--text-dim);font-size:11px;opacity:.5;">\u2630</div>
+          <!-- priority dot -->
+          <div style="position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:10px 0 0 10px;background:${r.priority==='high'?'#EF4444':r.priority==='medium'?'#F59E0B':'#94A3B8'};"></div>
+          <div style="padding-left:6px;">
+            <div onclick="openDetail('${r.id}')" style="font-size:12px;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:4px;cursor:pointer;padding-right:16px;">${r.name||r.title||'\u2014'}</div>
+            <div style="font-size:10px;color:var(--text-dim);margin-bottom:8px;">${r.client||'\u2014'}</div>
+            <!-- progress bar -->
+            <div style="height:3px;background:var(--border-md);border-radius:2px;margin-bottom:8px;overflow:hidden;">
+              <div style="height:100%;width:${pct}%;background:var(--indigo);border-radius:2px;transition:width .3s;"></div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:10px;font-weight:700;color:${cdColor};">${cdText}</span>
+              <span style="font-size:10px;color:var(--text-dim);">${pct}%</span>
+            </div>
+          </div>
+        </div>`;
+    }).join('') : `<div style="padding:20px 10px;text-align:center;color:var(--text-dim);font-size:11px;font-style:italic;border:1.5px dashed var(--border-md);border-radius:8px;">Drop here</div>`;
+
+    return `
+      <div class="dnd-col"
+        data-col-status="${col.status}"
+        ondragover="devBoardDragOver(event)"
+        ondragenter="devBoardDragEnter(event)"
+        ondragleave="devBoardDragLeave(event)"
+        ondrop="devBoardDrop(event)"
+        style="border-radius:16px;overflow:visible;box-shadow:0 4px 20px rgba(0,0,0,0.10);transition:box-shadow .15s;">
+        <!-- Column Header -->
+        <div style="background:${col.bg};padding:12px 16px;border-radius:16px 16px 0 0;display:flex;align-items:center;justify-content:space-between;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:15px;">${col.icon}</span>
+            <span style="font-size:12px;font-weight:800;color:#fff;">${col.label}</span>
+          </div>
+          <span style="background:rgba(255,255,255,0.25);color:#fff;border-radius:20px;padding:1px 10px;font-size:12px;font-weight:800;">${reqs.length}</span>
+        </div>
+        <!-- Cards Drop Zone -->
+        <div class="dnd-drop-zone" data-zone-status="${col.status}"
+          style="background:var(--card);border:1.5px solid var(--border);border-top:none;border-radius:0 0 16px 16px;padding:10px;min-height:100px;transition:background .15s,border-color .15s;">
+          ${cardsHtml}
+        </div>
+      </div>`;
+  }).join('');
 
   return `
     <div style="margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
       <div style="font-size:13px;color:var(--text-muted);">${total} active requests</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        ${COLS.map(col => {
-          const n = allRequests.filter(r => r.status === col.status).length;
-          return n > 0 ? `<span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:${col.bg};color:#fff;">${col.label} · ${n}</span>` : '';
-        }).join('')}
-      </div>
+      <div style="font-size:11px;color:var(--text-dim);">\u2630 Drag cards between columns to update status</div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;align-items:start;">
-      ${COLS.map(col => {
-        const reqs = allRequests.filter(r => r.status === col.status);
-        return `
-          <div style="border-radius:16px;overflow:visible;box-shadow:0 4px 20px rgba(0,0,0,0.10);">
-            <div style="background:${col.bg};padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
-              <div style="display:flex;align-items:center;gap:8px;">
-                <span style="font-size:15px;">${col.icon}</span>
-                <span style="font-size:12px;font-weight:800;color:#fff;">${col.label}</span>
-              </div>
-              <span style="background:rgba(255,255,255,0.25);color:#fff;border-radius:20px;padding:1px 10px;font-size:12px;font-weight:800;">${reqs.length}</span>
-            </div>
-            <div style="background:var(--card);border:1.5px solid var(--border);border-top:none;border-radius:0 0 16px 16px;padding:10px;min-height:80px;overflow:visible;position:relative;">
-              ${reqs.length ? reqs.map(r => {
-                const deadline = calcCountdown(r.dateDeadline);
-                const deadlineHtml = deadline !== null ? `
-                  <span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;
-                    background:${deadline<0?'var(--red-dim)':deadline<=3?'var(--amber-dim)':'var(--green-dim)'};
-                    color:${deadline<0?'var(--red)':deadline<=3?'var(--amber)':'var(--green)'};">
-                    ${deadline<0?'\u26A0 '+Math.abs(deadline)+'h overdue':deadline===0?'\uD83D\uDD34 Today':'\u23F1 '+deadline+'h left'}
-                  </span>` : '';
-                return `
-                <div style="background:var(--inset);border:1.5px solid var(--border);border-radius:10px;margin-bottom:8px;overflow:visible;position:relative;transition:box-shadow .15s;"
-                  onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.10)'"
-                  onmouseout="this.style.boxShadow=''">
-                  <!-- card content \u2014 klik buka detail -->
-                  <div onclick="openDetail('${r.id}')" style="padding:10px 12px;cursor:pointer;position:relative;">
-                    <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:${PRIORITY_COLORS[r.priority]||'#94A3B8'};"></div>
-                    <div style="padding-left:8px;">
-                      <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.4;">${r.name||r.name||r.title||'\u2014'||"\u2014"}</div>
-                      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-                        <span style="font-size:10px;color:var(--text-dim);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.client||'\u2014'}</span>
-                        <span style="font-size:10px;">${TYPE_ICONS[r.type]||'\u2022'}</span>
-                        <span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;
-                          background:${r.priority==='high'?'#FEE2E2':r.priority==='medium'?'#FEF9C3':'#DCFCE7'};
-                          color:${PRIORITY_COLORS[r.priority]||'#475569'};">${(r.priority||'').toUpperCase()}</span>
-                        ${deadlineHtml}
-                      </div>
-                    </div>
-                  </div>
-                  <!-- STATUS ACTION -->
-                  <div style="border-top:1px solid var(--border);padding:7px 10px;display:flex;gap:6px;background:var(--card);">
-                    ${col.next ? `
-                    <button onclick="updateStatus('${r.id}','${col.next}')"
-                      style="flex:1;padding:6px 10px;background:${col.bg};color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap;transition:opacity .15s;"
-                      onmouseover="this.style.opacity='.82'" onmouseout="this.style.opacity='1'">
-                      → ${NEXT_LABEL[col.next]}
-                    </button>
-                    <button onclick="openDetail('${r.id}')" title="Comment"
-                      style="padding:6px 9px;background:var(--inset);border:1.5px solid var(--border-md);border-radius:7px;color:var(--text-muted);font-size:13px;cursor:pointer;transition:all .15s;white-space:nowrap;"
-                      onmouseover="this.style.color='var(--indigo)';this.style.borderColor='var(--indigo)'"
-                      onmouseout="this.style.color='var(--text-muted)';this.style.borderColor='var(--border-md)'">💬</button>
-                    ` : `
-                    <div style="flex:1;text-align:center;">
-                      <span style="font-size:11px;font-weight:800;color:var(--green);">✅ Done</span>
-                    </div>`}
-                  </div>
-                </div>`;
-              }).join('') : `
-                <div style="text-align:center;padding:28px 10px;">
-                  <div style="font-size:24px;margin-bottom:6px;opacity:.3;">\uD83D\uDCED</div>
-                  <div style="font-size:11px;color:var(--text-dim);">No items</div>
-                </div>`}
-            </div>
-          </div>
-        `;
-      }).join('')}
-    </div>
-  `;
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;align-items:start;">
+      ${colHtml}
+    </div>`;
 }
 
+// --- DEVBOARD DRAG & DROP ---
+let _dragId     = null;
+let _dragStatus = null;
+let _dragEl     = null;
 
-// --- SUBMIT REQUEST ---
-async function createRequest(title, type, priority, clientId, client, desc, notes, specs) {
-  if (!title || !type || !client || !desc) { showToast('Please fill in all required fields','error'); return false; }
-  await addDoc(collection(db,'requests'), {
-    title, type, priority, clientId: clientId||'', client,
-    description: desc, notes: notes||'',
-    specs: specs||[],
-    status: 'pending',
-    submittedBy: currentUser.uid,
-    submittedByName: currentUserData?.name || currentUser.email,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-    comments: []
-  });
-  showToast('Request sent successfully!', 'success');
-  return true;
-}
-
-
-
-// --- DETAIL / UPDATE ---
-window.openDetail = async function(id) {
-  openModal('modal-detail');
-  document.getElementById('detail-title').textContent = 'Loading...';
-  document.getElementById('detail-id').textContent = '';
-  document.getElementById('detail-body').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
-  const snap = await getDoc(doc(db,'requests',id));
-  if (!snap.exists()) { document.getElementById('detail-body').innerHTML = '<div class="loading">Request not found.</div>'; return; }
-  const r = { id: snap.id, ...snap.data() };
-  document.getElementById('detail-title').textContent = r.name||r.title||'—';
-  document.getElementById('detail-id').textContent = `#${r.id.slice(-8).toUpperCase()} \u00B7 ${r.client}`;
-  document.getElementById('detail-body').innerHTML = renderDetailBody(r);
+window.devBoardDragStart = function(e) {
+  _dragId     = e.currentTarget.dataset.id;
+  _dragStatus = e.currentTarget.dataset.status;
+  _dragEl     = e.currentTarget;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', _dragId);
+  setTimeout(() => { if (_dragEl) _dragEl.style.opacity = '0.4'; }, 0);
 };
+
+window.devBoardDragEnd = function(e) {
+  if (_dragEl) _dragEl.style.opacity = '';
+  // Remove all drag-over highlights
+  document.querySelectorAll('.dnd-drop-zone').forEach(z => {
+    z.style.background = '';
+    z.style.borderColor = '';
+  });
+  _dragEl = null;
+};
+
+window.devBoardDragOver = function(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+};
+
+window.devBoardDragEnter = function(e) {
+  e.preventDefault();
+  const zone = e.currentTarget.querySelector('.dnd-drop-zone');
+  if (zone) {
+    zone.style.background = 'var(--indigo-dim)';
+    zone.style.borderColor = 'var(--indigo)';
+  }
+};
+
+window.devBoardDragLeave = function(e) {
+  // Only clear if leaving the column entirely
+  if (!e.currentTarget.contains(e.relatedTarget)) {
+    const zone = e.currentTarget.querySelector('.dnd-drop-zone');
+    if (zone) {
+      zone.style.background = '';
+      zone.style.borderColor = '';
+    }
+  }
+};
+
+window.devBoardDrop = async function(e) {
+  e.preventDefault();
+  const col       = e.currentTarget;
+  const newStatus = col.dataset.colStatus;
+  if (!_dragId || !newStatus || newStatus === _dragStatus) {
+    devBoardDragEnd(e);
+    return;
+  }
+  // Clear highlight
+  const zone = col.querySelector('.dnd-drop-zone');
+  if (zone) { zone.style.background = ''; zone.style.borderColor = ''; }
+
+  // Update Firestore
+  try {
+    await updateDoc(doc(db,'requests',_dragId), {
+      status: newStatus,
+      updatedAt: serverTimestamp()
+    });
+    showToast('\u2713 Moved to ' + (STATUS_LABELS[newStatus]||newStatus), 'success');
+  } catch(err) {
+    showToast('Failed to update status', 'error');
+    console.error(err);
+  }
+  _dragId = _dragStatus = _dragEl = null;
+};
+
 
 function renderDetailBody(r) {
   const role = currentUserData?.role;
