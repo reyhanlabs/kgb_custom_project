@@ -870,7 +870,7 @@
     <div class="modal-header">
       <div class="modal-header-inner">
         <div class="modal-title" id="req-form-title">New Custom Request</div>
-        <div class="modal-title-sub" id="req-form-sub">Add the required items</div>
+        <div class="modal-title-sub" id="req-form-sub">Add the required details</div>
       </div>
       <button class="modal-close" onclick="closeModal('modal-request-form')">&#x2715;</button>
     </div>
@@ -1220,7 +1220,7 @@ const PAGE_TITLES = {
   requests:      ['Custom Request',  'Manage all custom requests grouped by client'],
   validate:      ['Needs Approval',  'Review and approve custom requests from clients'],
   devboard:      ['Dev Board',       'Track and update requests progress'],
-  gantt:         ['Gantt Chart',  'Visual timeline of all requests items'],
+  gantt:         ['Gantt Chart',  'Visual timeline of all custom requests'],
   clients:       ['Clients',      'Master data perusahaan clients'],
   'client-detail': ['',              ''],
 };
@@ -1449,7 +1449,7 @@ function renderGanttChart() {
         <div style="width:${LABEL_W}px;flex-shrink:0;border-right:2px solid var(--border-md);z-index:5;background:var(--card);">
           <!-- Header spacer -->
           <div style="height:${HDR_H}px;background:var(--inset);border-bottom:1.5px solid var(--border);display:flex;align-items:flex-end;padding:0 14px 8px;">
-            <span style="font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;">Item Request</span>
+            <span style="font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;">Request</span>
           </div>
           <!-- Rows -->
           <div style="overflow-y:hidden;">
@@ -1482,7 +1482,7 @@ function renderGanttChart() {
       <!-- FOOTER STATS -->
       <div style="display:flex;gap:20px;flex-wrap:wrap;padding:12px 18px;border-top:1.5px solid var(--border);background:var(--inset);">
         <div style="font-size:12px;color:var(--text-muted);">
-          <strong style="color:var(--text);">${reqs.length}</strong> items shown
+          <strong style="color:var(--text);">${reqs.length}</strong> requests shown
         </div>
         <div style="font-size:12px;color:var(--text-muted);">
           Range: <strong style="color:var(--text);">${minDate.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})}</strong>
@@ -1627,7 +1627,7 @@ function renderClientGroupCard(group) {
           ${onprog>0?`<span style="padding:3px 9px;border-radius:20px;background:var(--indigo-dim);color:var(--indigo);font-size:11px;font-weight:800;">⚡ ${onprog}</span>`:''}
           ${done>0?`<span style="padding:3px 9px;border-radius:20px;background:var(--green-dim);color:var(--green);font-size:11px;font-weight:800;">✓ ${done}</span>`:''}
           ${rejected>0?`<span style="padding:3px 9px;border-radius:20px;background:var(--red-dim);color:var(--red);font-size:11px;font-weight:800;">✕ ${rejected}</span>`:''}
-          <span style="font-size:12px;color:var(--text-dim);font-weight:700;">${group.items.length} item</span>
+          <span style="font-size:12px;color:var(--text-dim);font-weight:700;">${group.items.length} request</span>
           ${group.clientId?`<button onclick="event.stopPropagation();navToClient(${group.clientId})" style="padding:5px 12px;background:var(--indigo);color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">View Detail ›</button>`:''}
         </div>
       </div>
@@ -1636,7 +1636,7 @@ function renderClientGroupCard(group) {
         <table class="req-table" style="width:100%;border-collapse:collapse;">
           <thead>
             <tr style="border-bottom:1.5px solid var(--border);">
-              <th style="text-align:left;padding:10px 8px 8px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;">Item Name</th>
+              <th style="text-align:left;padding:10px 8px 8px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;">Request Name</th>
               <th style="text-align:left;padding:10px 8px 8px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;width:130px;">Status</th>
               <th style="text-align:left;padding:10px 8px 8px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;width:100px;">Deadline</th>
               <th style="width:64px;"></th>
@@ -2108,7 +2108,7 @@ function renderRequestCard(r, role) {
             <span class="badge badge-status-${r.status}" style="font-size:11px;">${statusLabel}</span>
           </div>
           <div style="background:var(--inset);border:1px solid var(--border);border-radius:8px;padding:7px 10px;">
-            <div style="font-size:10px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Custom Items</div>
+            <div style="font-size:10px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Custom Requests</div>
             <div style="font-size:14px;font-weight:800;color:var(--indigo);">${(r.items||[]).length} item</div>
           </div>
           <div style="background:var(--inset);border:1px solid var(--border);border-radius:8px;padding:7px 10px;">
@@ -2604,8 +2604,8 @@ window.openRequestForm = async function(id) {
   if (selector) selector.style.display = 'none';
   document.getElementById('req-date-request').value = new Date().toISOString().split('T')[0];
   if (id) {
-    document.getElementById('req-form-title').textContent = 'Edit Request Item';
-    document.getElementById('req-form-sub').textContent   = 'Update this item details';
+    document.getElementById('req-form-title').textContent = 'Edit Request';
+    document.getElementById('req-form-sub').textContent   = 'Update this request';
     const snap = await getDoc(doc(db, 'requests', id));
     if (!snap.exists()) { showToast('Request not found', 'error'); return; }
     const r = snap.data();
@@ -2644,7 +2644,7 @@ window.openRequestForm = async function(id) {
     }
   } else {
     document.getElementById('req-form-title').textContent = 'New Custom Request';
-    document.getElementById('req-form-sub').textContent   = 'Each item = 1 separate request';
+    document.getElementById('req-form-sub').textContent   = 'Each entry = 1 separate request';
     if (selector) selector.style.display = 'block';
     const ddEl = document.getElementById('req-client-select-dropdown');
     if (ddEl) ddEl.innerHTML = '<option value="">-- Select Client --</option>' +
@@ -2703,7 +2703,7 @@ window.addItemRow = function(item = {}) {
 
   div.innerHTML = `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-      <div style="font-size:12px;font-weight:800;color:var(--indigo);">Item #${itemNum}</div>
+      <div style="font-size:12px;font-weight:800;color:var(--indigo);">Request #${itemNum}</div>
       <button type="button" onclick="removeItemRow('item-row-${id}')"
         style="padding:3px 10px;background:var(--red-dim);border:1.5px solid rgba(220,38,38,0.2);border-radius:6px;color:var(--red);font-size:11px;font-weight:700;cursor:pointer;">
         \u2715 Delete
@@ -2711,7 +2711,7 @@ window.addItemRow = function(item = {}) {
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
       <div class="field" style="margin:0;">
-        <label>Item Name / Title <span style="color:var(--red)">*</span></label>
+        <label>Request Name / Title <span style="color:var(--red)">*</span></label>
         <input type="text" class="item-name" value="${item.name||''}" placeholder="Contoh: Report Rekap Penjualan"
           style="padding:9px 12px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;outline:none;width:100%;">
       </div>
@@ -2725,7 +2725,7 @@ window.addItemRow = function(item = {}) {
     </div>
     <div class="field" style="margin-bottom:10px;">
       <label>Requirements Description</label>
-      <textarea class="item-desc" placeholder="Describe the requirements for this item..."
+      <textarea class="item-desc" placeholder="Describe the requirements..."
         style="width:100%;min-height:70px;padding:9px 12px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;outline:none;resize:vertical;">${item.desc||''}</textarea>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">
@@ -2810,7 +2810,7 @@ window.removeItemRow = function(id) {
   // renumber
   list?.querySelectorAll('[id^="item-row"]').forEach((row, i) => {
     const label = row.querySelector('div[style*="font-weight:800"]');
-    if (label) label.textContent = `Item #${i+1}`;
+    if (label) label.textContent = `Request #${i+1}`;
   });
 };
 
@@ -2917,9 +2917,9 @@ window.saveRequest = async function() {
   if (!clientId && dd?.value) clientId = dd.value;
   const client = allClients.find(x => x.id === clientId)?.name || '';
   if (!clientId || !client) { showToast('Please select a client first', 'error'); return; }
-  if (items.length === 0)   { showToast('Add at least 1 item', 'error'); return; }
+  if (items.length === 0)   { showToast('Add at least 1 request', 'error'); return; }
   const unnamed = items.findIndex(it => !it.name);
-  if (unnamed >= 0) { showToast('Item #' + (unnamed+1) + ' has no name yet', 'error'); return; }
+  if (unnamed >= 0) { showToast('Request #' + (unnamed+1) + ' has no name yet', 'error'); return; }
   const priority = document.getElementById('req-priority')?.value || 'medium';
   const notes    = document.getElementById('req-notes')?.value.trim() || '';
   const baseDate = new Date().toISOString().split('T')[0];
@@ -2942,7 +2942,7 @@ window.saveRequest = async function() {
       submittedByName: currentUserData?.name || currentUser.email,
       createdAt: serverTimestamp(), updatedAt: serverTimestamp(), comments: []
     })));
-    showToast('\u2713 ' + items.length + ' items sent successfully!', 'success');
+    showToast('\u2713 ' + items.length + ' requests sent successfully!', 'success');
   }
   closeModal('modal-request-form');
 };
@@ -2994,7 +2994,7 @@ window.printRequest = async function(id) {
           </table>` : ''}
       </div>
     </div>
-  `).join('') : '<p style="color:#aaa;font-size:12px;font-style:italic;margin:0;">No items custom</p>';
+  `).join('') : '<p style="color:#aaa;font-size:12px;font-style:italic;margin:0;">No custom requests</p>';
 
   const commentsHtml = r.comments && r.comments.length > 0 ? r.comments.map(c=>`
     <div style="margin-bottom:8px;padding:8px 12px;border:1px solid #E5E7EB;border-left:2px solid #374151;border-radius:3px;">
