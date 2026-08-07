@@ -2970,7 +2970,7 @@ window.addItemRow = function(item = {}) {
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">
       <div class="field" style="margin:0;">
         <label style="font-size:11px;">Request Date</label>
-        <input type="date" class="item-date-requests" value="${item.dateRequest||today}" readonly
+        <input type="date" class="item-date-request" value="${item.dateRequest||today}" readonly
           style="padding:7px 10px;background:var(--inset);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text-muted);font-size:12px;font-family:inherit;outline:none;width:100%;">
       </div>
       <div class="field" style="margin:0;">
@@ -3274,6 +3274,7 @@ window.saveRequest = async function() {
       specs: item.specs||[], dateRequest: item.dateRequest||baseDate,
       dateDeadline: item.dateDeadline||'', duration: item.duration||'',
       redmineUrl: item.redmineUrl||'',
+      priority, clientId, client, notes,
       priority, clientId, client, notes, attachments, updatedAt: serverTimestamp()
     });
     delete itemAttachments[item.rowId];
