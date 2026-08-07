@@ -1871,6 +1871,7 @@ function renderClientGroupCard(group) {
                       ${r.dateDeadline?`<span style="font-size:11px;background:var(--amber-dim);color:var(--amber);border-radius:6px;padding:3px 9px;font-weight:700;">\uD83D\uDCC5 ${r.dateDeadline}</span>`:''}
                       ${r.duration?`<span style="font-size:11px;background:var(--inset);border:1px solid var(--border);border-radius:6px;padding:3px 9px;color:var(--text-muted);">\u23F1 ${r.duration}</span>`:''}
                     </div>`:''}
+                    ${r.redmineUrl?`<div style="margin-top:6px;"><a href="${r.redmineUrl}" target="_blank" style="font-size:11px;color:var(--indigo);font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">\uD83D\uDD17 Redmine #${r.redmineUrl.split('/').pop()}</a></div>`:''}
                     ${!r.desc&&!specHtml&&!r.dateDeadline&&!r.duration?'<span style="font-size:12px;color:var(--text-dim);font-style:italic;">No details</span>':''}
                   </div>
                 </td>
@@ -2491,6 +2492,7 @@ function renderDevBoard() {
               <span style="font-size:10px;font-weight:700;color:${cdColor};">${cdText}</span>
               <span style="font-size:10px;color:var(--text-dim);">${pct}%</span>
             </div>
+            ${r.redmineUrl?`<a href="${r.redmineUrl}" target="_blank" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:3px;margin-top:6px;font-size:10px;font-weight:700;color:var(--indigo);text-decoration:none;background:var(--indigo-dim);padding:2px 7px;border-radius:5px;">\uD83D\uDD17 Redmine</a>`:''}
           </div>
         </div>`;
     }).join('') : `<div style="padding:20px 10px;text-align:center;color:var(--text-dim);font-size:11px;font-style:italic;border:1.5px dashed var(--border-md);border-radius:8px;">Drop here</div>`;
@@ -2842,7 +2844,7 @@ window.openRequestForm = async function(id) {
     addItemRow({ name: r.name||'', type: r.type||'', desc: r.desc||'',
       specs: r.specs||[], dateRequest: r.dateRequest||'',
       dateDeadline: r.dateDeadline||'', duration: r.duration||'',
-      attachments: r.attachments||[] });
+      redmineUrl: r.redmineUrl||'', attachments: r.attachments||[] });
     // Disable deadline if not yet approved
     if (r.status === 'pending') {
       const deadlineInputs = document.querySelectorAll('.item-date-deadline');
@@ -2968,6 +2970,13 @@ window.addItemRow = function(item = {}) {
         <input type="text" class="item-duration" value="${item.duration||''}" placeholder="2 weeks"
           style="padding:7px 10px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:12px;font-family:inherit;outline:none;width:100%;">
       </div>
+    </div>
+    <div class="field" style="margin-bottom:10px;">
+      <label style="font-size:11px;display:flex;align-items:center;gap:6px;">
+        <span style="font-size:13px;">\uD83D\uDD17</span> Redmine Link <span style="font-size:10px;color:var(--text-dim);font-weight:400;">(optional)</span>
+      </label>
+      <input type="url" class="item-redmine" value="${item.redmineUrl||''}" placeholder="https://redmine.konsultama.co.id/issues/..."
+        style="padding:7px 10px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:12px;font-family:inherit;outline:none;width:100%;">
     </div>
     <div style="margin-bottom:10px;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
@@ -3151,6 +3160,7 @@ function collectItems() {
     const dateRequest  = row.querySelector('.item-date-requests')?.value || '';
     const dateDeadline = row.querySelector('.item-date-deadline')?.value || '';
     const duration     = row.querySelector('.item-duration')?.value.trim() || '';
+    const redmineUrl   = row.querySelector('.item-redmine')?.value.trim() || '';
     const specs = [];
     row.querySelectorAll('.item-specs-list > div').forEach(specRow => {
       const k = specRow.querySelector('.spec-key')?.value.trim();
@@ -3250,6 +3260,7 @@ window.saveRequest = async function() {
       name: item.name, type: item.type||'', desc: item.desc||'',
       specs: item.specs||[], dateRequest: item.dateRequest||baseDate,
       dateDeadline: item.dateDeadline||'', duration: item.duration||'',
+      redmineUrl: item.redmineUrl||'',
       priority, clientId, client, notes, attachments, updatedAt: serverTimestamp()
     });
     delete itemAttachments[item.rowId];
