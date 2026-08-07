@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Custom Request — Konsultama Global Bisnis</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="apple-touch-icon" href="/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1799,7 +1802,10 @@ function renderClientGroupCard(group) {
           ${done>0?`<span style="padding:3px 9px;border-radius:20px;background:var(--green-dim);color:var(--green);font-size:11px;font-weight:800;">✓ ${done}</span>`:''}
           ${rejected>0?`<span style="padding:3px 9px;border-radius:20px;background:var(--red-dim);color:var(--red);font-size:11px;font-weight:800;">✕ ${rejected}</span>`:''}
           <span style="font-size:12px;color:var(--text-dim);font-weight:700;">${group.items.length} request</span>
-          ${group.clientId?`<button onclick="event.stopPropagation();navToClient('${group.clientId}')" style="padding:5px 12px;background:var(--indigo);color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">View Detail ›</button>`:''}
+          ${group.clientId?`
+            <button onclick="event.stopPropagation();printClient('${group.clientId}')" style="padding:5px 12px;background:var(--green-dim);color:var(--green);border:1.5px solid rgba(16,185,129,0.3);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">\uD83D\uDDA8 Print</button>
+            <button onclick="event.stopPropagation();navToClient('${group.clientId}')" style="padding:5px 12px;background:var(--indigo);color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">View Detail ›</button>
+          `:''}
         </div>
       </div>
       <!-- TABLE REQUEST (accordion body) -->
@@ -3576,9 +3582,7 @@ function renderClientCard(cl, canEdit) {
           </button>
           ${canEdit ? `
           <div style="display:flex;gap:6px;margin-top:12px;">
-            <button onclick="printClient('${cl.id}')"
-              style="padding:7px 12px;background:var(--green-dim);border:1.5px solid rgba(16,185,129,0.3);border-radius:8px;color:var(--green);font-size:12px;font-weight:600;cursor:pointer;">
-              \uD83D\uDDA8 Print</button>
+
             <button onclick="openClientForm('${cl.id}')"
               style="padding:7px 12px;background:var(--inset);border:1.5px solid var(--border-md);border-radius:8px;color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;">
               \u270F Edit</button>
