@@ -1838,6 +1838,7 @@ function renderClientGroupCard(group) {
                       <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                         <span style="font-size:13px;font-weight:700;color:var(--text);">${r.name||'\u2014'}</span>
                         ${r.type?`<span class="badge badge-type-${r.type}" style="font-size:10px;">${tl}</span>`:''}
+                        ${r.redmineUrl?`<a href="${r.redmineUrl}" target="_blank" onclick="event.stopPropagation()" title="Open Redmine" style="font-size:10px;font-weight:700;color:var(--indigo);text-decoration:none;background:var(--indigo-dim);padding:1px 7px;border-radius:5px;border:1px solid var(--indigo-dim2);">\uD83D\uDD17 Redmine</a>`:''}
                         <span id="chev-${rowId}" style="font-size:9px;color:var(--text-dim);transition:transform .2s;margin-left:auto;flex-shrink:0;">\u25b6</span>
                       </div>
                       <div style="font-size:10px;color:var(--text-dim);font-family:monospace;margin-top:2px;">#${r.id.slice(-8).toUpperCase()}</div>
