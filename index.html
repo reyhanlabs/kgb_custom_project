@@ -1846,6 +1846,7 @@ function renderClientGroupCard(group) {
                 </td>
                 <td style="padding:9px 8px;">
                   <div style="display:flex;gap:4px;">
+                    <button onclick="event.stopPropagation();openDetail('${r.id}')" title="View Detail" style="width:26px;height:26px;border-radius:6px;border:1.5px solid var(--border-md);background:var(--inset);color:var(--text-muted);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;">\uD83D\uDC41</button>
                     <button onclick="event.stopPropagation();openRequestForm('${r.id}')" title="Edit"
                       style="width:26px;height:26px;border-radius:6px;border:1.5px solid var(--border-md);background:var(--inset);color:var(--indigo);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;">\u270F</button>
                     <button onclick="event.stopPropagation();printRequest('${r.id}')" title="Print" style="width:26px;height:26px;border-radius:6px;border:1.5px solid rgba(5,150,105,0.2);background:var(--green-dim);color:var(--green);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;">&#x1F5A8;</button>
@@ -3267,266 +3268,195 @@ window.printRequest = async function(id) {
   const snap = await getDoc(doc(db,'requests',id));
   if (!snap.exists()) { showToast('Data not found','error'); return; }
   const r = { id:snap.id, ...snap.data() };
+  const fmtDate = d => d ? new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+  const fmtDT   = ts => ts?.toDate ? ts.toDate().toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+  const statusLabel  = STATUS_LABELS[r.status]  || r.status  || '—';
+  const typeLabel    = TYPE_LABELS[r.type]       || r.type    || '—';
+  const priorityMap  = {high:'High',medium:'Medium',low:'Low'};
+  const cd           = calcCountdown(r.dateDeadline);
+  const cdTxt        = cd===null?'':cd<0?' ('+Math.abs(cd)+'h overdue)':cd===0?' (Today)':' ('+cd+'h left)';
+  const dlColor      = cd!==null&&cd<0?'#DC2626':cd!==null&&cd<=3?'#D97706':'#111';
+  const STATUS_C     = {pending:'#F59E0B',validated:'#0891B2',design:'#7C3AED','dev-be':'#027fb3','dev-fe':'#0369A1',testing:'#D97706',done:'#10B981',rejected:'#EF4444'};
+  const sc           = STATUS_C[r.status]||'#94A3B8';
 
-  const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
-  const fmtDateTime = (ts) => ts?.toDate ? ts.toDate().toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
-
-  const typeLabel   = TYPE_LABELS[r.type]   || r.type   || '—';
-  const statusLabel = STATUS_LABELS[r.status] || r.status || '—';
-  const priorityMap = { high:'High', medium:'Medium', low:'Low' };
-
-  // Specs section (new flat structure)
-  const specsHtml = r.specs && r.specs.length > 0
-    ? '<table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:8px;">' +
-        r.specs.map((s,i) =>
-          '<tr style="border-bottom:1px solid #F1F5F9;background:' + (i%2===0?'#FAFAFE':'#fff') + ';">' +
-            '<td style="padding:5px 10px;font-weight:700;color:#374151;width:35%;">' + s.key + '</td>' +
-            '<td style="padding:5px 10px;color:#6B7280;">' + s.value + '</td>' +
-          '</tr>'
-        ).join('') +
+  const specsHtml = (r.specs||[]).length
+    ? '<table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:6px;">' +
+        (r.specs||[]).map((s,i)=>'<tr style="background:'+(i%2===0?'#f8faff':'#fff')+';border-bottom:1px solid #e8edf5;"><td style="padding:6px 12px;font-weight:700;color:#374151;width:35%;">'+s.key+'</td><td style="padding:6px 12px;color:#555;">'+s.value+'</td></tr>').join('') +
       '</table>'
-    : '<p style="color:#aaa;font-size:12px;font-style:italic;margin:4px 0 0;">No specifications</p>';
-
-  // Comments
-  const commentsHtml = r.comments && r.comments.length > 0
-    ? r.comments.map(co =>
-        '<div style="margin-bottom:8px;padding:8px 12px;border:1px solid #E5E7EB;border-left:2px solid #374151;border-radius:3px;">' +
-          '<div style="font-size:11px;font-weight:700;color:#111;">' + (co.author||'—') + ' <span style="color:#aaa;font-weight:400;">&middot; ' + (co.time||'') + '</span></div>' +
-          '<div style="font-size:12px;margin-top:3px;color:#374151;">' + (co.text||'') + '</div>' +
-        '</div>'
-      ).join('')
-    : '<p style="color:#aaa;font-size:12px;font-style:italic;margin:0;">No comments yet</p>';
-
-  // Countdown
-  const cd = calcCountdown(r.dateDeadline);
-  const cdText = cd === null ? '' : cd < 0 ? (' (' + Math.abs(cd) + 'h overdue)') : cd === 0 ? ' (Today)' : ' (' + cd + 'h left)';
-  const deadlineColor = cd !== null && cd < 0 ? '#DC2626' : cd !== null && cd <= 3 ? '#D97706' : '#111';
+    : '<p style="color:#aaa;font-size:12px;font-style:italic;margin:4px 0;">No specifications added</p>';
 
   const printHtml =
-    '<div style="font-family:\'Inter\',Arial,sans-serif;max-width:780px;margin:0 auto;padding:40px 48px;color:#111;background:#fff;">' +
+    '<div style="font-family:\'Inter\',Arial,sans-serif;max-width:760px;margin:0 auto;padding:36px 44px;color:#111;background:#fff;">' +
 
       // HEADER
-      '<div style="display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:16px;border-bottom:2px solid #111;margin-bottom:20px;">' +
-        '<div>' +
-          '<div style="font-size:11px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;color:#555;margin-bottom:4px;">Custom Request Document</div>' +
-          '<div style="font-size:20px;font-weight:800;color:#111;">Konsultama Global Bisnis</div>' +
-          '<div style="font-size:12px;color:#555;margin-top:2px;">Custom Request Management System</div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:3px solid #027fb3;margin-bottom:24px;">' +
+        '<div style="display:flex;align-items:center;gap:14px;">' +
+          '<img src="/favicon.png" style="width:40px;height:40px;border-radius:8px;" onerror="this.style.display=\'none\'">' +
+          '<div>' +
+            '<div style="font-size:18px;font-weight:800;color:#027fb3;letter-spacing:-.3px;">Konsultama Global Bisnis</div>' +
+            '<div style="font-size:11px;color:#777;margin-top:1px;">Custom Request Management System</div>' +
+          '</div>' +
         '</div>' +
         '<div style="text-align:right;">' +
-          '<div style="font-size:10px;color:#777;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;">Request No.</div>' +
-          '<div style="font-size:17px;font-weight:800;color:#111;font-family:monospace;letter-spacing:.05em;">#' + r.id.slice(-8).toUpperCase() + '</div>' +
-          '<div style="font-size:10px;color:#777;margin-top:4px;">' + fmtDateTime(r.createdAt) + '</div>' +
+          '<div style="font-size:11px;color:#777;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Request No.</div>' +
+          '<div style="font-size:16px;font-weight:800;color:#111;font-family:monospace;">#'+r.id.slice(-8).toUpperCase()+'</div>' +
         '</div>' +
       '</div>' +
 
-      // REQUEST NAME
-      '<div style="margin-bottom:20px;">' +
-        '<div style="font-size:16px;font-weight:800;color:#111;line-height:1.4;">' + (r.name||r.title||'—') + '</div>' +
+      // REQUEST NAME + STATUS BADGE
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">' +
+        '<div style="font-size:17px;font-weight:800;color:#111;line-height:1.4;flex:1;">'+(r.name||r.title||'—')+'</div>' +
+        '<span style="font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;background:'+sc+'18;color:'+sc+';border:1.5px solid '+sc+'40;margin-left:12px;white-space:nowrap;">'+statusLabel+'</span>' +
       '</div>' +
 
       // INFO GRID
-      '<table style="width:100%;border-collapse:collapse;margin-bottom:20px;">' +
-        '<tbody>' +
-          '<tr style="border-bottom:1px solid #E5E7EB;">' +
-            '<td style="padding:7px 0;font-size:11px;color:#777;width:140px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Client</td>' +
-            '<td style="padding:7px 0;font-size:13px;font-weight:700;color:#111;">' + (r.client||'—') + '</td>' +
-            '<td style="padding:7px 0;font-size:11px;color:#777;width:140px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Status</td>' +
-            '<td style="padding:7px 0;font-size:13px;font-weight:700;color:#111;">' + statusLabel + '</td>' +
-          '</tr>' +
-          '<tr style="border-bottom:1px solid #E5E7EB;">' +
-            '<td style="padding:7px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Submitted By</td>' +
-            '<td style="padding:7px 0;font-size:13px;color:#111;">' + (r.submittedByName||'—') + '</td>' +
-            '<td style="padding:7px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Type</td>' +
-            '<td style="padding:7px 0;font-size:13px;color:#111;">' + typeLabel + '</td>' +
-          '</tr>' +
-          '<tr style="border-bottom:1px solid #E5E7EB;">' +
-            '<td style="padding:7px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Priority</td>' +
-            '<td style="padding:7px 0;font-size:13px;font-weight:700;color:#111;">' + (priorityMap[r.priority]||r.priority||'—') + '</td>' +
-            '<td style="padding:7px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Last Updated</td>' +
-            '<td style="padding:7px 0;font-size:13px;color:#111;">' + fmtDateTime(r.updatedAt) + '</td>' +
-          '</tr>' +
-        '</tbody>' +
-      '</table>' +
-
-      // TIMELINE
-      '<div style="margin-bottom:20px;">' +
-        '<div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#555;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #E5E7EB;">Timeline & Estimates</div>' +
-        '<table style="width:100%;border-collapse:collapse;">' +
-          '<tr style="border-bottom:1px solid #E5E7EB;">' +
-            '<td style="padding:6px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;width:140px;">Request Date</td>' +
-            '<td style="padding:6px 0;font-size:13px;color:#111;">' + fmtDate(r.dateRequest) + '</td>' +
-            '<td style="padding:6px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;width:140px;">Target Deadline</td>' +
-            '<td style="padding:6px 0;font-size:13px;font-weight:700;color:' + deadlineColor + ';">' + fmtDate(r.dateDeadline) + cdText + '</td>' +
-          '</tr>' +
-          (r.duration ? '<tr><td style="padding:6px 0;font-size:11px;color:#777;font-weight:600;text-transform:uppercase;">Est. Duration</td><td colspan="3" style="padding:6px 0;font-size:13px;color:#111;">' + r.duration + '</td></tr>' : '') +
-        '</table>' +
+      '<div style="background:#f0f7ff;border-radius:10px;padding:16px 20px;margin-bottom:20px;">' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;">' +
+          '<div><span style="color:#027fb3;font-weight:700;text-transform:uppercase;font-size:10px;letter-spacing:.06em;">Client</span><div style="font-size:13px;font-weight:700;color:#111;margin-top:2px;">'+(r.client||'—')+'</div></div>' +
+          '<div><span style="color:#027fb3;font-weight:700;text-transform:uppercase;font-size:10px;letter-spacing:.06em;">Submitted By</span><div style="font-size:13px;color:#111;margin-top:2px;">'+(r.submittedByName||'—')+'</div></div>' +
+          '<div><span style="color:#027fb3;font-weight:700;text-transform:uppercase;font-size:10px;letter-spacing:.06em;">Type</span><div style="font-size:13px;color:#111;margin-top:2px;">'+typeLabel+'</div></div>' +
+          '<div><span style="color:#027fb3;font-weight:700;text-transform:uppercase;font-size:10px;letter-spacing:.06em;">Priority</span><div style="font-size:13px;font-weight:700;color:#111;margin-top:2px;">'+(priorityMap[r.priority]||r.priority||'—')+'</div></div>' +
+          '<div><span style="color:#027fb3;font-weight:700;text-transform:uppercase;font-size:10px;letter-spacing:.06em;">Request Date</span><div style="font-size:13px;color:#111;margin-top:2px;">'+fmtDate(r.dateRequest)+'</div></div>' +
+          '<div><span style="color:#027fb3;font-weight:700;text-transform:uppercase;font-size:10px;letter-spacing:.06em;">Deadline</span><div style="font-size:13px;font-weight:700;margin-top:2px;color:'+dlColor+';">'+fmtDate(r.dateDeadline)+cdTxt+'</div></div>' +
+          (r.duration?'<div><span style="color:#027fb3;font-weight:700;text-transform:uppercase;font-size:10px;letter-spacing:.06em;">Est. Duration</span><div style="font-size:13px;color:#111;margin-top:2px;">'+r.duration+'</div></div>':'') +
+          '<div><span style="color:#027fb3;font-weight:700;text-transform:uppercase;font-size:10px;letter-spacing:.06em;">Last Updated</span><div style="font-size:13px;color:#555;margin-top:2px;">'+fmtDT(r.updatedAt)+'</div></div>' +
+        '</div>' +
       '</div>' +
 
-      // DESCRIPTION
+      // REQUIREMENTS
       '<div style="margin-bottom:20px;">' +
-        '<div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#555;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #E5E7EB;">Requirements</div>' +
-        '<p style="font-size:13px;line-height:1.8;color:#111;white-space:pre-wrap;margin:0;">' + (r.desc||'—') + '</p>' +
-        (r.notes ? '<div style="margin-top:12px;padding:10px 14px;border:1px solid #D1D5DB;border-left:3px solid #374151;border-radius:4px;font-size:12px;color:#374151;"><strong>Notes:</strong> ' + r.notes + '</div>' : '') +
+        '<div style="background:#027fb3;color:#fff;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;padding:7px 14px;border-radius:6px 6px 0 0;">Requirements</div>' +
+        '<div style="border:1px solid #027fb3;border-top:none;border-radius:0 0 6px 6px;padding:14px;">' +
+          '<p style="font-size:13px;line-height:1.8;color:#111;white-space:pre-wrap;margin:0;">'+(r.desc||'No description provided.')+'</p>' +
+          (r.notes?'<div style="margin-top:10px;padding:10px 14px;background:#f8faff;border-left:3px solid #027fb3;border-radius:0 4px 4px 0;font-size:12px;color:#374151;"><strong>Note:</strong> '+r.notes+'</div>':'') +
+        '</div>' +
       '</div>' +
 
       // SPECIFICATIONS
-      '<div style="margin-bottom:20px;">' +
-        '<div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#555;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #E5E7EB;">Specifications</div>' +
-        specsHtml +
-      '</div>' +
-
-      // COMMENTS
-      '<div style="margin-bottom:24px;">' +
-        '<div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#555;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #E5E7EB;">Discussion & Comments</div>' +
-        commentsHtml +
+      '<div style="margin-bottom:28px;">' +
+        '<div style="background:#027fb3;color:#fff;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;padding:7px 14px;border-radius:6px 6px 0 0;">Specifications</div>' +
+        '<div style="border:1px solid #027fb3;border-top:none;border-radius:0 0 6px 6px;overflow:hidden;">' +
+          specsHtml +
+        '</div>' +
       '</div>' +
 
       // SIGNATURES
-      '<div style="margin-top:36px;padding-top:20px;border-top:1px solid #E5E7EB;">' +
-        '<div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#555;margin-bottom:20px;">Approval Signatures</div>' +
+      '<div style="border-top:1px solid #e0e7ef;padding-top:20px;margin-top:8px;">' +
+        '<div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#027fb3;margin-bottom:20px;">Approval Signatures</div>' +
         '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;">' +
-          ['Submitted By','Validated By (CTO)','Assigned To (Dev)'].map(label =>
-            '<div style="text-align:center;">' +
-              '<div style="height:56px;border-bottom:1px solid #111;margin-bottom:6px;"></div>' +
-              '<div style="font-size:11px;color:#555;font-weight:600;">' + label + '</div>' +
-              '<div style="font-size:10px;color:#aaa;margin-top:2px;">Name & Signature</div>' +
-            '</div>'
+          ['Submitted By','Validated By (CTO)','Assigned To (Dev)'].map(label=>
+            '<div style="text-align:center;"><div style="height:52px;border-bottom:1px solid #111;margin-bottom:6px;"></div><div style="font-size:11px;color:#555;font-weight:600;">'+label+'</div><div style="font-size:10px;color:#aaa;margin-top:2px;">Name & Signature</div></div>'
           ).join('') +
         '</div>' +
       '</div>' +
 
       // FOOTER
-      '<div style="display:flex;justify-content:space-between;margin-top:28px;padding-top:12px;border-top:1px solid #E5E7EB;font-size:10px;color:#aaa;">' +
+      '<div style="display:flex;justify-content:space-between;margin-top:24px;padding-top:10px;border-top:1px solid #e0e7ef;font-size:10px;color:#aaa;">' +
         '<span>Konsultama Global Bisnis &mdash; Custom Request Management System</span>' +
-        '<span>Printed: ' + new Date().toLocaleString('en-GB') + '</span>' +
+        '<span>Printed: '+new Date().toLocaleString('en-GB')+'</span>' +
       '</div>' +
     '</div>';
 
   const w = window.open('', '_blank', 'width=900,height=700');
-  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Custom Request</title><style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Inter,Arial,sans-serif;background:#fff;color:#111;}@media print{body{margin:0;}}</style></head><body>' + printHtml + '</body></html>');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Request #'+r.id.slice(-8).toUpperCase()+'</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"><style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Inter,Arial,sans-serif;background:#fff;color:#111;}@media print{body{margin:0;}}</style></head><body>'+printHtml+'</body></html>');
   w.document.close();
   w.onload = function() { w.focus(); w.print(); };
 };
 window.printClient = async function(clientId) {
   const cl = allClients.find(x => x.id === clientId);
-  if (!cl) { showToast('Client not found', 'error'); return; }
-
-  const reqs = allRequests
-    .filter(r => r.clientId === clientId)
-    .sort((a,b) => (a.dateRequest||'').localeCompare(b.dateRequest||''));
-
+  if (!cl) { showToast('Client not found','error'); return; }
+  const reqs = allRequests.filter(r=>r.clientId===clientId)
+    .sort((a,b)=>(a.dateRequest||'').localeCompare(b.dateRequest||''));
   const fmtDate = d => d ? new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
-  const fmtDateTime = ts => ts?.toDate ? ts.toDate().toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
-
-  const STATUS_COLOR_PRINT = {
-    pending:'#F59E0B', validated:'#0891B2', rejected:'#EF4444',
-    design:'#7C3AED', 'dev-be':'#027fb3', 'dev-fe':'#0369A1',
-    testing:'#D97706', done:'#10B981'
-  };
-
-  const reqRows = reqs.length
-    ? reqs.map((r, i) => {
-        const sc = STATUS_COLOR_PRINT[r.status] || '#94A3B8';
-        const cd = calcCountdown(r.dateDeadline);
-        const cdTxt = r.status==='pending'||r.status==='rejected' ? '' : cd===null ? '' : cd<0 ? ' ('+Math.abs(cd)+'h overdue)' : cd===0 ? ' (Today)' : ' ('+cd+'h left)';
-        const specRows = (r.specs||[]).length
-          ? (r.specs||[]).map((s,si) =>
-              '<tr style="background:' + (si%2===0?'#FAFAFE':'#fff') + ';border-bottom:1px solid #F1F5F9;">' +
-                '<td style="padding:4px 10px;font-size:11px;font-weight:700;color:#374151;width:30%;">' + s.key + '</td>' +
-                '<td style="padding:4px 10px;font-size:11px;color:#6B7280;">' + s.value + '</td>' +
-              '</tr>'
-            ).join('')
-          : '';
-        return '<tr style="vertical-align:top;border-bottom:2px solid #E5E7EB;">' +
-          '<td style="padding:10px 12px;font-size:13px;font-weight:700;color:#111;width:40px;">' + (i+1) + '</td>' +
-          '<td style="padding:10px 12px;">' +
-            '<div style="font-size:13px;font-weight:800;color:#111;margin-bottom:3px;">' + (r.name||r.title||'—') + '</div>' +
-            (r.desc ? '<div style="font-size:12px;color:#555;line-height:1.6;margin-bottom:4px;">' + r.desc + '</div>' : '') +
-            (specRows ? '<table style="width:100%;border-collapse:collapse;margin-top:4px;border:1px solid #E5E7EB;border-radius:4px;overflow:hidden;">' + specRows + '</table>' : '') +
-          '</td>' +
-          '<td style="padding:10px 12px;white-space:nowrap;">' +
-            '<span style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;background:' + sc + '18;color:' + sc + ';border:1px solid ' + sc + '40;">' + (STATUS_LABELS[r.status]||r.status) + '</span>' +
-          '</td>' +
-          '<td style="padding:10px 12px;font-size:11px;color:#555;white-space:nowrap;">' +
-            (r.dateRequest ? fmtDate(r.dateRequest) : '—') +
-          '</td>' +
-          '<td style="padding:10px 12px;font-size:11px;font-weight:700;white-space:nowrap;" >' +
-            (r.dateDeadline ? '<span style="color:' + (calcCountdown(r.dateDeadline)<0?'#DC2626':calcCountdown(r.dateDeadline)<=3?'#D97706':'#111') + ';">' + fmtDate(r.dateDeadline) + cdTxt + '</span>' : '—') +
-          '</td>' +
-          '<td style="padding:10px 12px;font-size:11px;color:#555;">' + (r.duration||'—') + '</td>' +
-        '</tr>';
-      }).join('')
-    : '<tr><td colspan="6" style="padding:20px;text-align:center;color:#aaa;font-size:12px;font-style:italic;">No custom requests</td></tr>';
-
+  const STATUS_C = {pending:'#F59E0B',validated:'#0891B2',rejected:'#EF4444',design:'#7C3AED','dev-be':'#027fb3','dev-fe':'#0369A1',testing:'#D97706',done:'#10B981'};
   const summary = {
-    total: reqs.length,
-    pending: reqs.filter(r=>r.status==='pending').length,
-    inProgress: reqs.filter(r=>['validated','design','dev-be','dev-fe','testing'].includes(r.status)).length,
-    done: reqs.filter(r=>r.status==='done').length,
-    rejected: reqs.filter(r=>r.status==='rejected').length,
+    total:reqs.length,
+    pending:reqs.filter(r=>r.status==='pending').length,
+    inProgress:reqs.filter(r=>['validated','design','dev-be','dev-fe','testing'].includes(r.status)).length,
+    done:reqs.filter(r=>r.status==='done').length,
+    rejected:reqs.filter(r=>r.status==='rejected').length,
   };
+
+  const reqRows = reqs.length ? reqs.map((r,i) => {
+    const sc  = STATUS_C[r.status]||'#94A3B8';
+    const cd  = calcCountdown(r.dateDeadline);
+    const cdT = (r.status==='pending'||r.status==='rejected'||cd===null)?'':cd<0?' ('+Math.abs(cd)+'h overdue)':cd===0?' (Today)':' ('+cd+'h left)';
+    const dlC = cd!==null&&cd<0?'#DC2626':cd!==null&&cd<=3?'#D97706':'#111';
+    const specRows = (r.specs||[]).length
+      ? '<table style="width:100%;border-collapse:collapse;margin-top:4px;">'+(r.specs||[]).map((s,si)=>'<tr style="background:'+(si%2===0?'#f8faff':'#fff')+';border-bottom:1px solid #e8edf5;"><td style="padding:3px 8px;font-size:11px;font-weight:700;color:#374151;width:35%;">'+s.key+'</td><td style="padding:3px 8px;font-size:11px;color:#555;">'+s.value+'</td></tr>').join('')+'</table>' : '';
+    return '<tr style="vertical-align:top;border-bottom:1.5px solid #e0e7ef;">' +
+      '<td style="padding:10px 12px;font-size:13px;font-weight:700;color:#111;width:28px;">'+(i+1)+'</td>' +
+      '<td style="padding:10px 12px;">' +
+        '<div style="font-size:13px;font-weight:800;color:#111;margin-bottom:2px;">'+(r.name||r.title||'—')+'</div>' +
+        (r.desc?'<div style="font-size:11px;color:#555;line-height:1.6;margin-bottom:3px;">'+r.desc+'</div>':'') +
+        specRows +
+      '</td>' +
+      '<td style="padding:10px 12px;white-space:nowrap;">' +
+        '<span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;background:'+sc+'18;color:'+sc+';border:1px solid '+sc+'40;">'+(STATUS_LABELS[r.status]||r.status)+'</span>' +
+      '</td>' +
+      '<td style="padding:10px 12px;font-size:11px;color:#555;white-space:nowrap;">'+fmtDate(r.dateRequest)+'</td>' +
+      '<td style="padding:10px 12px;font-size:11px;font-weight:700;color:'+dlC+';white-space:nowrap;">'+fmtDate(r.dateDeadline)+cdT+'</td>' +
+      '<td style="padding:10px 12px;font-size:11px;color:#555;">'+(r.duration||'—')+'</td>' +
+    '</tr>';
+  }).join('') : '<tr><td colspan="6" style="padding:20px;text-align:center;color:#aaa;font-size:12px;font-style:italic;">No custom requests</td></tr>';
 
   const printHtml =
-    '<div style="font-family:\'Inter\',Arial,sans-serif;max-width:900px;margin:0 auto;padding:40px 48px;color:#111;background:#fff;">' +
+    '<div style="font-family:\'Inter\',Arial,sans-serif;max-width:900px;margin:0 auto;padding:36px 44px;color:#111;background:#fff;">' +
 
       // HEADER
-      '<div style="display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:16px;border-bottom:2px solid #111;margin-bottom:24px;">' +
-        '<div>' +
-          '<div style="font-size:11px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;color:#555;margin-bottom:4px;">Client Request Report</div>' +
-          '<div style="font-size:22px;font-weight:800;color:#111;">Konsultama Global Bisnis</div>' +
-          '<div style="font-size:12px;color:#555;margin-top:2px;">Custom Request Management System</div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:3px solid #027fb3;margin-bottom:24px;">' +
+        '<div style="display:flex;align-items:center;gap:14px;">' +
+          '<img src="/favicon.png" style="width:40px;height:40px;border-radius:8px;" onerror="this.style.display=\'none\'">' +
+          '<div>' +
+            '<div style="font-size:18px;font-weight:800;color:#027fb3;">Konsultama Global Bisnis</div>' +
+            '<div style="font-size:11px;color:#777;margin-top:1px;">Client Request Report</div>' +
+          '</div>' +
         '</div>' +
-        '<div style="text-align:right;">' +
-          '<div style="font-size:10px;color:#777;text-transform:uppercase;margin-bottom:4px;">Printed</div>' +
-          '<div style="font-size:11px;color:#555;">' + new Date().toLocaleString('en-GB') + '</div>' +
-        '</div>' +
+        '<div style="text-align:right;font-size:11px;color:#777;">Printed: '+new Date().toLocaleString('en-GB')+'</div>' +
       '</div>' +
 
       // CLIENT INFO
-      '<div style="background:#fff;border:1px solid #E5E7EB;border-radius:8px;padding:16px 20px;margin-bottom:24px;">' +
-        '<div style="font-size:16px;font-weight:800;color:#111;margin-bottom:8px;">' + cl.name + '</div>' +
-        '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;font-size:12px;">' +
-          (cl.industry ? '<div><span style="color:#777;font-weight:600;">Industry:</span> ' + cl.industry + '</div>' : '') +
-          (cl.pic      ? '<div><span style="color:#777;font-weight:600;">PIC:</span> ' + cl.pic + (cl.picRole?' ('+cl.picRole+')':'') + '</div>' : '') +
-          (cl.phone    ? '<div><span style="color:#777;font-weight:600;">Phone:</span> ' + cl.phone + '</div>' : '') +
-          (cl.email    ? '<div><span style="color:#777;font-weight:600;">Email:</span> ' + cl.email + '</div>' : '') +
-          (cl.size     ? '<div><span style="color:#777;font-weight:600;">Size:</span> ' + cl.size + '</div>' : '') +
+      '<div style="background:#f0f7ff;border-radius:10px;padding:14px 18px;margin-bottom:16px;">' +
+        '<div style="font-size:16px;font-weight:800;color:#111;margin-bottom:6px;">'+cl.name+'</div>' +
+        '<div style="display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:#555;">' +
+          (cl.industry?'<span><b style="color:#027fb3;">Industry:</b> '+cl.industry+'</span>':'')+
+          (cl.pic?'<span><b style="color:#027fb3;">PIC:</b> '+cl.pic+(cl.picRole?' ('+cl.picRole+')':'')+'</span>':'')+
+          (cl.phone?'<span><b style="color:#027fb3;">Phone:</b> '+cl.phone+'</span>':'')+
+          (cl.email?'<span><b style="color:#027fb3;">Email:</b> '+cl.email+'</span>':'')+
         '</div>' +
       '</div>' +
 
-      // SUMMARY BADGES
-      '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;">' +
-        '<span style="font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;background:#f9fafb;color:#111;">Total: ' + summary.total + '</span>' +
-        (summary.pending    ? '<span style="font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;background:#fffbeb;color:#D97706;">Awaiting: ' + summary.pending + '</span>'     : '') +
-        (summary.inProgress ? '<span style="font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;background:#f0f9ff;color:#0891B2;">In Progress: ' + summary.inProgress + '</span>' : '') +
-        (summary.done       ? '<span style="font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;background:#f0fdf4;color:#059669;">Done: ' + summary.done + '</span>'             : '') +
-        (summary.rejected   ? '<span style="font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;background:#fef2f2;color:#DC2626;">Rejected: ' + summary.rejected + '</span>'     : '') +
+      // SUMMARY
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;">' +
+        '<span style="font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid #ddd;color:#111;">Total: '+summary.total+'</span>' +
+        (summary.pending?'<span style="font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid #F59E0B;color:#D97706;">Awaiting: '+summary.pending+'</span>':'')+
+        (summary.inProgress?'<span style="font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid #0891B2;color:#0891B2;">In Progress: '+summary.inProgress+'</span>':'')+
+        (summary.done?'<span style="font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid #10B981;color:#059669;">Done: '+summary.done+'</span>':'')+
+        (summary.rejected?'<span style="font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid #EF4444;color:#DC2626;">Rejected: '+summary.rejected+'</span>':'')+
       '</div>' +
 
-      // REQUEST TABLE
-      '<table style="width:100%;border-collapse:collapse;border:1px solid #E5E7EB;">' +
-        '<thead>' +
-          '<tr style="background:#f9fafb;border-bottom:2px solid #E5E7EB;">' +
-            '<th style="padding:8px 12px;font-size:11px;font-weight:700;color:#555;text-transform:uppercase;text-align:left;width:32px;">#</th>' +
-            '<th style="padding:8px 12px;font-size:11px;font-weight:700;color:#555;text-transform:uppercase;text-align:left;">Request</th>' +
-            '<th style="padding:8px 12px;font-size:11px;font-weight:700;color:#555;text-transform:uppercase;text-align:left;width:110px;">Status</th>' +
-            '<th style="padding:8px 12px;font-size:11px;font-weight:700;color:#555;text-transform:uppercase;text-align:left;width:90px;">Req. Date</th>' +
-            '<th style="padding:8px 12px;font-size:11px;font-weight:700;color:#555;text-transform:uppercase;text-align:left;width:100px;">Deadline</th>' +
-            '<th style="padding:8px 12px;font-size:11px;font-weight:700;color:#555;text-transform:uppercase;text-align:left;width:80px;">Duration</th>' +
-          '</tr>' +
-        '</thead>' +
-        '<tbody>' + reqRows + '</tbody>' +
+      // TABLE
+      '<table style="width:100%;border-collapse:collapse;border:1px solid #027fb3;border-radius:8px;overflow:hidden;">' +
+        '<thead><tr style="background:#027fb3;">' +
+          '<th style="padding:9px 12px;font-size:11px;font-weight:700;color:#fff;text-align:left;width:28px;">#</th>' +
+          '<th style="padding:9px 12px;font-size:11px;font-weight:700;color:#fff;text-align:left;">Request</th>' +
+          '<th style="padding:9px 12px;font-size:11px;font-weight:700;color:#fff;text-align:left;width:100px;">Status</th>' +
+          '<th style="padding:9px 12px;font-size:11px;font-weight:700;color:#fff;text-align:left;width:90px;">Date</th>' +
+          '<th style="padding:9px 12px;font-size:11px;font-weight:700;color:#fff;text-align:left;width:100px;">Deadline</th>' +
+          '<th style="padding:9px 12px;font-size:11px;font-weight:700;color:#fff;text-align:left;width:80px;">Duration</th>' +
+        '</tr></thead>' +
+        '<tbody>'+reqRows+'</tbody>' +
       '</table>' +
 
       // FOOTER
-      '<div style="display:flex;justify-content:space-between;margin-top:28px;padding-top:12px;border-top:1px solid #E5E7EB;font-size:10px;color:#aaa;">' +
+      '<div style="display:flex;justify-content:space-between;margin-top:22px;padding-top:10px;border-top:1px solid #e0e7ef;font-size:10px;color:#aaa;">' +
         '<span>Konsultama Global Bisnis &mdash; Custom Request Management System</span>' +
-        '<span>' + cl.name + ' &middot; ' + reqs.length + ' requests</span>' +
+        '<span>'+cl.name+' &middot; '+reqs.length+' requests</span>' +
       '</div>' +
     '</div>';
 
-  const w = window.open('', '_blank', 'width=900,height=700');
-  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Custom Request</title><style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Inter,Arial,sans-serif;background:#fff;color:#111;}@media print{body{margin:0;}}</style></head><body>' + printHtml + '</body></html>');
+  const w = window.open('', '_blank', 'width=1000,height=750');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+cl.name+' - Requests</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"><style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Inter,Arial,sans-serif;background:#fff;color:#111;}@media print{body{margin:0;}}</style></head><body>'+printHtml+'</body></html>');
   w.document.close();
   w.onload = function() { w.focus(); w.print(); };
 };
