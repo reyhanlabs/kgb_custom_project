@@ -3170,7 +3170,7 @@ function collectItems() {
     const name         = row.querySelector('.item-name')?.value.trim() || '';
     const type         = row.querySelector('.item-type')?.value || '';
     const desc         = row.querySelector('.item-desc')?.value.trim() || '';
-    const dateRequest  = row.querySelector('.item-date-requests')?.value || '';
+    const dateRequest  = row.querySelector('.item-date-request')?.value || '';
     const dateDeadline = row.querySelector('.item-date-deadline')?.value || '';
     const duration     = row.querySelector('.item-duration')?.value.trim() || '';
     const redmineUrl   = row.querySelector('.item-redmine')?.value.trim() || '';
@@ -3180,7 +3180,7 @@ function collectItems() {
       const v = specRow.querySelector('.spec-val')?.value.trim();
       if (k) specs.push({ key:k, value:v||'' });
     });
-    if (name || desc) items.push({ name, type, desc, dateRequest, dateDeadline, duration, specs, rowId: row.id });
+    if (name || desc) items.push({ name, type, desc, dateRequest, dateDeadline, duration, redmineUrl, specs, rowId: row.id });
   });
   return items;
 }
