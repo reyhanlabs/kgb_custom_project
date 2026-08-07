@@ -1645,9 +1645,9 @@ function renderClientGroupCard(group) {
           <tbody>
             ${group.items.map(r => {
               const safeName = (r.name||'').replace(/'/g,"\'");
-              const cd = calcCountdown(r.dateDeadline);
+              const cd = (r.status === 'pending' || r.status === 'rejected') ? null : calcCountdown(r.dateDeadline);
               const cdColor = cd===null?'var(--text-dim)':cd<0?'var(--red)':cd<=3?'var(--amber)':'var(--green)';
-              const cdText  = cd===null?'\u2014':cd<0?`\u26a0 ${Math.abs(cd)}h`:cd===0?'\uD83D\uDD34 Today':`${cd}h left`;
+              const cdText  = (r.status === 'pending' || r.status === 'rejected') ? '\u2014' : cd===null?'\u2014':cd<0?`\u26a0 ${Math.abs(cd)}h`:cd===0?'\uD83D\uDD34 Today':`${cd}h left`;
               const tl = r.type ? (TYPE_LABELS[r.type]||r.type) : '';
               const sc = r.status==='done'?'#10B981':r.status==='rejected'?'#EF4444':r.status==='pending'?'#F59E0B':r.status==='validated'?'#6366F1':'#027fb3';
               const rowId = 'item-detail-' + r.id;
@@ -1774,7 +1774,7 @@ function renderClientDetailRow(r) {
   const pipelineIdx = STATUS_ORDER.indexOf(r.status);
   const pct = r.status==='rejected'?0:Math.round((pipelineIdx/(STATUS_ORDER.length-1))*100);
   const fillColor = r.status==='done'?'#10B981':r.status==='rejected'?'#EF4444':'#027fb3';
-  const cd = calcCountdown(r.dateDeadline);
+  const cd = (r.status === 'pending' || r.status === 'rejected') ? null : calcCountdown(r.dateDeadline);
   const cdColor = cd===null?'var(--text-dim)':cd<0?'var(--red)':cd<=3?'var(--amber)':'var(--green)';
   const safeTitle = (r.name||r.title||'—'||'').replace(/'/g,"\'");
 
@@ -2587,7 +2587,7 @@ window.addComment = async function(id) {
 // --- REQUEST FORM (ADD / EDIT) ---
 window.openRequestForm = async function(id) {
   id = id || '';
-  openModal('modal-requests-form');
+  openModal('modal-request-form');
   document.getElementById('req-edit-id').value = id;
   const itemsList = document.getElementById('req-items-list');
   if (itemsList) itemsList.innerHTML = '';
@@ -2602,7 +2602,7 @@ window.openRequestForm = async function(id) {
   const selector = document.getElementById('req-client-selector');
   if (badge)    badge.style.display    = 'none';
   if (selector) selector.style.display = 'none';
-  document.getElementById('req-date-requests').value = new Date().toISOString().split('T')[0];
+  document.getElementById('req-date-request').value = new Date().toISOString().split('T')[0];
   if (id) {
     document.getElementById('req-form-title').textContent = 'Edit Request Item';
     document.getElementById('req-form-sub').textContent   = 'Update this item details';
@@ -2619,6 +2619,23 @@ window.openRequestForm = async function(id) {
     addItemRow({ name: r.name||'', type: r.type||'', desc: r.desc||'',
       specs: r.specs||[], dateRequest: r.dateRequest||'',
       dateDeadline: r.dateDeadline||'', duration: r.duration||'' });
+    // Disable deadline if not yet approved
+    if (r.status === 'pending') {
+      const deadlineInputs = document.querySelectorAll('.item-date-deadline');
+      deadlineInputs.forEach(el => {
+        el.disabled = true;
+        el.style.background = 'var(--inset)';
+        el.style.color = 'var(--text-dim)';
+        el.title = 'Deadline can only be set after approval';
+        el.placeholder = 'Available after approval';
+      });
+      const durationInputs = document.querySelectorAll('.item-duration');
+      durationInputs.forEach(el => {
+        el.disabled = true;
+        el.style.background = 'var(--inset)';
+        el.style.color = 'var(--text-dim)';
+      });
+    }
     const cl = allClients.find(x => x.id === r.clientId);
     if (badge && cl) {
       badge.style.display = 'flex';
@@ -2627,7 +2644,7 @@ window.openRequestForm = async function(id) {
     }
   } else {
     document.getElementById('req-form-title').textContent = 'New Custom Request';
-    document.getElementById('req-form-sub').textContent   = 'Each item = 1 separate requests';
+    document.getElementById('req-form-sub').textContent   = 'Each item = 1 separate request';
     if (selector) selector.style.display = 'block';
     const ddEl = document.getElementById('req-client-select-dropdown');
     if (ddEl) ddEl.innerHTML = '<option value="">-- Select Client --</option>' +
@@ -2927,7 +2944,7 @@ window.saveRequest = async function() {
     })));
     showToast('\u2713 ' + items.length + ' items sent successfully!', 'success');
   }
-  closeModal('modal-requests-form');
+  closeModal('modal-request-form');
 };
 
 window.quickApprove = async function(id) {
