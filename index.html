@@ -1770,7 +1770,7 @@ function renderBugTracker() {
       return `<tr class="bug-row" data-status="${b.status}" style="border-bottom:1px solid var(--border);" onmouseover="this.style.background='var(--inset)'" onmouseout="this.style.background=''">
         <td style="padding:9px 12px;font-size:12px;color:var(--text-dim);text-align:center;width:30px;">${i+1}</td>
         <td style="padding:9px 12px;">
-          <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.4;">${b.desc||'\u2014'}</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.5;">${b.desc||'\u2014'}</div>
           ${b.redmineUrl
             ? `<a href="${b.redmineUrl}" target="_blank" style="font-size:10px;font-weight:700;color:var(--indigo);text-decoration:none;background:var(--indigo-dim);padding:1px 7px;border-radius:5px;margin-top:3px;display:inline-block;">\uD83D\uDD17 #${b.ticketNo||'Redmine'}</a>`
             : b.ticketNo ? `<span style="font-size:10px;color:var(--text-dim);font-family:monospace;">#${b.ticketNo}</span>` : ''}
@@ -1778,15 +1778,21 @@ function renderBugTracker() {
         <td style="padding:9px 12px;white-space:nowrap;">
           <span style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;background:${pr.bg};color:${pr.color};">${pr.label}</span>
         </td>
-        <td style="padding:9px 12px;font-size:11px;color:var(--text-muted);white-space:nowrap;">${fmtDate(b.dateReport)}</td>
-        <td style="padding:9px 12px;font-size:11px;color:var(--text-muted);white-space:nowrap;">${fmtDate(b.dateFinish)}</td>
         <td style="padding:9px 12px;white-space:nowrap;">
           <span style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;background:${st.bg};color:${st.color};">${st.label}</span>
         </td>
-        <td style="padding:9px 12px;font-size:11px;color:var(--text-muted);white-space:nowrap;">${fmtDate(b.dateRelease)}</td>
-        <td style="padding:9px 12px;font-size:11px;color:var(--text-muted);">${b.versionNo||'\u2014'}</td>
-        <td style="padding:9px 12px;font-size:11px;color:var(--text-muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${b.notes||'\u2014'}</td>
-        <td style="padding:9px 12px;text-align:center;">${b.updateToUser?`<span style="font-size:11px;font-weight:700;padding:2px 7px;border-radius:12px;background:var(--green-dim);color:var(--green);">\u2713</span>`:`<span style="color:var(--text-dim);">&mdash;</span>`}</td>
+        <td style="padding:9px 12px;font-size:11px;color:var(--text-muted);white-space:nowrap;">${fmtDate(b.dateReport)}</td>
+        <td style="padding:9px 12px;font-size:11px;color:var(--text-muted);white-space:nowrap;">${fmtDate(b.dateFinish)}</td>
+        <td style="padding:9px 12px;">
+          <div style="font-size:11px;font-weight:700;color:var(--text-muted);white-space:nowrap;">${fmtDate(b.dateRelease)}</div>
+          ${b.versionNo ? `<div style="font-size:10px;color:var(--text-dim);margin-top:2px;font-family:monospace;">${b.versionNo}</div>` : ''}
+        </td>
+        <td style="padding:9px 12px;font-size:11px;color:var(--text-muted);max-width:160px;" title="${b.notes||''}">${b.notes||'\u2014'}</td>
+        <td style="padding:9px 12px;text-align:center;">
+          ${b.updateToUser
+            ? `<span style="font-size:11px;font-weight:700;padding:2px 9px;border-radius:12px;background:var(--green-dim);color:var(--green);">\u2713 Yes</span>`
+            : `<span style="font-size:11px;color:var(--text-dim);">\u2014</span>`}
+        </td>
         <td style="padding:9px 12px;">
           <div style="display:flex;gap:4px;">
             <button onclick="event.stopPropagation();openBugForm('${b.id}')" title="Edit"
@@ -1811,19 +1817,18 @@ function renderBugTracker() {
           \uFF0B Log Bug</button>
       </div>
       <div style="overflow-x:auto;">
-        <table style="width:100%;border-collapse:collapse;min-width:820px;">
+        <table style="width:100%;border-collapse:collapse;min-width:900px;">
           <thead>
             <tr style="border-bottom:1.5px solid var(--border);">
               <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:center;width:30px;">#</th>
               <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:left;">Description</th>
               <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:left;width:80px;">Priority</th>
+              <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:left;width:90px;">Status</th>
               <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:left;width:100px;">Report Date</th>
               <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:left;width:100px;">Finish Date</th>
-              <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:left;width:90px;">Status</th>
-              <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:left;width:100px;">Release Date</th>
-              <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:left;width:80px;">Version</th>
+              <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:left;width:110px;">Release / Version</th>
+              <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:left;width:130px;">Notes</th>
               <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:center;width:70px;">Updated</th>
-              <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:left;width:100px;">Notes</th>
               <th style="width:64px;"></th>
             </tr>
           </thead>
