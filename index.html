@@ -683,6 +683,65 @@
     .btn-primary { width: 100%; }
   }
 
+
+  /* ── BUG TRACKER TOOLTIP ───────────────────── */
+  .bt-cell-clip {
+    position: relative;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: default;
+  }
+  .bt-cell-clip:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    left: 0; top: 100%;
+    z-index: 999;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    min-width: 200px;
+    max-width: 320px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    pointer-events: none;
+  }
+  .bt-desc-clip {
+    position: relative;
+    max-width: 260px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    cursor: default;
+    line-height: 1.5;
+  }
+  .bt-desc-clip[data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    left: 0; top: 100%;
+    z-index: 999;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-word;
+    min-width: 240px;
+    max-width: 360px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    pointer-events: none;
+  }
+
 </style>
 </head>
 <body>
@@ -1769,10 +1828,10 @@ function renderBugTracker() {
       const pr = BUG_PRIORITY[b.priority]|| { label:b.priority||'?',  color:'#fff',    bg:'#94A3B8' };
       return `<tr class="bug-row" data-status="${b.status}" style="border-bottom:1px solid var(--border);" onmouseover="this.style.background='var(--inset)'" onmouseout="this.style.background=''">
         <td style="padding:9px 12px;font-size:12px;color:var(--text-dim);text-align:center;width:30px;">${i+1}</td>
-        <td style="padding:9px 12px;">
-          <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.5;">${b.desc||'\u2014'}</div>
+        <td style="padding:9px 12px;max-width:260px;">
+          <div class="bt-desc-clip" data-tip="${b.desc||''}" style="font-size:13px;font-weight:600;color:var(--text);">${b.desc||'\u2014'}</div>
           ${b.redmineUrl
-            ? `<a href="${b.redmineUrl}" target="_blank" style="font-size:10px;font-weight:700;color:var(--indigo);text-decoration:none;background:var(--indigo-dim);padding:1px 7px;border-radius:5px;margin-top:3px;display:inline-block;">\uD83D\uDD17 #${b.ticketNo||'Redmine'}</a>`
+            ? `<a href="${b.redmineUrl}" target="_blank" style="font-size:10px;font-weight:700;color:var(--indigo);text-decoration:none;background:var(--indigo-dim);padding:1px 7px;border-radius:5px;margin-top:4px;display:inline-block;">\uD83D\uDD17 #${b.ticketNo||'Redmine'}</a>`
             : b.ticketNo ? `<span style="font-size:10px;color:var(--text-dim);font-family:monospace;">#${b.ticketNo}</span>` : ''}
         </td>
         <td style="padding:9px 12px;white-space:nowrap;">
@@ -1787,10 +1846,12 @@ function renderBugTracker() {
           <div style="font-size:11px;font-weight:700;color:var(--text-muted);white-space:nowrap;">${fmtDate(b.dateRelease)}</div>
           ${b.versionNo ? `<div style="font-size:10px;color:var(--text-dim);margin-top:2px;font-family:monospace;">${b.versionNo}</div>` : ''}
         </td>
-        <td style="padding:9px 12px;font-size:11px;color:var(--text-muted);max-width:160px;" title="${b.notes||''}">${b.notes||'\u2014'}</td>
-        <td style="padding:9px 12px;text-align:center;">
+        <td style="padding:9px 12px;max-width:160px;">
+          ${b.notes ? `<div class="bt-cell-clip" data-tip="${b.notes}" style="font-size:11px;color:var(--text-muted);">${b.notes}</div>` : `<span style="color:var(--text-dim);">\u2014</span>`}
+        </td>
+        <td style="padding:9px 12px;text-align:center;white-space:nowrap;">
           ${b.updateToUser
-            ? `<span style="font-size:11px;font-weight:700;padding:2px 9px;border-radius:12px;background:var(--green-dim);color:var(--green);">\u2713 Yes</span>`
+            ? `<span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--green-dim);color:var(--green);display:inline-flex;align-items:center;gap:4px;"><span>\u2713</span><span>Updated</span></span>`
             : `<span style="font-size:11px;color:var(--text-dim);">\u2014</span>`}
         </td>
         <td style="padding:9px 12px;">
@@ -1828,7 +1889,7 @@ function renderBugTracker() {
               <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:left;width:100px;">Finish Date</th>
               <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:left;width:110px;">Release / Version</th>
               <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:left;width:130px;">Notes</th>
-              <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:center;width:70px;">Updated</th>
+              <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:center;width:90px;">Updated</th>
               <th style="width:64px;"></th>
             </tr>
           </thead>
