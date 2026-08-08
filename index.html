@@ -592,6 +592,9 @@
   }
   .card-action-btn:hover { filter:brightness(1.08); transform:translateY(-1px); }
 
+  /* ══ CLIENT META CHIPS (profile header / accordion header) ══ */
+  .client-meta-chip { white-space:nowrap; flex-shrink:0; }
+
   /* ══ MOBILE RESPONSIVE ══ */
   @media (max-width: 680px) {
     /* Modal jadi hampir full-width & padding lebih kecil */
@@ -615,6 +618,22 @@
     /* Header kartu grup klien: wrap rapi */
     .client-group-header { flex-wrap:wrap; gap:10px !important; }
     .client-group-badges { width:100%; justify-content:flex-start !important; margin-left:0 !important; }
+    .client-group-avatar { width:34px !important; height:34px !important; font-size:12px !important; }
+    .client-group-chev { display:none !important; }
+    .client-group-info { flex-basis:100%; }
+
+    /* Chip kontak (PIC/telepon/email/industri) jadi pil rapi, tidak pecah tengah kalimat */
+    .client-meta-row { gap:6px !important; }
+    .client-meta-chip {
+      background:var(--inset); border:1px solid var(--border); border-radius:20px;
+      padding:3px 9px !important; line-height:1.4;
+    }
+
+    /* Profil klien (halaman detail client) */
+    .client-profile-card { padding:16px !important; }
+    .client-profile-top { flex-direction:column; align-items:flex-start !important; }
+    .client-profile-avatar { width:42px !important; height:42px !important; }
+    .client-profile-actions { width:100%; justify-content:space-between !important; margin-top:6px; }
 
     /* Tabel request per klien → jadi kartu bertumpuk */
     .req-table thead { display:none; }
@@ -633,9 +652,19 @@
     .req-td-deadline { order:4; }
     .req-td-actions { order:5; margin-left:auto; }
     .req-td-actions > div { justify-content:flex-end; }
+
+    /* Kartu request (progress + deadline + pipeline steps) di halaman detail klien */
+    .req-progress-grid { grid-template-columns:1fr !important; gap:8px !important; }
+    .req-deadline-box { text-align:left !important; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+    .pipeline-steps { overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; padding-bottom:2px; }
+    .pipeline-steps::-webkit-scrollbar { display:none; }
+    .pipeline-step { flex:0 0 auto !important; min-width:52px; font-size:8.5px !important; padding:0 3px; }
   }
   @media (max-width: 420px) {
     .stats-row { grid-template-columns:1fr !important; }
+  }
+  @media (max-width: 760px) {
+    .dash-2col { grid-template-columns:1fr !important; }
   }
 
   /* ══ PRINT STYLES ══ */
@@ -2146,13 +2175,13 @@ function renderDashboard() {
     '</div>' +
 
     // STATUS OVERVIEW + TYPE CHART
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">' +
+    '<div class="dash-2col" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">' +
       renderRecentActivity(allRequests) +
       renderMiniChart(allRequests) +
     '</div>' +
 
     // AWAITING + IN PROGRESS - side by side, colored cards
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">' +
+    '<div class="dash-2col" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">' +
 
       // Awaiting Approval - amber border
       '<div style="border-radius:14px;overflow:hidden;box-shadow:var(--sh-card);background:var(--card);border:1.5px solid var(--border);border-top:3px solid #F59E0B;">' +
@@ -2286,24 +2315,24 @@ function renderClientGroupCard(group) {
     <div style="background:var(--card);border:1.5px solid var(--border);border-left:5px solid ${color};border-radius:16px;overflow:hidden;box-shadow:var(--sh-card);">
       <!-- CLIENT HEADER (click to open/close) -->
       <div class="client-group-header" onclick="toggleClientGroup('${gid}')" style="display:flex;align-items:flex-start;gap:14px;padding:14px 20px;background:linear-gradient(90deg, ${hexToRgba(color,0.14)}, var(--inset) 55%);border-bottom:1px solid var(--border);cursor:pointer;user-select:none;">
-        <span id="chev-${gid}" style="flex-shrink:0;font-size:11px;color:var(--text-dim);transition:transform .2s;transform:rotate(${isOpen?'90deg':'0deg'});display:inline-block;margin-top:4px;">\u25B6</span>
-        <div style="width:40px;height:40px;border-radius:10px;background:${color};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;">${initials}</div>
-        <div style="flex:1;min-width:0;">
+        <span id="chev-${gid}" class="client-group-chev" style="flex-shrink:0;font-size:11px;color:var(--text-dim);transition:transform .2s;transform:rotate(${isOpen?'90deg':'0deg'});display:inline-block;margin-top:4px;">\u25B6</span>
+        <div class="client-group-avatar" style="width:40px;height:40px;border-radius:10px;background:${color};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;">${initials}</div>
+        <div class="client-group-info" style="flex:1;min-width:0;">
           <div style="font-size:15px;font-weight:800;color:var(--text);">${group.name}</div>
           <div style="font-size:11px;color:var(--text-muted);margin-top:1px;">${cl?.industry||''}${cl?.size?' \u00B7 '+cl.size:''}</div>
           ${cl && (cl.pic||cl.phone||cl.email) ? `
-          <div style="display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:5px;">
-            ${cl.pic?`<span style="font-size:11px;color:var(--text-muted);display:inline-flex;align-items:center;gap:4px;">\uD83D\uDC64 <strong style="color:var(--text);">${cl.pic}</strong>${cl.picRole?` <span style="color:var(--text-dim);">(${cl.picRole})</span>`:''}</span>`:''}
-            ${cl.phone?`<a href="tel:${cl.phone.replace(/[^0-9+]/g,'')}" onclick="event.stopPropagation()" style="font-size:11px;color:var(--indigo);text-decoration:none;display:inline-flex;align-items:center;gap:4px;">\uD83D\uDCDE ${cl.phone}</a>`:''}
-            ${cl.email?`<a href="mailto:${cl.email}" onclick="event.stopPropagation()" style="font-size:11px;color:var(--indigo);text-decoration:none;display:inline-flex;align-items:center;gap:4px;">\u2709 ${cl.email}</a>`:''}
+          <div class="client-meta-row" style="display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:5px;">
+            ${cl.pic?`<span class="client-meta-chip" style="font-size:11px;color:var(--text-muted);display:inline-flex;align-items:center;gap:4px;">\uD83D\uDC64 <strong style="color:var(--text);">${cl.pic}</strong>${cl.picRole?` <span style="color:var(--text-dim);">(${cl.picRole})</span>`:''}</span>`:''}
+            ${cl.phone?`<a href="tel:${cl.phone.replace(/[^0-9+]/g,'')}" onclick="event.stopPropagation()" class="client-meta-chip" style="font-size:11px;color:var(--indigo);text-decoration:none;display:inline-flex;align-items:center;gap:4px;">\uD83D\uDCDE ${cl.phone}</a>`:''}
+            ${cl.email?`<a href="mailto:${cl.email}" onclick="event.stopPropagation()" class="client-meta-chip" style="font-size:11px;color:var(--indigo);text-decoration:none;display:inline-flex;align-items:center;gap:4px;">\u2709 ${cl.email}</a>`:''}
           </div>` : ''}
         </div>
-        <div class="client-group-badges" style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
-          ${pending>0?`<span style="padding:3px 9px;border-radius:20px;background:var(--amber-dim);color:var(--amber);font-size:11px;font-weight:800;">\u23F3 ${pending}</span>`:''}
-          ${onprog>0?`<span style="padding:3px 9px;border-radius:20px;background:var(--indigo-dim);color:var(--indigo);font-size:11px;font-weight:800;">\u26A1 ${onprog}</span>`:''}
-          ${done>0?`<span style="padding:3px 9px;border-radius:20px;background:var(--green-dim);color:var(--green);font-size:11px;font-weight:800;">\u2713 ${done}</span>`:''}
-          ${rejected>0?`<span style="padding:3px 9px;border-radius:20px;background:var(--red-dim);color:var(--red);font-size:11px;font-weight:800;">\u2715 ${rejected}</span>`:''}
-          <span style="font-size:12px;color:var(--text-dim);font-weight:700;">${group.items.length} request</span>
+        <div class="client-group-badges" style="display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap;">
+          ${pending>0?`<span style="padding:3px 9px;border-radius:20px;background:var(--amber-dim);color:var(--amber);font-size:11px;font-weight:800;white-space:nowrap;">\u23F3 ${pending}</span>`:''}
+          ${onprog>0?`<span style="padding:3px 9px;border-radius:20px;background:var(--indigo-dim);color:var(--indigo);font-size:11px;font-weight:800;white-space:nowrap;">\u26A1 ${onprog}</span>`:''}
+          ${done>0?`<span style="padding:3px 9px;border-radius:20px;background:var(--green-dim);color:var(--green);font-size:11px;font-weight:800;white-space:nowrap;">\u2713 ${done}</span>`:''}
+          ${rejected>0?`<span style="padding:3px 9px;border-radius:20px;background:var(--red-dim);color:var(--red);font-size:11px;font-weight:800;white-space:nowrap;">\u2715 ${rejected}</span>`:''}
+          <span style="font-size:12px;color:var(--text-dim);font-weight:700;white-space:nowrap;">${group.items.length} request</span>
           ${group.clientId?`
             <button onclick="event.stopPropagation();printClient('${group.clientId}')" style="padding:5px 12px;background:var(--green-dim);color:var(--green);border:1.5px solid rgba(16,185,129,0.3);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">\uD83D\uDDA8 Print</button>
             <button onclick="event.stopPropagation();navToClient('${group.clientId}')" style="padding:5px 12px;background:var(--indigo);color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">View Detail \u203A</button>
@@ -2332,8 +2361,8 @@ function renderClientGroupCard(group) {
               const rowId = 'item-detail-' + r.id;
               const specHtml = (r.specs||[]).map(s=>'<span style="font-size:11px;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:2px 8px;color:var(--text-muted);"><strong style="color:var(--text);">'+s.key+':</strong> '+s.value+'</span>').join('');
               return `
-              <tr style="border-bottom:1px solid var(--border);" onmouseover="this.style.background='var(--inset)'" onmouseout="this.style.background=''">
-                <td style="padding:9px 8px;cursor:pointer;" onclick="toggleItemDetail('${rowId}')">
+              <tr class="req-row" style="border-bottom:1px solid var(--border);" onmouseover="this.style.background='var(--inset)'" onmouseout="this.style.background=''">
+                <td class="req-td-title" style="padding:9px 8px;cursor:pointer;" onclick="toggleItemDetail('${rowId}')">
                   <div style="display:flex;align-items:flex-start;gap:8px;">
                     <div style="width:3px;min-height:36px;background:${sc};border-radius:2px;flex-shrink:0;margin-top:2px;"></div>
                     <div style="min-width:0;flex:1;">
@@ -2347,13 +2376,13 @@ function renderClientGroupCard(group) {
                     </div>
                   </div>
                 </td>
-                <td style="padding:9px 8px;">
+                <td class="req-td-status" style="padding:9px 8px;">
                   <span class="badge badge-status-${r.status}" style="font-size:11px;">${STATUS_LABELS[r.status]||r.status}</span>
                 </td>
-                <td style="padding:9px 8px;">
+                <td class="req-td-deadline" style="padding:9px 8px;">
                   <span style="font-size:11px;font-weight:700;color:${cdColor};">${cdText}</span>
                 </td>
-                <td style="padding:9px 8px;">
+                <td class="req-td-actions" style="padding:9px 8px;">
                   <div style="display:flex;gap:4px;">
                     <button onclick="event.stopPropagation();openDetail('${r.id}')" title="View Detail" style="width:26px;height:26px;border-radius:6px;border:1.5px solid var(--border-md);background:var(--inset);color:var(--text-muted);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;">\uD83D\uDC41</button>
                     <button onclick="event.stopPropagation();openRequestForm('${r.id}')" title="Edit"
@@ -2364,7 +2393,7 @@ function renderClientGroupCard(group) {
                   </div>
                 </td>
               </tr>
-              <tr id="${rowId}" style="display:none;background:var(--inset);">
+              <tr id="${rowId}" class="req-detail-row" style="display:none;background:var(--inset);">
                 <td colspan="4" style="padding:0 8px 12px 28px;">
                   <div style="border-left:2px solid ${sc};padding-left:14px;margin-top:4px;">
                     ${r.desc?`<div style="font-size:13px;color:var(--text);line-height:1.65;white-space:pre-wrap;margin-bottom:${specHtml?'10px':'0'};">${r.desc}</div>`:''}
@@ -2411,27 +2440,27 @@ function renderClientDetail(clientId) {
       \u2190 Back to Custom Requests
     </button>
     <!-- PROFIL KLIEN -->
-    <div style="background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:20px 24px;margin-bottom:20px;box-shadow:var(--sh-card);">
-      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-        <div style="width:50px;height:50px;border-radius:13px;background:${color};display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;flex-shrink:0;">${initials}</div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:20px;font-weight:800;color:var(--text);margin-bottom:4px;">${cl.name}</div>
-          <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--text-muted);">
-            ${cl.industry?`<span>\uD83C\uDFED ${cl.industry}</span>`:''}
-            ${cl.size?`<span>\uD83D\uDC65 ${cl.size}</span>`:''}
-            ${cl.pic?`<span>\uD83D\uDC64 ${cl.pic}${cl.picRole?' \u00B7 '+cl.picRole:''}</span>`:''}
-            ${cl.phone?`<span>\uD83D\uDCDE ${cl.phone}</span>`:''}
-            ${cl.email?`<span>\u2709 ${cl.email}</span>`:''}
-            ${cl.products?`<span>\uD83D\uDCE6 ${cl.products}</span>`:''}
+    <div class="client-profile-card" style="background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:20px 24px;margin-bottom:20px;box-shadow:var(--sh-card);">
+      <div class="client-profile-top" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+        <div class="client-profile-avatar" style="width:50px;height:50px;border-radius:13px;background:${color};display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;flex-shrink:0;">${initials}</div>
+        <div class="client-profile-info" style="flex:1;min-width:0;">
+          <div style="font-size:20px;font-weight:800;color:var(--text);margin-bottom:6px;">${cl.name}</div>
+          <div class="client-meta-row" style="display:flex;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--text-muted);">
+            ${cl.industry?`<span class="client-meta-chip">\uD83C\uDFED ${cl.industry}</span>`:''}
+            ${cl.size?`<span class="client-meta-chip">\uD83D\uDC65 ${cl.size}</span>`:''}
+            ${cl.pic?`<span class="client-meta-chip">\uD83D\uDC64 ${cl.pic}${cl.picRole?' \u00B7 '+cl.picRole:''}</span>`:''}
+            ${cl.phone?`<span class="client-meta-chip">\uD83D\uDCDE ${cl.phone}</span>`:''}
+            ${cl.email?`<span class="client-meta-chip">\u2709 ${cl.email}</span>`:''}
+            ${cl.products?`<span class="client-meta-chip">\uD83D\uDCE6 ${cl.products}</span>`:''}
           </div>
         </div>
-        <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
+        <div class="client-profile-actions" style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
           <div style="text-align:center;padding:8px 16px;background:var(--inset);border-radius:10px;border:1px solid var(--border);">
             <div style="font-size:22px;font-weight:800;color:${color};">${reqs.length}</div>
             <div style="font-size:11px;color:var(--text-muted);">Request</div>
           </div>
           <button onclick="openClientForm('${clientId}')"
-            style="padding:8px 14px;background:var(--inset);border:1.5px solid var(--border-md);border-radius:8px;color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;"
+            style="padding:8px 14px;background:var(--inset);border:1.5px solid var(--border-md);border-radius:8px;color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;"
             onmouseover="this.style.color='var(--indigo)';this.style.borderColor='var(--indigo)'"
             onmouseout="this.style.color='var(--text-muted)';this.style.borderColor='var(--border-md)'">\u270F Edit Client</button>
         </div>
@@ -2472,15 +2501,15 @@ function renderClientDetailRow(r) {
             <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:4px;">${r.name||r.name||r.title||'\u2014'||'\u2014'}</div>
             <div style="font-size:11px;color:var(--text-dim);font-family:monospace;">#${r.id.slice(-8).toUpperCase()} \u00B7 Submitted ${r.createdAt?.toDate?r.createdAt.toDate().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}):'\u2014'} by ${r.submittedByName||'\u2014'}</div>
           </div>
-          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;">
             <span class="badge badge-status-${r.status}">${STATUS_LABELS[r.status]||r.status}</span>
             <span class="priority-badge priority-${r.priority}">${(r.priority||'').toUpperCase()}</span>
           </div>
         </div>
 
         <!-- PROGRESS + TIMELINE -->
-        <div style="display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;margin-bottom:14px;">
-          <div>
+        <div class="req-progress-grid" style="display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;margin-bottom:14px;">
+          <div style="min-width:0;">
             <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
               <span style="font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;">Progress</span>
               <span style="font-size:11px;font-weight:800;color:${fillColor};">${r.status==='rejected'?'Rejected':r.status==='done'?'\u2713 Done':pct+'%'}</span>
@@ -2489,19 +2518,19 @@ function renderClientDetailRow(r) {
               <div style="height:100%;width:${pct}%;background:${fillColor};border-radius:99px;transition:width .5s;"></div>
             </div>
             <!-- PIPELINE STEPS -->
-            <div style="display:flex;gap:0;margin-top:8px;">
+            <div class="pipeline-steps" style="display:flex;gap:0;margin-top:8px;">
               ${STATUS_ORDER.map((s,i)=>{
                 const done = i<pipelineIdx||(r.status==='done'&&i===STATUS_ORDER.length-1);
                 const active= i===pipelineIdx&&r.status!=='done'&&r.status!=='rejected';
-                return `<div style="flex:1;text-align:center;font-size:9px;font-weight:700;color:${done?'var(--green)':active?'var(--amber)':'var(--text-dim)'};">${STATUS_LABELS[s].split('/')[0].trim()}</div>`;
+                return `<div class="pipeline-step" style="flex:1;min-width:0;text-align:center;font-size:9px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:${done?'var(--green)':active?'var(--amber)':'var(--text-dim)'};">${STATUS_LABELS[s].split('/')[0].trim()}</div>`;
               }).join('')}
             </div>
           </div>
-          <div style="text-align:right;min-width:90px;">
+          <div class="req-deadline-box" style="text-align:right;min-width:90px;">
             ${r.dateDeadline?`
               <div style="font-size:10px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;">Deadline</div>
-              <div style="font-size:13px;font-weight:800;color:${cdColor};">${formatDate(r.dateDeadline)}</div>
-              <div style="font-size:11px;font-weight:700;color:${cdColor};">${cd<0?`\u26A0 ${Math.abs(cd)}h overdue`:cd===0?'\uD83D\uDD34 Today':`\u23F1 ${cd}h left`}</div>
+              <div style="font-size:13px;font-weight:800;color:${cdColor};white-space:nowrap;">${formatDate(r.dateDeadline)}</div>
+              <div style="font-size:11px;font-weight:700;color:${cdColor};white-space:nowrap;">${cd<0?`\u26A0 ${Math.abs(cd)}h overdue`:cd===0?'\uD83D\uDD34 Today':`\u23F1 ${cd}h left`}</div>
             `:r.duration?`<div style="font-size:11px;color:var(--text-muted);">${r.duration}</div>`:''}
           </div>
         </div>
@@ -2577,7 +2606,7 @@ window.toggleItemDetail = function(rowId) {
   const chev   = document.getElementById('chev-' + rowId);
   if (!detail) return;
   const open = detail.style.display === 'none' || detail.style.display === '';
-  detail.style.display = open ? 'table-row' : 'none';
+  detail.style.display = open ? '' : 'none';
   if (chev) chev.style.transform = open ? 'rotate(90deg)' : 'rotate(0deg)';
 };
 
