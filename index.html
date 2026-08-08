@@ -684,42 +684,10 @@
   }
 
 
-  /* ── BUG TRACKER TOOLTIP ───────────────────── */
-  .bt-tip-wrap { position: relative; }
-  .bt-tip-clip {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    cursor: default;
-  }
-  .bt-tip-desc {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    cursor: default;
-    line-height: 1.5;
-  }
-  .bt-tooltip {
-    display: none;
-    position: absolute;
-    left: 0; top: calc(100% + 4px);
-    z-index: 9999;
-    background: var(--card);
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-size: 12px;
-    color: var(--text);
-    line-height: 1.7;
-    white-space: pre-wrap;
-    word-break: break-word;
-    min-width: 220px;
-    max-width: 360px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
-    pointer-events: none;
-  }
-  .bt-tip-wrap:hover .bt-tooltip { display: block; }
+  /* -- BT TOOLTIP -- */
+  .bt-tip-clip { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:default; }
+  .bt-tip-desc { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; cursor:default; line-height:1.5; }
+  #bt-global-tip { display:none; position:fixed; z-index:99999; background:var(--card); border:1.5px solid var(--border); border-radius:10px; padding:10px 14px; font-size:12px; color:var(--text); line-height:1.7; white-space:pre-wrap; word-break:break-word; max-width:320px; box-shadow:0 8px 28px rgba(0,0,0,0.18); pointer-events:none; }
 
 </style>
 </head>
@@ -1750,6 +1718,35 @@ window.syncGanttScroll = function(el) {
 };
 
 
+
+// --- BT TOOLTIP ---
+window.btTipShow = function(e, text) {
+  if (!text) return;
+  const tip = document.getElementById('bt-global-tip');
+  if (!tip) return;
+  tip.textContent = text;
+  tip.style.display = 'block';
+  _btTipPos(e.clientX, e.clientY);
+};
+window.btTipHide = function() {
+  const t = document.getElementById('bt-global-tip');
+  if (t) t.style.display = 'none';
+};
+function _btTipPos(mx, my) {
+  const t = document.getElementById('bt-global-tip');
+  if (!t || t.style.display === 'none') return;
+  const pad=14, tw=t.offsetWidth||300, th=t.offsetHeight||80;
+  const vw=window.innerWidth, vh=window.innerHeight;
+  let x=mx+pad, y=my+pad;
+  if (x+tw>vw-pad) x=mx-tw-pad;
+  if (y+th>vh-pad) y=my-th-pad;
+  t.style.left=Math.max(pad,x)+"px"; t.style.top=Math.max(pad,y)+"px";
+}
+document.addEventListener('mousemove', function(e){
+  const t=document.getElementById('bt-global-tip');
+  if(t&&t.style.display!=='none') _btTipPos(e.clientX,e.clientY);
+});
+
 // --- BUG TRACKER ---
 const BUG_STATUS = {
   open:       { label:'Open',        color:'#EF4444', bg:'#FEE2E2' },
@@ -1808,10 +1805,9 @@ function renderBugTracker() {
       return `<tr class="bug-row" data-status="${b.status}" style="border-bottom:1px solid var(--border);" onmouseover="this.style.background='var(--inset)'" onmouseout="this.style.background=''">
         <td style="padding:9px 12px;font-size:12px;color:var(--text-dim);text-align:center;width:30px;">${i+1}</td>
         <td style="padding:9px 12px;max-width:260px;">
-          <div class="bt-tip-wrap">
-            <div class="bt-tip-desc" style="font-size:13px;font-weight:600;color:var(--text);">${b.desc||'\u2014'}</div>
-            ${b.desc && b.desc.length > 80 ? `<div class="bt-tooltip">${b.desc}</div>` : ''}
-          </div>
+          <div class="bt-tip-desc" style="font-size:13px;font-weight:600;color:var(--text);cursor:pointer;"
+            onmouseenter="btTipShow(event,this.innerText)" onmouseleave="btTipHide()"
+          >${b.desc||'—'}</div>
           ${b.redmineUrl
             ? `<a href="${b.redmineUrl}" target="_blank" style="font-size:10px;font-weight:700;color:var(--indigo);text-decoration:none;background:var(--indigo-dim);padding:1px 7px;border-radius:5px;margin-top:4px;display:inline-block;">\uD83D\uDD17 #${b.ticketNo||'Redmine'}</a>`
             : b.ticketNo ? `<span style="font-size:10px;color:var(--text-dim);font-family:monospace;">#${b.ticketNo}</span>` : ''}
@@ -1829,10 +1825,11 @@ function renderBugTracker() {
           ${b.versionNo ? `<div style="font-size:10px;color:var(--text-dim);margin-top:2px;font-family:monospace;">${b.versionNo}</div>` : ''}
         </td>
         <td style="padding:9px 12px;max-width:160px;">
-          ${b.notes ? `<div class="bt-tip-wrap">
-            <div class="bt-tip-clip" style="font-size:11px;color:var(--text-muted);max-width:150px;">${b.notes}</div>
-            ${b.notes.length > 40 ? `<div class="bt-tooltip">${b.notes}</div>` : ''}
-          </div>` : `<span style="color:var(--text-dim);">\u2014</span>`}
+          ${b.notes
+            ? `<span class="bt-tip-clip" style="font-size:11px;color:var(--text-muted);display:block;max-width:150px;"
+                onmouseenter="btTipShow(event,this.innerText)" onmouseleave="btTipHide()"
+              >${b.notes}</span>`
+            : `<span style="color:var(--text-dim);">—</span>`}
         </td>
         <td style="padding:9px 12px;text-align:center;white-space:nowrap;">
           ${b.updateToUser
@@ -4268,5 +4265,6 @@ function renderEmpty(title, sub) {
     </div>
   </nav>
 
+<div id="bt-global-tip"></div>
 </body>
 </html>
