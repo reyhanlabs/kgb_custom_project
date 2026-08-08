@@ -530,6 +530,30 @@
   .modal-body { padding:22px 26px; }
   .modal-footer { padding:16px 26px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:10px; }
 
+  /* ══ CONFIRM DIALOG (replaces native confirm()) ══ */
+  .confirm-body { padding:32px 28px 8px; text-align:center; }
+  .confirm-icon {
+    width:56px; height:56px; border-radius:50%; margin:0 auto 16px;
+    display:flex; align-items:center; justify-content:center; font-size:24px;
+    background:var(--red-dim); color:var(--red);
+  }
+  .confirm-icon.warn { background:var(--amber-dim); color:var(--amber); }
+  .confirm-icon.info { background:var(--indigo-dim); color:var(--indigo); }
+  .confirm-title { font-size:16px; font-weight:800; color:var(--text); margin-bottom:8px; }
+  .confirm-message { font-size:13px; color:var(--text-muted); line-height:1.6; margin-bottom:6px; }
+  .confirm-target {
+    display:inline-block; max-width:100%; margin:6px 0 2px; padding:7px 14px;
+    background:var(--inset); border:1.5px solid var(--border); border-radius:10px;
+    font-size:13px; font-weight:700; color:var(--text); word-break:break-word;
+  }
+  .confirm-note { font-size:11.5px; color:var(--text-dim); margin-top:10px; }
+  .confirm-footer { padding:20px 26px 26px; border-top:none; display:flex; gap:10px; }
+  .confirm-footer button { flex:1; padding:11px; }
+  @media (max-width: 480px) {
+    .confirm-body { padding:26px 20px 4px; }
+    .confirm-footer { padding:16px 20px 20px; flex-direction:column-reverse; }
+  }
+
   /* ══ DETAIL VIEW ══ */
   .detail-section { margin-bottom:22px; }
   .detail-section h4 {
@@ -1168,6 +1192,23 @@
     </div>
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('modal-desc')">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CONFIRM DIALOG (replaces native confirm()) -->
+<div class="modal-overlay" id="modal-confirm">
+  <div class="modal" style="max-width:400px;">
+    <div class="confirm-body">
+      <div class="confirm-icon" id="confirm-icon">&#x1F5D1;</div>
+      <div class="confirm-title" id="confirm-title">Delete this item?</div>
+      <div class="confirm-message" id="confirm-message">This action cannot be undone.</div>
+      <div class="confirm-target" id="confirm-target" style="display:none;"></div>
+      <div class="confirm-note" id="confirm-note" style="display:none;"></div>
+    </div>
+    <div class="confirm-footer">
+      <button class="btn-secondary" id="confirm-cancel-btn">Cancel</button>
+      <button class="btn-danger" id="confirm-ok-btn" style="font-weight:700;">Delete</button>
     </div>
   </div>
 </div>
@@ -2115,7 +2156,12 @@ window.saveBug = async function() {
 };
 
 window.deleteBug = async function(id) {
-  if (!confirm('Delete this bug report? This cannot be undone.')) return;
+  const ok = await confirmDialog({
+    title: 'Delete this bug report?',
+    message: 'This action cannot be undone.',
+    confirmText: 'Delete',
+  });
+  if (!ok) return;
   await deleteDoc(doc(db,'bugs',id));
   showToast('Bug deleted','info');
 };
@@ -3841,7 +3887,14 @@ window.quickReject = async function(id) {
 };
 
 window.deleteRequest = async function(id, title) {
-  if (!confirm(`Delete requests berikut?\n\n"${title}"\n\nTindakan ini tidak dapat dibatalkan.`)) return;
+  const ok = await confirmDialog({
+    title: 'Delete this request?',
+    message: 'Request berikut akan dihapus permanen:',
+    target: title,
+    note: 'Tindakan ini tidak dapat dibatalkan.',
+    confirmText: 'Delete',
+  });
+  if (!ok) return;
   await deleteDoc(doc(db,'requests',id));
   showToast('Request deleted','info');
 };
@@ -4228,7 +4281,14 @@ window.saveClient = async function() {
 };
 
 window.deleteClient = async function(id, name) {
-  if (!confirm(`Delete clients berikut?\n\n"${name}"\n\nTindakan ini tidak dapat dibatalkan.`)) return;
+  const ok = await confirmDialog({
+    title: 'Delete this client?',
+    message: 'Client berikut akan dihapus permanen:',
+    target: name,
+    note: 'Tindakan ini tidak dapat dibatalkan.',
+    confirmText: 'Delete',
+  });
+  if (!ok) return;
   await deleteDoc(doc(db,'clients',id));
   showToast('Client dihapus','info');
 };
@@ -4248,6 +4308,64 @@ window.showToast = function(msg, type='info') {
   document.getElementById('toast-msg').textContent = msg;
   t.className = `toast t-${type} show`;
   const dur = type==='error'?4500:3000; setTimeout(() => t.classList.remove('show'), dur);
+};
+
+// --- CONFIRM DIALOG (replaces native confirm()) ---
+window.confirmDialog = function(opts) {
+  const {
+    title = 'Are you sure?',
+    message = 'This action cannot be undone.',
+    target = '',
+    note = '',
+    confirmText = 'Delete',
+    cancelText = 'Cancel',
+    icon = '\uD83D\uDDD1',
+    variant = 'danger', // danger | warn | info
+  } = opts || {};
+
+  const overlay   = document.getElementById('modal-confirm');
+  const iconEl    = document.getElementById('confirm-icon');
+  const targetEl  = document.getElementById('confirm-target');
+  const noteEl    = document.getElementById('confirm-note');
+  const okBtn     = document.getElementById('confirm-ok-btn');
+  const cancelBtn = document.getElementById('confirm-cancel-btn');
+
+  iconEl.className = 'confirm-icon' + (variant !== 'danger' ? ' ' + variant : '');
+  iconEl.innerHTML = icon;
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-message').textContent = message;
+  if (target) { targetEl.textContent = target; targetEl.style.display = 'inline-block'; }
+  else { targetEl.style.display = 'none'; }
+  if (note) { noteEl.textContent = note; noteEl.style.display = 'block'; }
+  else { noteEl.style.display = 'none'; }
+  okBtn.textContent = confirmText;
+  cancelBtn.textContent = cancelText;
+  okBtn.className = variant === 'danger' ? 'btn-danger' : 'btn-submit';
+  okBtn.style.fontWeight = '700';
+
+  overlay.classList.add('show');
+
+  return new Promise(resolve => {
+    const cleanup = (result) => {
+      overlay.classList.remove('show');
+      okBtn.removeEventListener('click', onOk);
+      cancelBtn.removeEventListener('click', onCancel);
+      overlay.removeEventListener('click', onBackdrop);
+      document.removeEventListener('keydown', onKey);
+      resolve(result);
+    };
+    const onOk = () => cleanup(true);
+    const onCancel = () => cleanup(false);
+    const onBackdrop = (e) => { if (e.target === overlay) cleanup(false); };
+    const onKey = (e) => {
+      if (e.key === 'Escape') cleanup(false);
+      if (e.key === 'Enter') cleanup(true);
+    };
+    okBtn.addEventListener('click', onOk);
+    cancelBtn.addEventListener('click', onCancel);
+    overlay.addEventListener('click', onBackdrop);
+    document.addEventListener('keydown', onKey);
+  });
 };
 
 window.toggleTheme = function() {
