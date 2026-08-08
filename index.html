@@ -819,6 +819,7 @@
         </div>
       </div>
     </div>
+    <div style="padding:0 20px 12px;"><div style="padding:10px 14px;background:var(--inset);border:1.5px solid var(--border);border-radius:10px;display:flex;align-items:center;gap:10px;"><input type="checkbox" id="bug-update-user" style="width:16px;height:16px;cursor:pointer;accent-color:var(--green);"><label for="bug-update-user" style="font-size:13px;font-weight:600;color:var(--text);cursor:pointer;">&#x2713; Update To User <span style="font-size:11px;color:var(--text-dim);font-weight:400;">(communicated to client)</span></label></div></div>
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('modal-bug-form')">Cancel</button>
       <button class="btn-submit" onclick="saveBug()">&#x1F4BE; Save Bug</button>
@@ -1598,7 +1599,7 @@ function renderGanttChart() {
           : 0;
 
       barHtml = `
-        <div onclick="openRequestForm('${r.id}')"
+        <div onclick="openDetail('${r.id}')"
           title="${name} | ${client} | ${STATUS_LABELS[r.status]||r.status}"
           style="position:absolute;left:${s*DAY_W}px;top:7px;width:${w}px;height:${ROW_H-14}px;
                  border-radius:6px;cursor:pointer;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,0.18);
@@ -1617,13 +1618,14 @@ function renderGanttChart() {
 
     // Label column
     rowsLabel += `
-      <div style="height:${ROW_H}px;display:flex;align-items:center;padding:0 10px 0 14px;gap:8px;background:${bg};border-bottom:1px solid var(--border);overflow:hidden;cursor:pointer;" onclick="openRequestForm('${r.id}')">
+      <div style="height:${ROW_H}px;display:flex;align-items:center;padding:0 10px 0 14px;gap:8px;background:${bg};border-bottom:1px solid var(--border);overflow:hidden;cursor:pointer;" onclick="openDetail('${r.id}')">
         <div style="width:6px;height:28px;border-radius:3px;background:${col};flex-shrink:0;"></div>
         <div style="min-width:0;flex:1;">
           <div style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${name}</div>
           <div style="font-size:10px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${client}</div>
         </div>
         <span class="badge badge-status-${r.status}" style="font-size:9px;flex-shrink:0;">${STATUS_LABELS[r.status]||r.status}</span>
+        ${r.redmineUrl?`<a href="${r.redmineUrl}" target="_blank" onclick="event.stopPropagation()" style="font-size:10px;font-weight:700;color:var(--indigo);text-decoration:none;background:var(--indigo-dim);padding:1px 6px;border-radius:4px;flex-shrink:0;">\uD83D\uDD17</a>`:''}
       </div>`;
 
     // Bar row
@@ -1765,7 +1767,7 @@ function renderBugTracker() {
     const rows = g.bugs.map((b,i) => {
       const st = BUG_STATUS[b.status]    || { label:b.status||'?',    color:'#94A3B8', bg:'#F1F5F9' };
       const pr = BUG_PRIORITY[b.priority]|| { label:b.priority||'?',  color:'#fff',    bg:'#94A3B8' };
-      return `<tr style="border-bottom:1px solid var(--border);" onmouseover="this.style.background='var(--inset)'" onmouseout="this.style.background=''">
+      return `<tr class="bug-row" data-status="${b.status}" style="border-bottom:1px solid var(--border);" onmouseover="this.style.background='var(--inset)'" onmouseout="this.style.background=''">
         <td style="padding:9px 12px;font-size:12px;color:var(--text-dim);text-align:center;width:30px;">${i+1}</td>
         <td style="padding:9px 12px;">
           <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.4;">${b.desc||'\u2014'}</div>
@@ -1783,6 +1785,8 @@ function renderBugTracker() {
         </td>
         <td style="padding:9px 12px;font-size:11px;color:var(--text-muted);white-space:nowrap;">${fmtDate(b.dateRelease)}</td>
         <td style="padding:9px 12px;font-size:11px;color:var(--text-muted);">${b.versionNo||'\u2014'}</td>
+        <td style="padding:9px 12px;font-size:11px;color:var(--text-muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${b.notes||'\u2014'}</td>
+        <td style="padding:9px 12px;text-align:center;">${b.updateToUser?`<span style="font-size:11px;font-weight:700;padding:2px 7px;border-radius:12px;background:var(--green-dim);color:var(--green);">\u2713</span>`:`<span style="color:var(--text-dim);">&mdash;</span>`}</td>
         <td style="padding:9px 12px;">
           <div style="display:flex;gap:4px;">
             <button onclick="event.stopPropagation();openBugForm('${b.id}')" title="Edit"
@@ -1795,7 +1799,7 @@ function renderBugTracker() {
     }).join('');
 
     return `
-    <div style="background:var(--card);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--sh-card);margin-bottom:14px;">
+    <div class="bug-group" style="background:var(--card);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--sh-card);margin-bottom:14px;">
       <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--inset);border-bottom:1.5px solid var(--border);">
         <div style="width:36px;height:36px;border-radius:10px;background:${color};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;flex-shrink:0;">${init}</div>
         <div style="flex:1;min-width:0;">
@@ -1818,6 +1822,8 @@ function renderBugTracker() {
               <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:left;width:90px;">Status</th>
               <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:left;width:100px;">Release Date</th>
               <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:left;width:80px;">Version</th>
+              <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:center;width:70px;">Updated</th>
+              <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;text-align:left;width:100px;">Notes</th>
               <th style="width:64px;"></th>
             </tr>
           </thead>
@@ -1828,9 +1834,119 @@ function renderBugTracker() {
   }).join('');
 
   return `
-    <div style="margin-bottom:16px;font-size:13px;color:var(--text-muted);">${allBugs.length} bugs across ${sorted.length} client${sorted.length!==1?'s':''}</div>
+    <div style="margin-bottom:12px;"><input id="bug-search-input" type="text" placeholder="\uD83D\uDD0D Search bugs..." oninput="searchBugs(this.value)" style="width:100%;padding:9px 14px;background:var(--card);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;font-family:inherit;outline:none;" onfocus="this.style.borderColor='var(--indigo)'" onblur="this.style.borderColor='var(--border)'"></div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+      <div style="font-size:13px;color:var(--text-muted);flex:1;">${allBugs.length} bugs across ${sorted.length} client${sorted.length!==1?'s':''}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button onclick="filterBugs('')" id="bug-filter-all" style="padding:4px 12px;border-radius:20px;border:1.5px solid var(--indigo);background:var(--indigo);color:#fff;font-size:11px;font-weight:700;cursor:pointer;">All ${allBugs.length}</button>
+        <button onclick="filterBugs('open')" id="bug-filter-open" style="padding:4px 12px;border-radius:20px;border:1.5px solid #EF4444;background:var(--red-dim);color:#EF4444;font-size:11px;font-weight:700;cursor:pointer;">Open ${allBugs.filter(b=>b.status==='open').length}</button>
+        <button onclick="filterBugs('inprogress')" id="bug-filter-inprogress" style="padding:4px 12px;border-radius:20px;border:1.5px solid #F59E0B;background:var(--amber-dim);color:var(--amber);font-size:11px;font-weight:700;cursor:pointer;">In Progress ${allBugs.filter(b=>b.status==='inprogress').length}</button>
+        <button onclick="filterBugs('testing')" id="bug-filter-testing" style="padding:4px 12px;border-radius:20px;border:1.5px solid #0891B2;background:#e0f2fe;color:#0891B2;font-size:11px;font-weight:700;cursor:pointer;">Testing ${allBugs.filter(b=>b.status==='testing').length}</button>
+        <button onclick="filterBugs('released')" id="bug-filter-released" style="padding:4px 12px;border-radius:20px;border:1.5px solid #7C3AED;background:#ede9fe;color:#7C3AED;font-size:11px;font-weight:700;cursor:pointer;">Released ${allBugs.filter(b=>b.status==='released').length}</button>
+        <button onclick="filterBugs('closed')" id="bug-filter-closed" style="padding:4px 12px;border-radius:20px;border:1.5px solid #10B981;background:var(--green-dim);color:var(--green);font-size:11px;font-weight:700;cursor:pointer;">Closed ${allBugs.filter(b=>b.status==='closed').length}</button>
+      </div>
+    </div>
     ${groupHtml}`;
 }
+
+
+window.searchBugs = function(q) {
+  const query = q.toLowerCase().trim();
+  document.querySelectorAll('.bug-row').forEach(row => {
+    row.style.display = (!query || row.textContent.toLowerCase().includes(query)) ? '' : 'none';
+  });
+  document.querySelectorAll('.bug-group').forEach(grp => {
+    grp.style.display = Array.from(grp.querySelectorAll('.bug-row')).some(r => r.style.display !== 'none') ? '' : 'none';
+  });
+};
+
+window.filterBugs = function(status) {
+  ['all','open','inprogress','testing','released','closed'].forEach(s => {
+    const btn = document.getElementById('bug-filter-' + (s||'all'));
+    if (btn) btn.style.opacity = ((s === status) || (!status && s === 'all')) ? '1' : '0.55';
+  });
+  document.querySelectorAll('.bug-row').forEach(row => {
+    row.style.display = (!status || row.dataset.status === status) ? '' : 'none';
+  });
+  document.querySelectorAll('.bug-group').forEach(grp => {
+    grp.style.display = Array.from(grp.querySelectorAll('.bug-row')).some(r => r.style.display !== 'none') ? '' : 'none';
+  });
+};
+
+
+window.printBugs = async function(clientId) {
+  const cl = allClients.find(x => x.id === clientId);
+  if (!cl) { showToast('Client not found','error'); return; }
+  const bugs = allBugs.filter(b => b.clientId === clientId)
+    .sort((a,b2) => (b2.dateReport||'').localeCompare(a.dateReport||''));
+  const fmtDate = d => d ? new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+  const BP = {urgent:{label:'Urgent',color:'#EF4444'},high:{label:'High',color:'#F59E0B'},normal:{label:'Normal',color:'#0891B2'},low:{label:'Low',color:'#94A3B8'}};
+  const BS = {open:{label:'Open',color:'#EF4444'},inprogress:{label:'In Progress',color:'#F59E0B'},testing:{label:'Testing',color:'#0891B2'},released:{label:'Released',color:'#7C3AED'},closed:{label:'Closed',color:'#10B981'}};
+  const sm = {total:bugs.length,open:bugs.filter(b=>b.status==='open').length,inProg:bugs.filter(b=>b.status==='inprogress').length,rel:bugs.filter(b=>b.status==='released').length,closed:bugs.filter(b=>b.status==='closed').length};
+
+  const rows = bugs.length ? bugs.map((b,i) => {
+    const pr = BP[b.priority]||{label:b.priority||'?',color:'#94A3B8'};
+    const st = BS[b.status]  ||{label:b.status||'?',color:'#94A3B8'};
+    return `<tr style="border-bottom:1px solid #e8edf5;vertical-align:top;">
+      <td style="padding:8px 10px;font-size:12px;color:#777;text-align:center;">${i+1}</td>
+      <td style="padding:8px 10px;font-size:12px;color:#111;max-width:280px;">${b.desc||'—'}</td>
+      <td style="padding:8px 10px;text-align:center;">${b.redmineUrl ? `<a href="${b.redmineUrl}" style="color:#027fb3;font-weight:700;text-decoration:none;">#${b.ticketNo||'Redmine'}</a>` : (b.ticketNo||'—')}</td>
+      <td style="padding:8px 10px;text-align:center;"><span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:${pr.color}18;color:${pr.color};">${pr.label}</span></td>
+      <td style="padding:8px 10px;font-size:11px;color:#555;white-space:nowrap;">${fmtDate(b.dateReport)}</td>
+      <td style="padding:8px 10px;font-size:11px;color:#555;white-space:nowrap;">${fmtDate(b.dateFinish)}</td>
+      <td style="padding:8px 10px;text-align:center;"><span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:${st.color}18;color:${st.color};">${st.label}</span></td>
+      <td style="padding:8px 10px;font-size:11px;color:#555;white-space:nowrap;">${fmtDate(b.dateRelease)}</td>
+      <td style="padding:8px 10px;font-size:11px;color:#555;">${b.versionNo||'—'}</td>
+      <td style="padding:8px 10px;text-align:center;">${b.updateToUser ? '✓' : '&mdash;'}</td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="10" style="padding:20px;text-align:center;color:#aaa;font-style:italic;">No bugs for this client</td></tr>`;
+
+  const printHtml = `<div style="font-family:'Inter',Arial,sans-serif;max-width:960px;margin:0 auto;padding:36px 44px;background:#fff;">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:3px solid #027fb3;margin-bottom:24px;">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <img src="/favicon.png" style="width:40px;height:40px;border-radius:8px;" onerror="this.style.display='none'">
+        <div><div style="font-size:18px;font-weight:800;color:#027fb3;">Konsultama Global Bisnis</div>
+        <div style="font-size:11px;color:#999;">Bug Tracker Report</div></div>
+      </div>
+      <div style="text-align:right;font-size:11px;color:#777;">Printed: ${new Date().toLocaleString('en-GB')}</div>
+    </div>
+    <div style="background:#f0f7ff;border-radius:10px;padding:14px 18px;margin-bottom:16px;">
+      <div style="font-size:16px;font-weight:800;color:#111;margin-bottom:4px;">${cl.name}</div>
+      <div style="font-size:12px;color:#555;">${cl.industry||''}${cl.pic?' · PIC: '+cl.pic:''}</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;">
+      <span style="font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid #ddd;">Total: ${sm.total}</span>
+      ${sm.open?`<span style="font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid #EF4444;color:#DC2626;">Open: ${sm.open}</span>`:''}
+      ${sm.inProg?`<span style="font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid #F59E0B;color:#D97706;">In Progress: ${sm.inProg}</span>`:''}
+      ${sm.rel?`<span style="font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid #7C3AED;color:#7C3AED;">Released: ${sm.rel}</span>`:''}
+      ${sm.closed?`<span style="font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid #10B981;color:#059669;">Closed: ${sm.closed}</span>`:''}
+    </div>
+    <table style="width:100%;border-collapse:collapse;border:1.5px solid #027fb3;">
+      <thead><tr style="background:#027fb3;">
+        <th style="padding:9px 10px;font-size:10px;font-weight:700;color:#fff;text-align:center;width:28px;">#</th>
+        <th style="padding:9px 10px;font-size:10px;font-weight:700;color:#fff;text-align:left;">Description</th>
+        <th style="padding:9px 10px;font-size:10px;font-weight:700;color:#fff;text-align:center;width:70px;">Ticket</th>
+        <th style="padding:9px 10px;font-size:10px;font-weight:700;color:#fff;text-align:center;width:70px;">Priority</th>
+        <th style="padding:9px 10px;font-size:10px;font-weight:700;color:#fff;text-align:left;width:90px;">Report</th>
+        <th style="padding:9px 10px;font-size:10px;font-weight:700;color:#fff;text-align:left;width:90px;">Finish</th>
+        <th style="padding:9px 10px;font-size:10px;font-weight:700;color:#fff;text-align:center;width:80px;">Status</th>
+        <th style="padding:9px 10px;font-size:10px;font-weight:700;color:#fff;text-align:left;width:90px;">Release</th>
+        <th style="padding:9px 10px;font-size:10px;font-weight:700;color:#fff;text-align:left;width:80px;">Version</th>
+        <th style="padding:9px 10px;font-size:10px;font-weight:700;color:#fff;text-align:center;width:60px;">Updated</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div style="display:flex;justify-content:space-between;margin-top:22px;padding-top:10px;border-top:1px solid #e0e7ef;font-size:10px;color:#aaa;">
+      <span>Konsultama Global Bisnis — Bug Tracker</span>
+      <span>${cl.name} · ${bugs.length} bug${bugs.length!==1?'s':''}</span>
+    </div>
+  </div>`;
+
+  const w = window.open('','_blank','width=1100,height=800');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+cl.name+' - Bug Report</title><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"><style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Inter,Arial,sans-serif;background:#fff;}@media print{body{margin:0;}}</style></head><body>'+printHtml+'</body></html>');
+  w.document.close();
+  w.onload = function() { w.focus(); w.print(); };
+};
 
 window.openBugForm = async function(id, prefill={}) {
   openModal('modal-bug-form');
@@ -1852,6 +1968,8 @@ window.openBugForm = async function(id, prefill={}) {
     document.getElementById('bug-date-finish').value  = b.dateFinish||'';
     document.getElementById('bug-date-release').value = b.dateRelease||'';
     document.getElementById('bug-version').value      = b.versionNo||'';
+    const utu = document.getElementById('bug-update-user');
+    if (utu) utu.checked = b.updateToUser || false;
     document.getElementById('bug-notes').value        = b.notes||'';
     document.getElementById('bug-client-badge-name').textContent = b.client||'\u2014';
     document.getElementById('bug-client-badge').style.display = 'flex';
@@ -1901,6 +2019,7 @@ window.saveBug = async function() {
     redmineUrl:  document.getElementById('bug-redmine').value.trim(),
     priority:    document.getElementById('bug-priority').value,
     status:      document.getElementById('bug-status').value,
+    updateToUser: document.getElementById('bug-update-user')?.checked || false,
     dateReport:  document.getElementById('bug-date-report').value,
     dateFinish:  document.getElementById('bug-date-finish').value,
     dateRelease: document.getElementById('bug-date-release').value,
@@ -1974,6 +2093,8 @@ function renderDashboard() {
       '<div class="stat-card s-pending"><div class="stat-icon">\u23F3</div><div class="stat-num">' + pending.length + '</div><div class="stat-label">Awaiting Approval</div></div>' +
       '<div class="stat-card s-validated"><div class="stat-icon">\u26A1</div><div class="stat-num">' + approved.length + '</div><div class="stat-label">In Progress</div></div>' +
       '<div class="stat-card s-done"><div class="stat-icon">\u2705</div><div class="stat-num">' + done + '</div><div class="stat-label">Done</div></div>' +
+      '<div class="stat-card" style="border-top:3px solid #EF4444;background:var(--card);border:1.5px solid var(--border);box-shadow:var(--sh-card);border-top-width:3px;"><div class="stat-icon" style="color:#EF4444;">\uD83D\uDC1B</div><div class="stat-num" style="color:#EF4444;">' + allBugs.filter(b=>b.status==="open").length + '</div><div class="stat-label">Open Bugs</div></div>' +
+      '<div class="stat-card" style="border-top:3px solid #10B981;background:var(--card);border:1.5px solid var(--border);box-shadow:var(--sh-card);border-top-width:3px;"><div class="stat-icon" style="color:#10B981;">\uD83D\uDEE1</div><div class="stat-num" style="color:#10B981;">' + allBugs.filter(b=>b.status==="closed").length + '</div><div class="stat-label">Bugs Closed</div></div>' +
     '</div>' +
 
     // STATUS OVERVIEW + TYPE CHART
@@ -2536,7 +2657,7 @@ function renderTimelineCard(r) {
       ? `\u26A0 ${Math.abs(countdown)} hari telah overdue`
       : countdown === 0
         ? '\uD83D\uDD34 Deadline hari ini!'
-        : `\u23F1 ${countdown} hari lagi`;
+        : `\u23F1 ${countdown} h left`;
     countdownHtml = `<div style="margin-top:8px;padding:5px 10px;background:${bg};border-radius:6px;font-size:11px;font-weight:700;color:${color};text-align:center;">${label}</div>`;
   }
 
@@ -2719,7 +2840,7 @@ function renderValidateCard(r) {
     <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;
       background:${countdown<0?'var(--red-dim)':countdown<=3?'var(--amber-dim)':'var(--green-dim)'};
       color:${countdown<0?'var(--red)':countdown<=3?'var(--amber)':'var(--green)'};">
-      ${countdown<0?'\u26A0 '+Math.abs(countdown)+' hari lewat':countdown===0?'\uD83D\uDD34 Today':'\u23F1 '+countdown+' hari lagi'}
+      ${countdown<0?'\u26A0 '+Math.abs(countdown)+' h overdue':countdown===0?'\uD83D\uDD34 Today':'\u23F1 '+countdown+' h left'}
     </span>` : '';
   return `
     <div style="background:var(--card);border:2px solid var(--amber-dim);border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(217,119,6,0.10);">
@@ -2768,7 +2889,7 @@ function renderValidateCard(r) {
             style="padding:10px 14px;background:var(--inset);border:1.5px solid var(--border-md);border-radius:9px;font-size:13px;font-weight:700;color:var(--text-muted);cursor:pointer;font-family:inherit;transition:all .15s;"
             onmouseover="this.style.color='var(--indigo)';this.style.borderColor='var(--indigo)'"
             onmouseout="this.style.color='var(--text-muted)';this.style.borderColor='var(--border-md)'">
-            \uD83D\uDC41 Lihat Detail
+            \uD83D\uDC41 View Detail
           </button>
           <div style="display:flex;gap:6px;align-items:center;flex:1;min-width:200px;">
             <input id="reject-reason-${r.id}" style="flex:1;padding:9px 12px;background:var(--inset);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-size:12px;font-family:inherit;outline:none;"
@@ -2817,7 +2938,7 @@ function renderDevBoard() {
           <!-- priority dot -->
           <div style="position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:10px 0 0 10px;background:${r.priority==='high'?'#EF4444':r.priority==='medium'?'#F59E0B':'#94A3B8'};"></div>
           <div style="padding-left:6px;">
-            <div onclick="openDetail('${r.id}')" style="font-size:12px;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:4px;cursor:pointer;padding-right:16px;">${r.name||r.title||'\u2014'}</div>
+            <div onclick="openDetail('${r.id}')" style="font-size:12px;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:4px;cursor:pointer;padding-right:16px;text-decoration:underline dotted;text-underline-offset:2px;">${r.name||r.title||'\u2014'}</div>
             <div style="font-size:10px;color:var(--text-dim);margin-bottom:8px;">${r.client||'\u2014'}</div>
             <!-- progress bar -->
             <div style="height:3px;background:var(--border-md);border-radius:2px;margin-bottom:8px;overflow:hidden;">
@@ -3010,7 +3131,7 @@ function renderDetailBody(r) {
         ${r.dateDeadline ? `<div style="background:${calcCountdown(r.dateDeadline)<0?'var(--red-dim)':calcCountdown(r.dateDeadline)<=3?'var(--amber-dim)':'var(--inset)'};border:1px solid ${calcCountdown(r.dateDeadline)<0?'rgba(220,38,38,0.25)':calcCountdown(r.dateDeadline)<=3?'rgba(217,119,6,0.25)':'var(--border)'};border-radius:8px;padding:10px 12px;">
           <div style="font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Target Deadline</div>
           <div style="font-size:13px;font-weight:800;color:${calcCountdown(r.dateDeadline)<0?'var(--red)':calcCountdown(r.dateDeadline)<=3?'var(--amber)':'var(--text)'};">${formatDate(r.dateDeadline)}</div>
-          ${calcCountdown(r.dateDeadline)!==null ? `<div style="font-size:11px;font-weight:700;margin-top:3px;color:${calcCountdown(r.dateDeadline)<0?'var(--red)':calcCountdown(r.dateDeadline)<=3?'var(--amber)':'var(--green)'};">${calcCountdown(r.dateDeadline)<0?'\u26A0 '+Math.abs(calcCountdown(r.dateDeadline))+' hari terlewat':calcCountdown(r.dateDeadline)===0?'\uD83D\uDD34 Today!':'\u23F1 '+calcCountdown(r.dateDeadline)+' hari lagi'}</div>` : ''}
+          ${calcCountdown(r.dateDeadline)!==null ? `<div style="font-size:11px;font-weight:700;margin-top:3px;color:${calcCountdown(r.dateDeadline)<0?'var(--red)':calcCountdown(r.dateDeadline)<=3?'var(--amber)':'var(--green)'};">${calcCountdown(r.dateDeadline)<0?'\u26A0 '+Math.abs(calcCountdown(r.dateDeadline))+' hari terlewat':calcCountdown(r.dateDeadline)===0?'\uD83D\uDD34 Today!':'\u23F1 '+calcCountdown(r.dateDeadline)+' h left'}</div>` : ''}
         </div>` : ''}
         ${r.dateStart ? `<div style="background:var(--inset);border:1px solid var(--border);border-radius:8px;padding:10px 12px;">
           <div style="font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Estimated Start</div>
@@ -3405,7 +3526,7 @@ function renderAttachThumbs(rowId) {
         style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:var(--red);color:#fff;border:none;font-size:10px;cursor:pointer;line-height:1;">\u2715</button>
     </div>`);
   });
-  wrap.innerHTML = thumbs.join('') || `<span style="font-size:11px;color:var(--text-dim);font-style:italic;">Belum ada gambar</span>`;
+  wrap.innerHTML = thumbs.join('') || `<span style="font-size:11px;color:var(--text-dim);font-style:italic;">No image uploaded</span>`;
 }
 
 window.removeExistingAttach = function(rowId, idx) {
