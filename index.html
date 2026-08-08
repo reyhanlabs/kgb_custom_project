@@ -943,38 +943,50 @@
         </div>
       </div>
       <div class="nav-section">
-        <div class="nav-label">Main Menu</div>
+
+        <!-- Master Data -->
+        <div class="nav-label">Master Data</div>
+        <div id="nav-clients" class="nav-item" data-page="clients" onclick="navigate('clients')" style="display:none">
+          <div class="nav-icon-pill"><span>&#x1F3E2;</span></div>
+          <span class="nav-text">Clients</span>
+        </div>
+
+        <!-- Custom Request -->
+        <div class="nav-label">Custom Request</div>
         <div class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')">
-          <div class="nav-icon-pill"><span>⊞</span></div>
+          <div class="nav-icon-pill"><span>&#x229E;</span></div>
           <span class="nav-text">Dashboard</span>
         </div>
         <div class="nav-item" data-page="requests" onclick="navigate('requests')">
-          <div class="nav-icon-pill"><span>📋</span></div>
+          <div class="nav-icon-pill"><span>&#x1F4CB;</span></div>
           <span class="nav-text">Custom Request</span>
           <span class="nav-badge" id="badge-pending" style="display:none">0</span>
         </div>
         <div id="nav-validate" class="nav-item" data-page="validate" onclick="navigate('validate')" style="display:none">
-          <div class="nav-icon-pill"><span>✓</span></div>
+          <div class="nav-icon-pill"><span>&#x2713;</span></div>
           <span class="nav-text">Needs Approval</span>
           <span class="nav-badge" id="badge-validate" style="display:none">0</span>
         </div>
         <div id="nav-dev" class="nav-item" data-page="devboard" onclick="navigate('devboard')" style="display:none">
-          <div class="nav-icon-pill"><span>◈</span></div>
+          <div class="nav-icon-pill"><span>&#x25C8;</span></div>
           <span class="nav-text">Dev Board</span>
-        </div>
-        <div id="nav-bugtracker" class="nav-item" data-page="bugtracker" onclick="navigate('bugtracker')" style="display:none">
-          <div class="nav-icon-pill"><span>&#x1F41B;</span></div>
-          <span class="nav-text">Bug Tracker</span>
-        </div>
-        <div class="nav-label" id="nav-label-master">Master Data</div>
-        <div id="nav-clients" class="nav-item" data-page="clients" onclick="navigate('clients')" style="display:none">
-          <div class="nav-icon-pill"><span>&#x1F3E2;</span></div>
-          <span class="nav-text">Clients</span>
         </div>
         <div id="nav-gantt" class="nav-item" data-page="gantt" onclick="navigate('gantt')" style="display:none">
           <div class="nav-icon-pill"><span>&#x1F4C5;</span></div>
           <span class="nav-text">Gantt Chart</span>
         </div>
+
+        <!-- Bug Tracker -->
+        <div class="nav-label">Bug Tracker</div>
+        <div id="nav-bugdash" class="nav-item" data-page="bugdash" onclick="navigate('bugdash')" style="display:none">
+          <div class="nav-icon-pill"><span>&#x1F4CA;</span></div>
+          <span class="nav-text">Dashboard</span>
+        </div>
+        <div id="nav-bugtracker" class="nav-item" data-page="bugtracker" onclick="navigate('bugtracker')" style="display:none">
+          <div class="nav-icon-pill"><span>&#x1F41B;</span></div>
+          <span class="nav-text">Bug Tracker</span>
+        </div>
+
       </div>
       <div class="sidebar-user">
         <div class="user-row">
@@ -1390,6 +1402,7 @@ function showApp() {
   document.getElementById('nav-dev').style.display = 'flex';
   document.getElementById('nav-validate').style.display = 'flex';
   document.getElementById('nav-gantt').style.display = 'flex';
+  document.getElementById('nav-bugdash').style.display = 'flex';
   document.getElementById('nav-bugtracker').style.display = 'flex';
   // start listening
   listenRequests();
@@ -1503,6 +1516,7 @@ const PAGE_TITLES = {
   validate:      ['Needs Approval',  'Review and approve custom requests from clients'],
   devboard:      ['Dev Board',       'Track and update requests progress'],
   gantt:         ['Gantt Chart',  'Visual timeline of all custom requests'],
+  bugdash:       ['Bug Tracker Dashboard', 'Overview and statistics for all bugs'],
   bugtracker:    ['Bug Tracker',   'Track and manage bugs per client'],
   clients:       ['Clients',      'Master data for all clients'],
   'client-detail': ['',              ''],
@@ -1553,6 +1567,7 @@ function renderPage(page) {
   else if (page === 'devboard')   c.innerHTML = renderDevBoard();
   else if (page === 'clients')    c.innerHTML = renderClientsPage();
   else if (page === 'gantt')       c.innerHTML = renderGanttChart();
+  else if (page === 'bugdash')     c.innerHTML = renderBugDashboard();
   else if (page === 'bugtracker')  c.innerHTML = renderBugTracker();
 }
 
@@ -1817,6 +1832,144 @@ document.addEventListener('mousemove', function(e){
   const t=document.getElementById('bt-global-tip');
   if(t&&t.style.display!=='none') _btTipPos(e.clientX,e.clientY);
 });
+
+function renderBugDashboard() {
+  const total      = allBugs.length;
+  const open       = allBugs.filter(b => b.status === 'open').length;
+  const inProgress = allBugs.filter(b => b.status === 'inprogress').length;
+  const testing    = allBugs.filter(b => b.status === 'testing').length;
+  const released   = allBugs.filter(b => b.status === 'released').length;
+  const closed     = allBugs.filter(b => b.status === 'closed').length;
+
+  const groups = {};
+  allBugs.forEach(b => {
+    const key = b.clientId || ('__' + b.client);
+    if (!groups[key]) groups[key] = { name: b.client || 'Unknown', bugs: [] };
+    groups[key].bugs.push(b);
+  });
+  const clientList = Object.values(groups).sort((a, b) => b.bugs.length - a.bugs.length);
+  const recent = [...allBugs]
+    .sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0))
+    .slice(0, 8);
+
+  const fmtDate = d => d ? new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) : '\u2014';
+  const ST = {
+    open:       { label: 'Open',        color: '#EF4444', bg: 'var(--red-dim)' },
+    inprogress: { label: 'In Progress', color: '#F59E0B', bg: 'var(--amber-dim)' },
+    testing:    { label: 'Testing',     color: '#0891B2', bg: '#e0f2fe' },
+    released:   { label: 'Released',    color: '#7C3AED', bg: '#ede9fe' },
+    closed:     { label: 'Closed',      color: '#10B981', bg: 'var(--green-dim)' },
+  };
+
+  const statCards = [
+    { label: 'Total Bugs',  value: total,      color: '#027fb3', icon: '\uD83D\uDC1B' },
+    { label: 'Open',        value: open,       color: '#EF4444', icon: '\uD83D\uDD34' },
+    { label: 'In Progress', value: inProgress, color: '#F59E0B', icon: '\u26A1' },
+    { label: 'Testing',     value: testing,    color: '#0891B2', icon: '\uD83D\uDD0D' },
+    { label: 'Released',    value: released,   color: '#7C3AED', icon: '\uD83D\uDE80' },
+    { label: 'Closed',      value: closed,     color: '#10B981', icon: '\u2705' },
+  ].map(s => `
+    <div style="background:var(--card);border:1.5px solid var(--border);border-top:3px solid ${s.color};border-radius:14px;padding:16px 18px;box-shadow:var(--sh-card);">
+      <div style="font-size:22px;margin-bottom:6px;">${s.icon}</div>
+      <div style="font-size:26px;font-weight:800;color:${s.color};line-height:1;">${s.value}</div>
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-top:4px;text-transform:uppercase;letter-spacing:.06em;">${s.label}</div>
+    </div>`).join('');
+
+  const statusBars = total > 0 ? [
+    { label: 'Open',        count: open,       color: '#EF4444' },
+    { label: 'In Progress', count: inProgress, color: '#F59E0B' },
+    { label: 'Testing',     count: testing,    color: '#0891B2' },
+    { label: 'Released',    count: released,   color: '#7C3AED' },
+    { label: 'Closed',      count: closed,     color: '#10B981' },
+  ].filter(s => s.count > 0).map(s => `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+      <div style="font-size:12px;color:var(--text-muted);width:80px;flex-shrink:0;">${s.label}</div>
+      <div style="flex:1;height:8px;background:var(--inset);border-radius:4px;overflow:hidden;">
+        <div style="height:100%;width:${Math.round(s.count/total*100)}%;background:${s.color};border-radius:4px;"></div>
+      </div>
+      <div style="font-size:12px;font-weight:800;color:${s.color};width:28px;text-align:right;">${s.count}</div>
+    </div>`).join('') : '<div style="color:var(--text-dim);font-size:13px;font-style:italic;">No bugs yet</div>';
+
+  const maxBugs = Math.max(...clientList.map(g => g.bugs.length), 1);
+  const clientBars = clientList.slice(0, 8).map(g => {
+    const gOpen = g.bugs.filter(b => b.status === 'open').length;
+    return `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+      <div style="font-size:11px;color:var(--text-muted);width:110px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${g.name}">${g.name}</div>
+      <div style="flex:1;height:8px;background:var(--inset);border-radius:4px;overflow:hidden;">
+        <div style="height:100%;width:${Math.round(g.bugs.length/maxBugs*100)}%;background:var(--indigo);border-radius:4px;"></div>
+      </div>
+      <div style="font-size:12px;font-weight:800;color:var(--indigo);width:24px;text-align:right;">${g.bugs.length}</div>
+      ${gOpen > 0 ? `<span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;background:var(--red-dim);color:#EF4444;white-space:nowrap;">${gOpen} open</span>` : ''}
+    </div>`;
+  }).join('');
+
+  const recentRows = recent.map((b, i) => {
+    const st = ST[b.status] || { label: b.status, color: '#94A3B8', bg: 'var(--inset)' };
+    return `
+    <tr style="border-bottom:1px solid var(--border);" onmouseover="this.style.background='var(--inset)'" onmouseout="this.style.background=''">
+      <td style="padding:9px 12px;font-size:12px;color:var(--text-dim);text-align:center;width:28px;">${i+1}</td>
+      <td style="padding:9px 12px;max-width:220px;">
+        <div class="bt-tip-desc" style="font-size:12px;font-weight:600;color:var(--text);"
+          onmouseenter="btTipShow(event,this.innerText)" onmouseleave="btTipHide()"
+        >${b.desc || '\u2014'}</div>
+      </td>
+      <td style="padding:9px 12px;font-size:11px;color:var(--text-muted);white-space:nowrap;">${b.client || '\u2014'}</td>
+      <td style="padding:9px 12px;white-space:nowrap;">
+        <span style="font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;background:${st.bg};color:${st.color};">${st.label}</span>
+      </td>
+      <td style="padding:9px 12px;font-size:11px;color:var(--text-muted);white-space:nowrap;">${fmtDate(b.dateReport)}</td>
+    </tr>`;
+  }).join('');
+
+  if (!total) return `
+    <div style="text-align:center;padding:80px 20px;">
+      <div style="font-size:48px;opacity:.25;margin-bottom:16px;">\uD83D\uDC1B</div>
+      <div style="font-size:16px;font-weight:700;color:var(--text-muted);">No bugs tracked yet</div>
+      <div style="font-size:13px;color:var(--text-dim);margin-top:6px;">Go to <strong>Bug Tracker</strong> and log your first bug</div>
+    </div>`;
+
+  return `
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;">
+        ${statCards}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div style="background:var(--card);border:1.5px solid var(--border);border-top:3px solid #EF4444;border-radius:14px;padding:18px 20px;box-shadow:var(--sh-card);">
+          <div style="font-size:10px;font-weight:800;color:#EF4444;text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px;">Status Breakdown</div>
+          ${statusBars}
+        </div>
+        <div style="background:var(--card);border:1.5px solid var(--border);border-top:3px solid var(--indigo);border-radius:14px;padding:18px 20px;box-shadow:var(--sh-card);">
+          <div style="font-size:10px;font-weight:800;color:var(--indigo);text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px;">Bugs per Client</div>
+          ${clientBars || '<div style="color:var(--text-dim);font-size:13px;font-style:italic;">No data</div>'}
+        </div>
+      </div>
+      <div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--sh-card);">
+        <div style="padding:14px 18px;border-bottom:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:13px;font-weight:800;color:var(--text);">\uD83D\uDD52 Recent Bugs</div>
+          <button onclick="navigate('bugtracker')"
+            style="font-size:11px;font-weight:700;color:var(--indigo);background:var(--indigo-dim);border:none;border-radius:8px;padding:5px 12px;cursor:pointer;">
+            View All \u2192
+          </button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;min-width:500px;">
+            <thead>
+              <tr style="border-bottom:1.5px solid var(--border);">
+                <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;text-align:center;width:28px;">#</th>
+                <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;text-align:left;">Description</th>
+                <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;text-align:left;width:120px;">Client</th>
+                <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;text-align:left;width:90px;">Status</th>
+                <th style="padding:8px 12px;font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase;text-align:left;width:90px;">Report</th>
+              </tr>
+            </thead>
+            <tbody>${recentRows}</tbody>
+          </table>
+        </div>
+      </div>
+    </div>`;
+}
+
 
 // --- BUG TRACKER ---
 const BUG_STATUS = {
