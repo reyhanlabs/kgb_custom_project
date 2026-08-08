@@ -213,6 +213,7 @@
     cursor:pointer; box-shadow:0 4px 14px rgba(99,102,241,0.3); transition:opacity .15s;
   }
   .btn-submit:hover { opacity:.9; }
+  .btn-submit:disabled { opacity:.6; cursor:not-allowed; }
   .btn-approve {
     padding:9px 16px; background:linear-gradient(135deg,#10B981,#059669); color:#fff;
     border:none; border-radius:var(--radius); font-size:13px; font-family:inherit;
@@ -881,7 +882,7 @@
     <div style="padding:0 20px 12px;"><div style="padding:10px 14px;background:var(--inset);border:1.5px solid var(--border);border-radius:10px;display:flex;align-items:center;gap:10px;"><input type="checkbox" id="bug-update-user" style="width:16px;height:16px;cursor:pointer;accent-color:var(--green);"><label for="bug-update-user" style="font-size:13px;font-weight:600;color:var(--text);cursor:pointer;">&#x2713; Update To User <span style="font-size:11px;color:var(--text-dim);font-weight:400;">(communicated to client)</span></label></div></div>
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('modal-bug-form')">Cancel</button>
-      <button class="btn-submit" onclick="saveBug()">&#x1F4BE; Save Bug</button>
+      <button class="btn-submit" id="btn-save-bug" onclick="saveBug()">&#x1F4BE; Save Bug</button>
     </div>
   </div>
 </div>
@@ -1105,7 +1106,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('modal-client-form')">Cancel</button>
-      <button class="btn-submit" onclick="saveClient()">Save Client</button>
+      <button class="btn-submit" id="btn-save-client" onclick="saveClient()">Save Client</button>
     </div>
   </div>
 </div>
@@ -1172,7 +1173,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('modal-request-form')">Cancel</button>
-      <button class="btn-submit" onclick="saveRequest()">&#x1F4BE; Save Request</button>
+      <button class="btn-submit" id="btn-save-request" onclick="saveRequest()">&#x1F4BE; Save Request</button>
     </div>
   </div>
 </div>
@@ -2145,14 +2146,23 @@ window.saveBug = async function() {
     notes:       document.getElementById('bug-notes').value.trim(),
     updatedAt:   serverTimestamp(),
   };
-  if (editId) {
-    await updateDoc(doc(db,'bugs',editId), payload);
-    showToast('\u2713 Bug updated successfully','success');
-  } else {
-    await addDoc(collection(db,'bugs'), { ...payload, createdAt: serverTimestamp() });
-    showToast('\u2713 Bug logged successfully','success');
+  const btn = document.getElementById('btn-save-bug');
+  const originalLabel = btn ? btn.innerHTML : '';
+  if (btn) { btn.disabled = true; btn.innerHTML = 'Menyimpan...'; }
+  try {
+    if (editId) {
+      await updateDoc(doc(db,'bugs',editId), payload);
+      showToast('\u2713 Bug updated successfully','success');
+    } else {
+      await addDoc(collection(db,'bugs'), { ...payload, createdAt: serverTimestamp() });
+      showToast('\u2713 Bug logged successfully','success');
+    }
+    closeModal('modal-bug-form');
+  } catch (err) {
+    showToast('Gagal menyimpan bug: ' + err.message, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = originalLabel; }
   }
-  closeModal('modal-bug-form');
 };
 
 window.deleteBug = async function(id) {
@@ -3673,18 +3683,25 @@ async function uploadItemAttachments(rowId) {
   // File fisiknya tetap ada di Cloudinary (unsigned upload tidak bisa hapus dari client tanpa API secret) - dampaknya minor karena kuota gratis cukup besar.
   const kept = store ? store.existing.slice() : [];
   if (store && store.newFiles.length) {
-    for (const f of store.newFiles) {
+    // Upload semua file SEKALIGUS (paralel), bukan satu-satu, biar jauh lebih cepat
+    const uploaded = await Promise.all(store.newFiles.map(async f => {
       const formData = new FormData();
       formData.append('file', f);
       formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
       formData.append('folder', 'custom-requests');
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
-        method: 'POST', body: formData
-      });
-      if (!res.ok) { showToast(`Gagal upload ${f.name}`, 'error'); continue; }
-      const data = await res.json();
-      kept.push({ url: data.secure_url, name: f.name, publicId: data.public_id });
-    }
+      try {
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+          method: 'POST', body: formData
+        });
+        if (!res.ok) { showToast(`Gagal upload ${f.name}`, 'error'); return null; }
+        const data = await res.json();
+        return { url: data.secure_url, name: f.name, publicId: data.public_id };
+      } catch (err) {
+        showToast(`Gagal upload ${f.name}`, 'error');
+        return null;
+      }
+    }));
+    uploaded.forEach(u => { if (u) kept.push(u); });
   }
   return kept;
 }
@@ -3842,36 +3859,46 @@ window.saveRequest = async function() {
   const priority = document.getElementById('req-priority')?.value || 'medium';
   const notes    = document.getElementById('req-notes')?.value.trim() || '';
   const baseDate = new Date().toISOString().split('T')[0];
-  showToast('Menyimpan...', 'info');
-  if (editId) {
-    const item = items[0];
-    const attachments = await uploadItemAttachments(item.rowId);
-    await updateDoc(doc(db, 'requests', editId), {
-      name: item.name, type: item.type||'', desc: item.desc||'',
-      specs: item.specs||[], dateRequest: item.dateRequest||baseDate,
-      dateDeadline: item.dateDeadline||'', duration: item.duration||'',
-      redmineUrl: item.redmineUrl||'',
-      priority, clientId, client, notes, attachments, updatedAt: serverTimestamp()
-    });
-    delete itemAttachments[item.rowId];
-    showToast('\u2713 Request updated successfully', 'success');
-  } else {
-    await Promise.all(items.map(async item => {
+  const btn = document.getElementById('btn-save-request');
+  const originalLabel = btn ? btn.innerHTML : '';
+  const hasAttachments = items.some(it => (itemAttachments[it.rowId]?.newFiles?.length || 0) > 0);
+  if (btn) { btn.disabled = true; btn.innerHTML = hasAttachments ? 'Mengupload gambar...' : 'Menyimpan...'; }
+  showToast(hasAttachments ? 'Mengupload gambar & menyimpan...' : 'Menyimpan...', 'info');
+  try {
+    if (editId) {
+      const item = items[0];
       const attachments = await uploadItemAttachments(item.rowId);
-      await addDoc(collection(db, 'requests'), {
+      await updateDoc(doc(db, 'requests', editId), {
         name: item.name, type: item.type||'', desc: item.desc||'',
         specs: item.specs||[], dateRequest: item.dateRequest||baseDate,
         dateDeadline: item.dateDeadline||'', duration: item.duration||'',
-        priority, clientId, client, notes, attachments,
-        status: 'pending', submittedBy: currentUser.uid,
-        submittedByName: currentUserData?.name || currentUser.email,
-        createdAt: serverTimestamp(), updatedAt: serverTimestamp(), comments: []
+        redmineUrl: item.redmineUrl||'',
+        priority, clientId, client, notes, attachments, updatedAt: serverTimestamp()
       });
       delete itemAttachments[item.rowId];
-    }));
-    showToast('\u2713 ' + items.length + ' requests sent successfully!', 'success');
+      showToast('\u2713 Request updated successfully', 'success');
+    } else {
+      await Promise.all(items.map(async item => {
+        const attachments = await uploadItemAttachments(item.rowId);
+        await addDoc(collection(db, 'requests'), {
+          name: item.name, type: item.type||'', desc: item.desc||'',
+          specs: item.specs||[], dateRequest: item.dateRequest||baseDate,
+          dateDeadline: item.dateDeadline||'', duration: item.duration||'',
+          priority, clientId, client, notes, attachments,
+          status: 'pending', submittedBy: currentUser.uid,
+          submittedByName: currentUserData?.name || currentUser.email,
+          createdAt: serverTimestamp(), updatedAt: serverTimestamp(), comments: []
+        });
+        delete itemAttachments[item.rowId];
+      }));
+      showToast('\u2713 ' + items.length + ' requests sent successfully!', 'success');
+    }
+    closeModal('modal-request-form');
+  } catch (err) {
+    showToast('Gagal menyimpan request: ' + err.message, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = originalLabel; }
   }
-  closeModal('modal-request-form');
 };
 
 window.quickApprove = async function(id) {
@@ -4269,15 +4296,24 @@ window.saveClient = async function() {
     updatedAt: serverTimestamp(),
   };
   const editId = document.getElementById('client-edit-id').value;
-  if (editId) {
-    await updateDoc(doc(db,'clients',editId), data);
-    showToast('\u2713 Data clients updated successfully','success');
-  } else {
-    data.createdAt = serverTimestamp();
-    await addDoc(collection(db,'clients'), data);
-    showToast('\u2713 Client berhasil diaddkan','success');
+  const btn = document.getElementById('btn-save-client');
+  const originalLabel = btn ? btn.innerHTML : '';
+  if (btn) { btn.disabled = true; btn.innerHTML = 'Menyimpan...'; }
+  try {
+    if (editId) {
+      await updateDoc(doc(db,'clients',editId), data);
+      showToast('\u2713 Data clients updated successfully','success');
+    } else {
+      data.createdAt = serverTimestamp();
+      await addDoc(collection(db,'clients'), data);
+      showToast('\u2713 Client berhasil diaddkan','success');
+    }
+    closeModal('modal-client-form');
+  } catch (err) {
+    showToast('Gagal menyimpan client: ' + err.message, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = originalLabel; }
   }
-  closeModal('modal-client-form');
 };
 
 window.deleteClient = async function(id, name) {
